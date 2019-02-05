@@ -1,0 +1,99 @@
+\documentclass{scrbook}
+
+
+
+\usepackage[T1]{fontenc} 
+\usepackage[utf8]{inputenc}
+\usepackage[danish]{babel}
+\usepackage{mathpazo}
+\usepackage{microtype}
+\usepackage{booktabs}
+
+\newcommand{\NN}{\mathbf N}
+\newcommand{\ZZ}{\mathbf Z}
+\newcommand{\RR}{\mathbf R}
+\newcommand{\QQ}{\mathbf Q}
+\newcommand{\ddiv}{\operatorname{div}}
+
+\newcommand{\varname}[1]{\operatorname{\emph{#1}}}
+\newcommand{\Procedure}{\operatorname{\textbf{Procedure~}}}
+\newcommand{\Function}{\operatorname{\textbf{Funktion~}}}
+\newcommand{\Class}{\operatorname{\textbf{Klasse~}}}
+\newcommand{\Constant}{\operatorname{\textbf{Konstant~}}}
+\newcommand{\of}{\operatorname{\textbf{af~}}}
+\newcommand{\iif}{\operatorname{\textbf{hvis~}}}
+\newcommand{\tthen}{\operatorname{\textbf{:~}}}
+\newcommand{\eelse}{\operatorname{\textbf{ellers~}}}
+\newcommand{\return}{\operatorname{\textbf{returner~}}}
+\newcommand{\while}{\operatorname{\textbf{mens~}}}
+\newcommand{\ddo}{\operatorname{\textbf{udfør}}}
+\newcommand{\allocate}{\operatorname{\textbf{alloker~}}}
+\newcommand{\dispose}{\operatorname{\textbf{afalloker~}}}
+\newcommand{\PointerTo}{\operatorname{\textbf{Peger på~}}}
+\newcommand{\adressof}{\operatorname{\textbf{adressen på~}}}
+\newcommand{\invariant}{\operatorname{\textbf{invariant~}}}
+\newcommand{\assert}{\operatorname{\textbf{antag~}}}
+\newcommand{\this}{\operatorname{\textbf{dette}}}
+
+\newcommand{\Array}{\varname{Række}}
+
+\newcommand{\List}{\operatorname{\emph{Liste}}}
+\newcommand{\Handle}{\operatorname{\emph{Greb}}}
+\newcommand{\Node}{\operatorname{\emph{Knude}}}
+\newcommand{\Element}{\operatorname{\emph{Element}}}
+\newcommand{\size}{\operatorname{\emph{størrelse}}}
+\newcommand{\splice}{\operatorname{\emph{splejs}}}
+\newcommand{\moveAfter}{\operatorname{\emph{flytEfter}}}
+\newcommand{\nnext}{\varname{næste}}
+\newcommand{\prev}{\varname{forrige}}
+
+\usepackage{amsmath}
+\usepackage{amsthm}
+\newtheorem{lem}{Lemma}[chapter]
+\newtheorem{cor}{Korollar}[chapter]
+\newtheorem{thm}{Sætning}[chapter]
+\theoremstyle{definition}
+\newtheorem{exerc}{Opgave}[chapter]
+\renewcommand*{\proofname}{Bevis}
+
+
+\usepackage{xcolor}
+\definecolor{callout}{RGB}{150, 35, 31}
+\definecolor{myblue}{RGB}{200, 200, 255}
+\usepackage{tikz}
+\usetikzlibrary{arrows}  
+\usetikzlibrary{positioning}  
+\usetikzlibrary{backgrounds}  
+\usetikzlibrary{shapes.multipart}  
+
+\usepackage{multirow}
+\usepackage{enumerate}
+
+\newcommand{\comment}[1]{\textcolor{callout}{/\!\!/ #1}}
+
+\title{Algoritmer og datastrukturer}
+\subtitle{Grundværktøjerne}
+\author{Martin Dietzfelbinger \and Kurt Mehlhorn \and Peter Sanders}
+
+
+\begin{document}
+\maketitle
+\setcounter{chapter}{1}
+\chapter{Inledning}
+%\setcounter{section}{1}
+%  \input{2-2.tex}
+\setcounter{section}{8}
+  \input{2-9.tex}
+
+\chapter{Fremstilling af følger med rækker og hægtede lister}
+\input{3-0.tex}
+
+\setcounter{chapter}{10}
+\chapter{Minimale spændetræer}
+\setcounter{section}{3}
+\input{11-4.tex}
+
+\appendix
+\chapter{Appendiks}
+\input{appendix.tex}
+\end{document}

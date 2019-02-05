@@ -1,0 +1,355 @@
+\section{Foren-og-find}
+
+En \emph{klassedeling} af en mængde $M$ er en familie $M_1,\ldots, M_k$ af delmængder af $M$ sådan at delmængderne er disjunkte og sammen dækker $M$, dvs. at der gælder $M_i\cap M_j=\emptyset$ for $i\neq j$ og $M=M_1\cup \cdots\cup M_k$. 
+En mængde $M_i$ kaldes en \emph{klasse} i klassedelingen.
+For eksempel leder skoven $T$ i Kruskals algoritme til en klassedeling af knudemængden $V$.
+Klassedelingens klasser er sammenhængskomponenterne i $(V,T)$.
+Der kan forekomme trivielle komponenter, som kun består af en enkelt knude.
+Især består klassedlingen i begyndelsen udelukkende af den slags singletoner.
+Kruskals algoritme udfører nu to operationer på denne klassedeling:
+Den afgør, om to elementer hører til samme delmængde (dvs. til samme deltræ), og forener to delmendger til en (når der tilføjes en kant til $T$).
+
+Foren-og-find-datastrukturen forvalter en klassedeling af mængden $1..n$ på en måde, der tillader begge operationer at blive gennemført effektivt.
+I hver klasse udnævnes et af elementerne til klassens \emph{repræsentant}, som også bruges som klassens navn.
+Valget af repræsentant gøres af algoritmen, ikke af brugeren.
+I begyndelsen udgør hvert element $v$ fra $1..n$ en klasse for sig;
+klassens repræsentant er $v$ selv.
+Funktionen \emph{find}($v$) returnerer repræsentanten for den klasse, som indeholder $v$.
+For at afgøre, om to elementer tilhører samme klasse eller ej, bestemmer man deres repræsentanter og sammenligner disse.
+Operationen $\varname{foren}(r,s)$, anvendt på repræsentanter af forskellige%
+\footnote{I nogle fremstillinger kan $\varname{foren}$ bruges med vilkårlige elementer som argument.
+Så kaldes operationen på repræsentanter $\varname{hægt}$.
+}
+blokke, forener disse blokke til en ny blok (og fastlægger en ny repræsentant).
+
+For at implementere Kruskals algoritme med hjælp af foren-og-find-datastrukturen, behøver man kun letter ændringer til proceduren i fig.~11.4.
+I begyndelsen kaldes klassens konstruktør, som gør hver knude $v$ til sin egen klasse.
+Vi behøver bare at erstatte $\iif$-anvisningen med følgende:
+
+\begin{quote}
+\begin{tabbing}
+  $r := \varname{find}(u); s := \varname{find}(v);$\\
+  $\iif r\neq s \tthen T:= T\cup \{\{u,v\}\}; \varname{foren}(r,s);$
+\end{tabbing}
+\end{quote}
+
+\begin{figure}
+  \begin{tabbing}
+    ~~~~\=~~~~\= \kill
+    $\Class \varname{Foren-og-Find}(n\colon \NN)$\\
+    \>$\varname{forælder} = \langle 1,\ldots, n\rangle\colon\Array[1..n]\of [1.. n]$ 
+    \tikz[remember picture] \node (init) {};\\
+    \>$\varname{rang} =\langle 0,\ldots, 0\rangle\colon \Array [1..n]\of [0..\log n]$\\
+    \\
+    $\Function \varname{find}(v\colon 1..n)\colon 1..n$\\
+    \>$\iif \varname{forælder}[v] = v\tthen\return v$\\
+    \> $\eelse$ \=$v':= \varname{find}(\varname{forælder}[v])$
+    \tikz[remember picture] \node (pathcompr) {};\\
+    \> \> $\varname{forælder}[v]:=v'$\\
+    \> \> $\return v'$\\
+    \\
+    $\Procedure \varname{foren}(r,s\colon 1..n)$\\
+    \> $\assert r, s \text{ repræsentanter af forskellige klasser}$
+    \tikz[remember picture] \node (margin) {}; \\
+    \> $\iif\varname{rang}[r]< \varname{rang}[s]\tthen \varname{forælder}[r]:= s$
+    \tikz[remember picture] \node (different) {};\\
+    \> $\eelse$ \=$\varname{forælder}[s]:=r$\\
+    \>\>$\iif \varname{rang}[r] =   \varname{rang}[s]\tthen \varname{rang}[r]++$
+    \tikz[remember picture] \node (same) {};
+  \end{tabbing}
+
+  \tikzset{
+    vertex/.style = {circle, fill, inner sep = 1.5pt},
+    weight/.style = {font=\small, midway, auto, inner sep = 1pt, circle},
+    selfloop/.style = {loop above, looseness = 20},
+    >=stealth'}
+  \begin{tikzpicture}[scale = .5, remember picture, overlay, 
+    show background rectangle, framed,
+    shift = (margin|-init), callout, anchor = east] 
+    \node (1) at (0,0) [vertex, label = below:$1$, label= right:$0$] {};
+    \node (dots) at (2,0) {$\cdots$};
+    \node (n) at (3,0) [vertex, label = below:$n$, label = right:$0$] {};
+    \draw [->] (1) edge [selfloop] (1); 
+    \draw [->] (n) edge [selfloop] (n); 
+  \end{tikzpicture}
+     % 
+  \begin{tikzpicture}[scale = .5, remember picture, overlay, shift = (margin|-pathcompr), , callout] 
+    \node (v) at (0,-3) [vertex, label = left:$v$] {};
+    \node (fv) at (0,-2) [vertex, label = left:\emph{forælder}$(v)$] {};
+    \node (dots) at (0,-1) [inner sep = 2pt] {:};
+    \node (v') at (0,0) [vertex, label = left:$v'$] {};
+    \draw [->] (v) -- (fv); 
+    \draw [->] (fv) -- (dots); 
+    \draw [->] (dots) -- (v'); 
+    \draw [->] (v') edge [selfloop] (v'); 
+    \begin{scope}[xshift = 2cm]
+      \node (v) at (0,-3) [vertex] {};
+      \node (fv) at (0,-2) [vertex] {};
+      \node (dots) at (0,-1) [inner sep = 2pt]{:};
+      \node (v') at (0,0) [vertex] {};
+      \draw [->] (v) edge[bend left, in = 120] (v'); 
+      \draw [->] (fv) edge[bend left] (v'); 
+      \draw [->] (dots) -- (v'); 
+      \draw [->] (v') edge [selfloop] (v'); 
+    \end{scope}
+  \end{tikzpicture}
+%
+  \begin{tikzpicture}[scale =.5, remember picture, overlay, shift = (margin|-different), callout]
+    \node (r) at (0,0) [vertex, label = left:$r$, label = right: $2$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \draw [->] (r) edge [selfloop] (r);
+    \node (s) at (2, 0) [vertex, label = left:$s$, label = right: $3$] {};
+    \draw (s) -- +(.75,-.75) -- +(-.75,-.75) -- (s);
+    \draw [->] (s) edge [selfloop] (s);
+    \begin{scope}[xshift = 5cm]
+    \node (r) at (0,-.25) [vertex, label = left:$r$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \node (s) at (2, 0) [vertex, label = above left:$s$, label = right: $3$] {};
+    \draw (s) -- +(.7,-.7) -- +(-.7,-.7) -- (s);
+    \draw [->] (s) edge [selfloop] (s);
+      \draw [->] (r) -- (s);
+    \end{scope}
+  \end{tikzpicture}
+%
+  \begin{tikzpicture}[scale =.5, remember picture, overlay, shift = (margin|-same), callout]
+    \node (r) at (0,0) [vertex, label = left:$r$, label = right: $2$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \draw [->] (r) edge [selfloop] (r);
+    \node (s) at (2, 0) [vertex, label = left:$s$, label = right: $2$] {};
+    \draw (s) -- +(.5,-.5) -- +(-.5,-.5) -- (s);
+    \draw [->] (s) edge [selfloop] (s);
+    \begin{scope}[xshift = 5cm]
+    \node (r) at (0,0) [vertex, label = left:$r$, label = above right:$3$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \draw [->] (r) edge [selfloop] (r);
+    \node (s) at (2, .-.25) [vertex, label = above :$s$] {};
+    \draw (s) -- +(.5,-.5) -- +(-.5,-.5) -- (s);
+    \draw [->] (s) -- (r);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{En effektiv foren-og-find-datastruktur til forvaltning af en klassedeling af mængden $1..n$.}
+\end{figure}
+
+Foren-og-find-datastrukturen er nemt at realisere som følger.
+Hver blok fremstilles som et rodfæstet træ, hvor roden tjener som repræsentant.
+Forgængeren til elementet $v$ i træet gemmes i indgangen $\varname{forælder}[v]$ i rækken $\varname{forælder}[1..n]$.
+For en rod $r$ gælder $\varname{forælder}[r]=r$, hvilket svarer til en løkke ved roden.
+ 
+Implementationen af operationen \emph{find}$(v)$ er triviel.
+Man følger forælderviseren, til en løkke er fundet.
+Denne løkke sider ved $v$s repræsentant.
+Implementationen af $\varname{foren}(u,v)$ er lignende enkel.
+Vi gør den ene repræsentant til den andens forælder.
+Den senere mister herved sin rolle som repræsentant; den første tjener som repræsentant repræsentant for den nyskabte klasse.
+Den proces, vi har beskrevet indtil nu, leder til en realisering af foren-og-find-datastrukturen, som er korrekt, men ineffektiv.
+Det er fordi $\varname{forælder}$-referencerne kan danne lange kæder, som skal gennemløbes gentagne gange for hver \emph{find}-operation.
+I værste fald skal vi bruge lineær tid for hver \emph{find}-operation.
+
+På grund af dette problem er der foretaget to forbedringer i algoritmen i fig.~11.6.
+Den første forbedring forhindrer, at de træer, som udgør klasserne, bliver for dybe.
+Hertil gemmes for hver repræsentant et naturligt tal, repræsentantens \emph{rang}.
+I begyndelsen er hvert element selv en repræsentant, med rang $0$.
+Når $\varname{forælder}$-operationen udføres på to repræsentanter af forskellig rang, bliver repræsentanten med den lavere rang barn til den anden.
+Når rangene er ens, kan den nye repræsentant vælges vilkårligt, men vi øger den nye repræsentants rang med $1$.
+Denne første forbedring hedder \emph{forening efter rang}.
+
+\begin{exerc}
+Antag, at \emph{find}-operationen ikke forandrer træstrukturen (eller at operationen ikke forekommer.)
+Vis, at rangen af en repræsentant er lig med dybden af det træ, den er rod i.
+\end{exerc}
+
+Den anden forbedring hedder \emph{vejforkortning}.
+Den sikrer, at en kæde af forælderhenvisninger aldrig gennemløbes to gange.
+Hertil ændres ved hver udførelse af $\varname{find}(v)$ alle de besøgte kunders forælderpegere til at pege på repræsentanten for $v$s klasse.
+I fig.~11.6 er denne regel formuleret som rekursiv procedure.
+Proceduren gennemløber først vejen fra $v$ til dennes repræsentant og benytter så rekursionsstakken for påny att gennemløbe denne vej til $v$ i modsat retning.
+Mens rekursionsstakken reduceres, ændres forælderpegerne.
+Alternativt kan vejen også gennemløbes to gange i samme retning.
+Ved første gennemløb bestemmes repræsentanten; ved andet gennemløb ændres forælderpegerne.
+
+\begin{exerc}
+  Beskriv en ikke-rekursiv implementation af \emph{find}.
+\end{exerc}
+
+\begin{thm}
+  Med forening efter rang har alle træer dybde højst $\log n$.
+\end{thm}
+
+\begin{proof}
+Vi viser først sætningen under antagelsen, at forbedringen »vejforkortning« ikke er benyttet.
+Det betyder, at \emph{find}-operationen ikke ændrer datastrukturen.
+Da er rangen af en repræsentant altid lig med dybden af det træ, den er rod i (opg. 11.8).
+Vi kan altså nøjes med at begrænse rangen af hver rod til $\log n$.
+Hertil vil  vi vise (ved induktion), at et træ, hvis rod har rang $k$, indeholder mindst $2^k$ knuder.
+For $k=0$ gælder udsagnet åbenbart.
+  Den eneste tidspunkt, hvor rangen af en rod forandres under en $\varname{foren}$-operation, og i så fald fra $k-1$ til $k$, er når den får et nyt barn, som hidtil var repræsentant med rang $k-1$.
+Ifølge induktionshypotesen indeholdt rodens og det nye barns træer inden operationen hver især mindst $2^{k-1}$ knuder.
+Efter operationen har det nye træ derfor mindst $2^k$ knuder, og vi har bevist påstanden.
+Vi konkluderer, at den største rang er højst $\log n$, idet der kun er $n$ knuder i det hele.
+
+Beviset gælder stadig, når vi tilføjer forbedringen »vejforkortning«, idet vejforkortning aldrig kan gøre et træ dybere.
+\end{proof}
+
+Kombinationen af strategierne vejforkortning og forening efter rang gør foren-og-find-datastrukturen ufattelig effektiv.
+Hver operations amortiserede omkostning er nærmest konstant.
+
+\begin{thm}
+Foren-og-find-datastrukturen i fig.~11.6 udfører $m$ find- og $n-1$ forenoperationer i tid $O(m\alpha(m,n))$.
+Her er
+\[ 
+  \alpha(m,n) = \min\{\,i\geq 1\colon A(i,\lceil m/n\rceil)\geq \log n\,\}\,,
+\]
+hvor
+  \begin{align*}
+    A(1,j)&= 2^j,&\text{for } j\geq 1\,,\\
+    A(i,1)&= A(i-1,2),&\text{for } i\geq 2\,,\\
+    A(i,j)&=A(i-1,A(i,j-1)) \qquad &\text{for } i\geq 2,j\geq 2\,.
+  \end{align*}
+\end{thm}
+
+Læseren vil have sandsynligvis have vanskeligheder ved omgående at forstå, hvad disse formler skulle betyde.
+Funktionen%
+\footnote{Bogstavet $A$ henviser til logikeren W. Ackermann, som sent i 1920rne som den første angav en lignende funktion.}
+$A$ vokser ekstremt hurtigt.
+Der gælder $A(1,j)=2^j)$ for $j\geq 1$, endvidere $A(2,1)=A(1,2)=2^2=4$, $A(2,2)=A(1,A(2,1))=2^4= 16$, $A(2,3)=A(1,A(2,2)) = 2^{16}$,
+$A(2,4)=2^{2^{16}}$, 
+$A(2,5)=2^{2^{2^{16}}}$, 
+$A(3,1)=A(2,2)=16$,
+$A(3,2)=A(2,A(3,1))=A(2,16)$, og så videre.
+
+\begin{exerc}
+ Anslå værdien af $A(5,1)$.
+\end{exerc}
+
+For alle pratisk tænkbare
+\footnote{Ovs. anm.: Man skal holde sig for øje, at antallet af elementarpartikler i universum anslås til at være mindre end $10^{100}$.}
+værdier $n$ gælder $\alpha(m,n)\leq 5$, og forening efter rang og vejforkortning garanterer tilsammen i alt væsentligt konstant amortiseret tid for hver operation.
+Beviset for sætning 11.4 går ud over denne lærebogs rammer.
+Vi henviser læseren til [].
+Her skal vi i stedet vise en svagere udgave, hvis udsagn for pratiske formål er lige så stærkt.
+Hertil definerer vi talfølgen $T_k, k\geq 0$ ved induktion: 
+$T_0=1$ og $T_k= 2^{T_{k-1}}$ for $k\geq 1$.
+Tallet $T_k$ kan altså fremstilles som tårn af topotenser $2^{2^{\vdots^2}}$ af højde $k$.
+Man ser, at der for $k\geq 2$ gælder ligningen $T_k = A(2,k-1)$.
+De første værdier for denne meget hurtig voksende talfølge ser sådan ud:
+
+\medskip
+\begin{tabular}{l|lllllllc}
+  $k$  & 0 & 1 & 2 & 3 & 4 & 5 & 6 & $\cdots$ \\\midrule
+  $T_k$ & 1 & 2 & 4 & 16 & 65536 & $2^{65536}$ & $2^{2^{65536}}$ & $\cdots$
+\end{tabular}
+\medskip
+
+For $x>0$ definerer vi nu $\log^* x$ som $\min\{\,x\colon T_k\geq x\,\}$.
+%(TODO: uses $\mid$)
+Det er samtidigt det mindste tal $k\geq 0$, hvis $k$-foldige logaritme  $\log (\log (\cdots\log x)\cdots))$ er højst $1$.
+Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for alle $x\leq 10^{19729}(<2^{65536})$.
+
+\begin{thm}
+  Foren-og-find-datastrukturen med forening efter rang og vejforkortning udfører $m$ find- och $n-1$ foren-operationer i tid $O((m+n)\log^* n)$.
+\end{thm}
+
+\begin{proof}
+  (Beviset går tilbage til [104].)
+  Vi betragter en vilkårlig følge af $m$ $\varname{find}$- og $n-1$ $\varname{foren}$-operationer, med udgangspunkt i initialiseringen for mængden $1..n$.
+  Idet $\varname{foren}$ tager konstant tid, kan vi indskrænke os til analysen af $\varname{find}$.
+
+  Hidtil har kun rodknuderne haft tildelt en rang.
+  Disse range kan vokse i løbet af operationsfølgen.
+  Nu  definerer vi for hver knude $v$ dens \emph{sidste rang} $\varname{sr}(v)$ som rangen af $v$ i det øjeblik, da den for første gang gøres til barn af en anden knude.
+  Skulle $v$ stadig være en rod til sidst, sætter vi $\emph{sr}(v)$ til $v$s endelige rang.
+  Vi gør følgende observationer:
+  \begin{enumerate}[(i)]
+    \item Langs hver vej i træerne er $\varname{sr}$-værdierne skarpt voksende nedefra og op.
+    \item Når en knude $v$ får sin slutrang $h$, indeholder $v$s undertræ mindst $2^h$ knuder.
+    \item Der er højst $n/2^h$ knuder med slutrang $h$.
+  \end{enumerate}
+  \emph{Bevis} for observationerne:
+  (i) Ved induktion i operationerne vil vi vise, at der altid gælder $\varname{sr}(v)<\varname{sr}(u)$, når $v$ er barn til $u$.
+  I begyndelsen er alle range $0$, og ingen knude er barn til en anden.
+  I det øjeblik, hvor $v$ med gøres til barn af rodknuden $u$ ved en forening, gælder efter operationen at $\varname{rang}(v)<\varname{rang}(u)$ ifølge algoritmen og $\varname{sr}(v)=\varname{rang}(v)$ ifølge definitionen af $\varname{sr}$.
+  Idet der for alle rodknuder gælder $\varname{rang}(u)\leq \varname{sr}(u)$, har vi $\varname{sr}(u)<\varname{sr}(v)$.
+  En \emph{find}-operation ændrer ikke ved denne egenskab, da den kun kan gøre $v$ til barn af en af sine aner, som har endnu højere slutrang ved induktion.
+
+  (ii)
+  I beviset for sætning 11.3 så vi, at en rod af rang $h$ indeholder mindst $2^h$ knuder i sit undertræ. 
+  % (TODO orig confused)
+  Det vil sige, at en knude $v$ med slutrang $\varname{sr}(v)= h$ i det øjeblik, hvor den bliver barn til en anden knude, har mindst $2^h$ knuder i sit undertræ.
+  (Bemærk, at $v$ senere kan miste knuder fra sit undertræ på grund af vejforkortning.)
+
+  (iii)
+  Betragt for fast $h$ og hver knude $v$ med slutrang $h$ mængden $M_v$ af knuder i $v$s undertræ i det øjeblik, hvor $v$ bliver gjort til barn af en anden knude $u$ (hhv. til sist, hvis $v$ da stadig er en rod).
+  Vi påstår at mængderne $M_v$ er disjunkte.
+  (Heraf følger påstanden, fordi (ii) medfører, at hver mængde $M_v$ indeholder højst $2^h$ elementer, og der er $n$ elementer i det hele.)
+  Ifølge (i) gælder $\varname{sr}(u)>h$.
+  Betragt nu $w\in M_v$.
+  På grund af foreninger kan $w$ få nye aner i det videre forløb.
+  Men i det øjeblik, hvor $v'$ bliver sådan en ny ane, må $v'$ være rod i et undertræ som også indeholder $u$; ifølge (i) har vi altså $\varname{sr}(v')>\varname{sr}(u)>h$.
+  Derfor kan $w$ aldrig tilhøre undertæet til nogen anden knude med slutrang $h$.
+  %(TODO still confused.)
+
+\medskip
+  Knuderne med $\varname{sr}$-værdi større end $0$ inddeles nu i \emph{ranggrupper} $G_0,G_1,\ldots$.
+  Ranggruppe $G_k$ indeholder alle knuder med slutrang i $\{T_{k-1}+1,\ldots, T_k\}$, hvor vi tolker $T_{-1}$ som $0$.
+  For eksempel indeholder $G_4$ alle knuder med slutrang i intervallet $\{17,\ldots, 65536\}$.
+  Da ifølge sætning 11.3 ingen rang kan blive større end $\log n$, kan vi allerede nu ane, at der for praktisk forekommende $n$ aldrig vil være en knude in ranggruppe $G_5$ eller højere. 
+  For at være nøjagtig betragter man følgende:
+  Når en knude $v$ ligger i ranggruppe $G_k$ for $k\geq 1$, så gælder 
+  \( T_{k-1}<\varname{sr}(v)\leq \log n\).
+  Heraf følger, at 
+  \( T_k = 2^{k-1} < 2^{\varname{sr}(v)} \leq n\),
+  hvoraf $k < \log^* n$.
+  % (TODO confused)
+  Antallet af ikketomme ranggrupper er altså begrænset af $\log^* n$.
+
+  Vi analyserer nu omkostningen af \emph{find}-operationen.
+  Vi anslår omkostningen for $\emph{find}(v)$ som antallet $r$ af knuder  på vejen $v=v_1,\ldots ,v_{r-1},v_r = s$ fra $v$ til træets rod $s$.
+  (Denne værdi er proportional med operationens tidsforbrug, inklusive vejforkortningens pegerændringer.)
+  I bund og grund fordeler vi omkostningerne på knuderne $v_i$ langs vejen, med omkostning 1 per knude.
+  Vi undtager dog følgende knuder, hvis omkostning vi direkte tilskriver \emph{find}$(v)$-operationen.
+  \begin{enumerate}[(a)]
+    \item omkostningen for knuder $v$ med $\varname{sr}(v)=0$ (da må gælde, at $v$ er et blad).
+    \item omkostningen for knuder $v_i$ med $\varname{sr}(v_i)>0$ og hvis forælder $v_{i+1}$ tilhører en højere ranggruppe.
+    \item omkostningen for rodknuden $v_r$ og dens umiddelbare efterfølger $v_{r_1}$.
+  \end{enumerate}
+  Fordi vi fra (i) har, at rangen langs vejen er voksende, og der ikke er mere end $\log^*n$ ikketomme ranggrupper, kan der ikke findes mere end $(\log^*n)-1$ knuder, der er omfattet af (b).
+  Med de højst 3 knuder, der er omfattet af (a) og (b), er der totalt højst $2+ \log^*n$ knuders omkostning tilskrevet \emph{find}$(v)$.
+  Sammenlagt over alle $m$ \emph{find}-operationer giver det en omkostning på $m(2+ \log*n)$.
+
+  Det står tilbage at tage hånd om de omkostninger, det er blevet tildelt knuderne.
+  Betragt en knude $v$ i ranggruppe $G_k$.
+  Når $v$ tildeles omkostningen 1 ved en \emph{find}-operation, har $v$ en forælder $u$ (som tilhører $G_k$ pga. (b)), som ikke er roden $s$.
+  Derfor får $v$ ved vejforkortningen $s$ som ny forælder.
+  Ved betragtning (i) gælder $\varname{sr}(u)<\varname{sr}(s)$.
+  Det betyder, at når $v$ tildeles omkostningen 1, får den en ny forælder af højere slutrang.
+  Efter højst $T_k$ af disse hændelser må $v$ have fået en forælder i en højere ranggruppe, herefter tildeles ikke flere omkostninger til $v$.
+  Knuden $v$ tildeles altså højst omkostning $T_k$.
+  Summeret over all knuder  i ranggruppen $G_k$ bliver den totale omkostning ikke mere end $|G_k|\cdot T_k$.
+
+  For at vurdere $|G_k|\cdot T_k$ betragter vi knuderne i $G_k$.
+  Deres mulige slutrange er $T_{k-1}+1,\ldots, T_k$.
+  Ifølge betragtning (iii) findes der højst $n/2^h$ knuder med slutrang $h$.
+  Derfor har vi
+  \[ |G_k| \leq \sum_{T_{k-1}<h\leq T_k} \frac{n}{2^k} <
+  \frac{n}{2^{T_{k-1}}} = \frac{n}{T_k}\,,\]
+  ifølge definitionen af $T_k$.
+  Dette giver $|G_k|\cdot T_k< n$.
+  Det betyder at den totale omkostning af alle knuder i ranggruppe $k$ er højst $n$.
+  Vi har allerede indset, at der ikke er flere end $\log^*n $ ikktomme ranggrupper.
+  Derfor er omkostningen for samtlige knuder begrænset af $n\log^*n$.
+
+  Til sist lægger vi omkostningerne som er tildelt operationerne og knuderne sammen og får $m(2+\log^*n) + m\log^* n = O((m+n)\log^*n)$, som ønsket.
+
+\end{proof}
+
+
+
+
+
+
+
+
+
+
+
+
