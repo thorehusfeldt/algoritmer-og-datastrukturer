@@ -842,6 +842,65 @@ Dette gælder med sikkerhed altid, når rækkestørrelsen er kendt i forvejen, s
 Ubegrænsede rækker udviser en afvejning mellem pladseffektivitet og ekstra tidsforbrug for kopiering af indgangene ved operationen $\varname{realloker}$. 
 
 
+\section{Implementationsaspekter}
+
+De fleste programmeringssprog still berænsede rækker til rådighed.
+% TODO changed "jede vernünftige" 
+Udover disse findes ubegrænsede rækker, lister, stakke, køer og dobbbeltkøer tilgængeligt i biblioteker, som findes til de gængse imperative programmeringssprog.
+Alligevel kommer man ofte i en situation, hvor man selv skal implementere listelignende datastrukturer, fx når de behandlende objekter forekommer samtidigt i som indgange i flere sammenkædede lister.
+I den slags implementationer udgør lagerforvaltningen ofte en betydelig udfordring.
+
+\subsection{C++}
+
+Klassen $\varname{vector}\langle\varname{Element}\rangle$ i STL (Standard Template Library) realiserer ubegrænsede rækker.
+Alligevel tillader de færreste implementationer af STL at rækker krymper.
+Klassens funktionalitet omfatter fastlæggelsen af rækkens maximale senere omfang ved det tidspunkt, den bliver skabt.
+Normalt angiver man hertil på dette tidspunkt et skøn over følgens længde $n$.
+På den måde kan man undgå mange udvidelsesoperationer.
+Sommetider ved man også, hvornår rækkens vækst er afsluttet, og kan så fremtvinge egenskaben $w=n$.
+Med disse raffinemeter findes der egenlig ingen grund til at bruge $C++$s rækker som rækker i stil med C.
+En yderligere fordel ved datatypen $\varname{vector}$ er, at dens instanser automatisk tilintegøres, når de tilsvarende variables gyldighedsområde bliver forladt.
+I løbet af fejlfindningsfasen kan man desuden skifte over til varianter, som ved hver rækkeadgang foretager en kontrol af indeksgrænser.
+
+Der findes yderliger nogle aspekter at tage hensyn til, nå man ofte har at gøre med voksende om krympende rækker og har fokus på specielt gode beregningstider.
+I løbet af forstørrelsen og formindskningen skal klassen $\varname{vector}$ flytte indgange fra en række til en anden, hvortil den benytter konstruktøren $\varname{Copy}$ fra klassen $\varname{Element}$.
+I de fleste tilfælde vil det være meget tidseffektivt at kalde den maskinnære grundoperation $\varname{memcpy}$, som kopierer en nærmere betegnet blok af på hinanden følgende bytes.
+En anden maskinnær optimeringsmulighed betstår i at forvirklige operationen $\varname{realloker}$ ved hjælp af C-standardfunktionen $\varname{realloc}$.
+Lagerforvaltningssystemet kan så muligvis helt undgå at kopiere data.
+
+Snublestenen ved anvendelsen af ubgrænsede rækker er den omstændighed, at pegere på rækkeindgange bliver ugyldige, når en ny række stilles til rådighed. 
+(Man taler om, at »referenceintegriteten« er ødelagt.)
+Man må altså ubetinget sikre, at rækken ikke bliver skiftet ud, mens sådan en peger er i brug.
+Når den slags udskftning ikke kan udelukkes, må man referere til indgange ved hjælp af indekser i stedet for pegere.
+
+Både STL og LEDA [130] stiller dobbbelthægtede lister til rådighed i form af klassen $\varname{list}\langle Element\rangle$, og enkelthægtede lister i form af klassen $\varname{slist}\langle Element\rangle$.
+
+[TODO incomplete]
+
+\subsection{Java}
+
+I pakken $\varname{util}$ i Java~6 findes klassen $\varname{ArrayList}$ for ubegrænsede rækker og klassen $\varname{LinkedList}$ for dobbelthægtede lister.
+Der findes også en grænseflade $\varname{Deque}$ for dobbeltkøer, som implementeres både af klassen $\varname{ArrayDeque}$ og af klassen $\varname{LinkedList}$.
+Stakgrænsefladen $\varname{Stack}$ implementeres i Java som udvidelse af klassen $\varname{Vector}$.
+
+Mange javabøger forkynder stolt, at Java ikke indeholder pegere.
+Læseren kan altså spørge sig, hvordan man så kan implementere hægtede lister.
+Svaret er naturligvis, at referencer til objekter i al væsentlighed er pegere, og at man i hvert fald kan bruge dem som var de pegere.
+I en vis forstand kan man sågar sige, at Java \emph{kun} har pegere, fordi den eneste adgang til objetker af ikke-elementære datatyper er via referencer -- objekter gemmes aldrig i forælderobjektet.
+
+Eksplicit lagerforvaltning er i Java ikke ubetinget nødvendig, fordi køretidssystemets skraldhåndtering tager sig af alle objekter, som ikke længere referes til.
+
+\subsection{Python}
+
+Python råder ikke over begrænsede rækker som del af sprogets grundlæggende datatyper. 
+For numeriske typer har man dog adgang til begrænsede rækker ved hjælp af modulet $\varname{array}$; den konkrete repræsentation er dog maskinafhængig.
+Ellers er den primære følgetype i Python typen $\varname{List}$, som er implementeret som en ubegrænset række.
+Standardmodulet $\varname{collections}$ indeholder datatypen $\varname{deque}$ for dobbelkøer, som er implementeret som en dobbelthægtet liste for hurtig manipulation af begge ender af følgen, men uden at understøtte hverken hurtig sammenføjning eller operationer på følgens interne indgange som fx $\varname{splejs}$.
+
+
+
+
+
 
 
 
