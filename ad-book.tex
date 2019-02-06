@@ -1,13 +1,14 @@
 \documentclass{scrbook}
-
-
-
 \usepackage[T1]{fontenc} 
 \usepackage[utf8]{inputenc}
 \usepackage[danish]{babel}
 \usepackage{mathpazo}
 \usepackage{microtype}
 \usepackage{booktabs}
+
+\title{Algoritmer og datastrukturer}
+\subtitle{Grundværktøjerne}
+\author{Martin Dietzfelbinger \and Kurt Mehlhorn \and Peter Sanders}
 
 \newcommand{\NN}{\mathbf N}
 \newcommand{\ZZ}{\mathbf Z}
@@ -71,13 +72,12 @@
 
 \newcommand{\comment}[1]{\textcolor{callout}{/\!\!/ #1}}
 
-\title{Algoritmer og datastrukturer}
-\subtitle{Grundværktøjerne}
-\author{Martin Dietzfelbinger \and Kurt Mehlhorn \and Peter Sanders}
-
-
+\input{vc.tex}
 \begin{document}
 \maketitle
+\let\thefootnote\relax
+\footnotetext{Udgave~\GITAbrHash, \GITAuthorDate, \GITAuthorName.}
+
 \setcounter{chapter}{1}
 \chapter{Inledning}
 %\setcounter{section}{1}
