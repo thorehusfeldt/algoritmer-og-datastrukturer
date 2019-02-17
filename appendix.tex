@@ -1,0 +1,356 @@
+\newenvironment{mydescription}
+{\begin{list}{}{\setlength\labelwidth{0pt}%
+               \setlength\itemindent{-\leftmargin}%
+               \addtolength{\itemindent}{5pt}
+               \setlength\itemsep{8pt plus 1pt}%
+               \let\makelabel\mydescriptionlabel}}
+{\end{list}}
+\newcommand*\mydescriptionlabel[1]{#1}
+
+\newcommand{\lref}[1]{\eqref{#1}}
+\section{Matematiske symboler}
+
+\begin{mydescription}
+\item[$\{e_1,\ldots,e_n\}$] mængden af elementer $e_1$, $\ldots$, $e_n$.
+
+\item[$\{\,e\colon P(e)\,\}$] mængden af elementer, for hvilke $P$ gælder.
+
+\item[$\langle e_1,\ldots,e_n\rangle $] følgen af indgange $e_1$, $\ldots$, $e_n$.
+
+\item[$\{\,e\in S\colon P(e)\,\}$] delfølgen af indgange fra $S$, for hvilke $P$ gælder.
+
+\item[$|x|$] absolutværdien af $x$ for et reelt tal $x$.
+
+\item[$\lfloor x\rfloor$] det største heltal $n$ med $n\leq x$ for et reelt tal $x$ (gulvfunktionen, nedrunding).
+
+\item[$\lceil x\rceil$] det minste heltal $n$ med $n\geq x$ for et reelt tal $x$ (loftsfunktionen, oprunding).
+
+
+\item[\mbox{$[a,b]$}] $\{\, r\in \RR\colon a \leq x\leq b\}$.
+
+
+\item[$i..j$] forkortelse for $\{i, \ldots, j\}$
+
+\item[$A^B$] mængden af funtioner fra $A$ til $B$
+
+\item[$A\times B$] mængden af ordnede par $(a,b)$ med $a\in A$ og $b\in B$.
+
+\item[$\bot$] en udefineret værdi
+
+\item[$\infty$] uendeligt
+
+\item[$-\infty$] minus uendeligt
+
+\item[$\forall x\colon P(x)$] alle $x$ opfylder udsagnet $P$ 
+
+\item[$\exists x\colon P(x)$] der ekisterer et $x$, som opfylder udsagnet $P$ 
+
+\item[$\NN$] mængden af ikke-negative heltal, $\NN= \{0,1,2,\ldots\}$.
+
+\item[$\NN_+$] mængden af positive heltal, $\NN= \{1,2,\ldots\}$.
+
+\item[$\ZZ$] mængden af hele tal, $\ZZ= \{\ldots, -2,-1,0,1,2,\ldots\}$.
+
+\item[$\RR$] mængden af reelle tal.
+
+\item[$\RR_{>0}$] mængden af positive reelle tal.
+\item[$\QQ$] mængden af rationelle tal.
+\item[|, \texttt{\&},  \texttt{«}, \texttt{»}, $\oplus$] bitvis eller, og, venstreskift, højreskift og eksklusivt eller.
+\item[$\sum_{i=1}^n a_i = \sum_{1\leq i\leq n} a_i = \sum_{i\in\{1,\ldots,n\} a_i}$] $=a_1+\cdots+a_n$.
+\item[$\sum_{s\in S} a_x$ hhv. $\sum_{P(x)}a_x$ eller $\sum_{x\text{ med } P(x)} a_x$] Summen over elementerne i en endelig mængde $S$, hhv. over alle elementer som upfylder prædikatet $P$.
+\item[$\prod_{i=1}^n a_i = \prod_{1\leq i\leq n} a_i = \prod_{i\in\{1,\ldots,n\} a_i}$] $=a_1\cdot\cdots\cdot a_n$.
+\item[$n!$] $\prod_{i=1}^ni$, kaldt »$n$ fakultet«. Der gælder $0!=1$.
+\item[$H_n$] $\sum_{i=1}^n1/i$, kaldt »det $n$te harmoniske tal« (se ulighed (A.12)).
+\item[$\log x$] logaritmen til $x$ med grundtal $2$, $\log_2x$, for $x>0$.
+\item[$\log^* x$] for $x>0$, det mindste tal $k\geq 0$ for hvilket $\log(\log(\cdots (\log x)\cdots ))\leq 1$ ($k$-foldig gentagelse af logaritmen).
+\item[$\ln x$] den naturlige logaritme til $x$ med grundtal $2,7182818284590\ldots$, for $x>0$.
+\item [$\mu(s,t)$] længden af den korteste vej fra $s$ til $t$; $\mu(t):=\mu(s,t)$.
+\item[$\ddiv$] kvotienten ved heltalsdivision; $m\ddiv n := \lceil m/n\rceil $ for $n>0$.
+\item[$\bmod$] resten ved heltalsdivision; $m\bmod n := m - n(m\ddiv n)$ for $n>0$.
+\item[$a\equiv b\pmod m$] for $m>0$: tallene $a$ og $b$ er kongruente modulo $m$, dvs. $a+im =b $ for et heltal $i$.
+\item[$\prec$] en vilkårlig ordensrelation.
+\item[$1$, $0$] de booleske værdier »sand« og »falsk«. 
+\item[$\Sigma^*$] mængden $\{\,(a_1,\ldots,a_n) \colon n\in \NN, a_1,\ldots, a_n\in \Sigma\,\}$ af tegnfølger (eller »ord«) $a_1\cdots a_n=(a_1,\ldots,a_n)$ over det endelige alfabet $\Sigma$. 
+\item[$|x|$] antallet $n$ af bogstaver i $x=(a_1,\ldots,a_n)\in \Sigma^*$ for ord $x$.
+
+\end{mydescription}
+
+\section{Matematiske begreber}\label{mathconcepts}
+
+\newcommand{\Oh}[1]{\operatorname{O}(#1)}
+\newcommand{\Om}[1]{\Omega(#1)}
+\newcommand{\Th}[1]{\Theta(#1)}
+
+\renewcommand*\mydescriptionlabel[1]{{\bf #1}:}
+\begin{mydescription}
+
+  \item[antisymmetrisk]
+    \index{relation!antisymmetrisk|textbf}
+    \index{antisymmetrisk relation|textbf}
+    En relation $R$ kaldes \emph{antisymmetrisk}, hvis der for alle $a$ og $b$  gælder, at $aRb$ og $bRa$ medfører $a = b$. 
+
+  \item[ækvivalensrelation]
+    \index{relation!aekvivalens@ækvivalens-|textbf}
+    \index{aekvivalensrelation@ækvivalensrelation|textbf}
+    eine transitive, reflexive und
+    symmetrische Relation. 
+
+  \item[asymptotische Notation] 
+    \begin{align*}
+      \Oh{f(n)} &=  \{\,g(n)\colon\exists c>0\colon\exists n_0\in\NN_+\colon\forall n\geq n_0\colon g(n)\leq c\cdot f(n)\,\}.\\
+      \Om{f(n)} &=  \{\,g(n)\colon\exists c>0\colon\exists n_0\in\NN_+\colon\forall n\geq n_0\colon g(n)\geq c\cdot f(n)\,\}.\\
+      \Th{f(n)} &=  \Oh{f(n)}\cap\,\Om{f(n)}.\\
+      o(f(n)) &=  \{\,g(n)\colon\forall c>0\colon\exists n_0\in\NN_+\colon\forall n\geq n_0\colon g(n)\leq c\cdot f(n)\,\}.\\
+      \omega(f(n))  &=  \{\,g(n)\colon\forall c>0\colon\exists
+    n_0\in\NN_+\colon\forall n\geq n_0\colon g(n)\geq c\cdot f(n)\,\}\,.\end{align*}
+    Se også afsnit~\ref{ch:intro:s:o}.
+
+  \item[konkav]\index{konkav funktion|textbf} 
+    En funktion $f$ er konkav på intervallet $[a,b]$, hvis
+    \[\forall x,y\in[a,b]\colon\forall t\in[0,1]\colon f(tx+(1-t)y)\geq tf(x)+(1-t)f(y).\]
+
+  \item[konveks]
+    \index{konveks funktion|textbf} 
+    En funktion  $f$ er konveks på internvallet $[a,b]$, hvis
+    \[\forall x,y\in[a,b]\colon\forall t\in[0,1]\colon f(tx+(1-t)y)\le tf(x)+(1-t)f(y).\]
+
+  \item[legeme]
+    \index{legeme (algebra)|textbf} 
+    en mængde af tal (indeholdende nul og et), for hvilke der er defineret følgende operationer: 
+    addition og (en hertil invers operation) subtraktion, multiplikation og (en hertil invers operation) division med elementer, som ikke er nul.
+    Addition og multiplikation er kommutativ og associativ og har neutralelementer, som opfører sig som de reelle tal nul og et.
+    De væsentligste eksempler på legemer er:
+    $\RR$, de reelle tal;
+    $\QQ$, de rationelle tal;
+    $\ZZ_p$, heltallene modulo et primtal $p$.
+
+  \item[leksikografisk ordning]
+    \index{leksikografisk ordning|textbf} 
+    den kanoniske måde at udvide en lineær ordning af en mængde til tupler, strenge og følger over samme mængde.
+    Der gælder $\seq{a_1,\ldots,a_k} < \seq{b_1,\ldots,b_\ell}$
+    hvis og kun hvis findes et $i\le\min\set{k,\ldots, \ell}$  med $\seq{a_1,\ldots,a_{i-1}} = \seq{b_1,\ldots,b_{i-1}}$ og $a_i < b_i$ eller 
+    eller når $k<\ell$ og $\seq{a_1,\ldots,a_k} = \seq{b_1,\ldots,b_k}$.
+    En alternativ, rekursiv definition er:
+    $\seq{\,}<\seq{b_1,\ldots,b_\ell}$ for alle $\ell>0$; for $k>0$ og $\ell>0$ gælder
+    $\seq{a_1,a_2,\ldots,a_k} < \seq{b_1,b_2,\ldots,b_\ell}$ hvis og kun hvis 
+    $a_1 < b_1$ eller $a_1=b_1$ og $\seq{a_2,\ldots,a_k}<\seq{b_2,\ldots,b_\ell}$.
+
+  \item[lineær ordning]\index{lineær ordning|textbf} 
+    (også: total ordning)
+    en refleksiv, transitiv, antisymmetrisk og total relation.
+    Ofte benyttes symbolet $\le$ for en lineær ordning.
+    For alle $a\leq b$ skrives da også $g\ge a$..
+    Forkortelse (den \emph{strenge} version af en total ordning):
+    Vi skriver $a<b$ når $a\le b$ og $a\ne b$; tilsvarende står $a>b$ for $a\ge b$ og $a\ne b$.
+    I så fald er relationene $<$ transitiv, \emph{irrefleksiv} (idet $a<b$ medfører $a\ne b$) og \emph{total} i den forstand at der for hvert par $a,b$ gælder $a<b$ eller $a=b$ eller $a>b$.
+
+  \item[lineær præordning]
+    \index{lineær præordning|textbf}
+    \index{lineær kvasiordning|textbf} (også: total præordning eller lineær/total kvasiordning)
+    en refleksiv, transitiv og total relation.
+    Også hertil benyttes ofte symbolerne $\le$ og $\ge$.
+
+    Den strenge variant defineres i dette tilfælde på følgende måde:
+    $a<b$ hvis der gælder $a\le b$ men ikke $a\ge b$.
+
+
+  \item[median]\index{median|textbf}
+    en indgang med rang $\ceil{\frac{1}{2}n}$ i en mængde med $n$ indgange.
+
+  \item[multiplikativ invers]\index{invers|textbf}
+    Når man multiplicerer et objekt $x$ med dets \emph{multiplikative invers} $x^{-1}$,
+    opnås $x\cdot x^{-1}=1$, dvs. multiplikationens neutralelement. 
+    Isæar gælder der i et \emph{legeme}, at hvert element bortset fra nul (additionens neutralelement) har en multiplikativ invers.
+
+  \item[primtal]\index{primtal|textbf} 
+    et heltal $n$ med $n \ge 2$ er et primtal, dersom der ikke findes heltal $a,b>1$ så $n=a\cdot b$.
+
+  \item[rang]\index{rang|textbf} 
+    Lad den lineære præordning $\le$ være defineret på en endelig mængde $S = \set{e_1,\ldots,e_n}$. 
+    En injektiv afbildning $r\colon S \rightarrow\set{1,\ldots, n}$ er en \emph{rangfunktion} for $S$, hvis der gælder $r(e_i) < r(e_j)$  
+    for alle $e_i$, $e_j$ med $e_i < e_j$.
+    Når $\le$ er en lineær ordning på $S$, eksisterer der præcis en rangfunktion.
+
+  \item[refleksiv]\index{refleksiv|textbf}\index{relation!refleksiv|textbf} 
+    En relation $R \subseteq A\times A$ kaldes \emph{refleksiv}, hvis $\forall a\in A\colon (a,a)\in R$.
+
+  \item[relation]\index{relation|textbf} 
+    En (binær) relation $R$ er en mængde af ordnede par.
+    Vi skriver ofte relationen med infiksnotation: 
+    udsagnet $aRb$ betyder bare $(a,b)\in R$.
+    (Alle relationer, som forekommer i denne bog, er binære.)  
+
+    %\item[strict weak order] A relation that is like a total order except 
+    %  the antisymmetry only needs to hold with respect to some equivalence relation $\equiv$ that
+    %  is not necessarily the identity (see also
+    %\url{http://www.sgi.com/tech/stl/LessThanComparable.html}).
+  \item[symmetrisk relation]
+    \index{symmetrisk relation|textbf}
+    \index{relation!symmetrisk|textbf}
+    Relationen $R$ er  \emph{symmetrisk}, hvis der for alle  $a$ og $b$ gælder, at $aR b$ medfører $bR a$.
+
+  \item[total ordning]\index{total ordning|textbf} dss. lineær ordning.
+
+  \item[total relation]
+    \index{total relation|textbf} 
+    \index{relation!total|textbf} 
+    en relation $R \subseteq A\times A$ er total på $A$, dersom for alle $a,b\in A$ gælder mindst et af udsagnene $aR b$ og $bR a$.
+    Når en relation $R$ er  total og transitiv, danner følgende definition en passende ækvivalensrelation $\sim_R$ på $A$: 
+    $a \sim_R b$ hvis og kun hvis $aRb$ og $bRa$.
+
+  \item[transitiv]
+    \index{transitiv relation|textbf}
+    \index{relation!transitiv|textbf} 
+    relationen $R$ kaldes \emph{transitiv}, hvis der vor alle $a$, $b$, $c$ gælder, at $aR b$ og $bRc$ medfører $aR c$. 
+
+    %\item[true] Abbreviation for the value $1$.
+
+\end{mydescription}
+
+\section{Sandsynlighedsregningens grundlag}
+
+\section{Nogle nyttige formler og uligheder}
+
+Vi begynder med at opremse nogle nyttige formler og grænser.
+Beviser for nogle af dem finder man forneden.
+
+\begin{itemize}
+  \item Enkle grænser for fakultetsfunktionen:
+    \begin{equation}\label{eq:factorial}
+      \left(\frac{n}{e}\right)^n \le n! \le n^n \text{, eller skarpere: } e \left(\frac{n}{e}\right)^n \le n! \le (en)\left(\frac{n}{e}\right)^n.
+    \end{equation}
+
+  \item 
+    Stirlings approksimationsformel for fakultetsfunktionen:
+    \begin{equation}\label{eq:stirling}
+      n! = \left(1+\Th{\frac{1}{n}}\right)\sqrt{2\pi n}\left(\frac{n}{e}\right)^n \,,\
+    \end{equation}\index{Stirlings formel|textbf}
+    eller mere nøjagtig:
+    \begin{equation}\tag*{(A.9$'$)}
+      \sqrt{2\pi n}\cdot\left(\frac{n}{e}\right)^n \cdot e^{\frac1{12n+1}}
+      \; < \;  n!  \; < \; 
+      \sqrt{2\pi n}\cdot\left(\frac{n}{e}\right)^n \cdot e^{\frac1{12n}}\mbox{ , für $n\ge1$.}
+    \end{equation}
+
+  \item En øvre grænse for binomialkoefficienten:
+    \begin{equation}\label{eq:bincoeff}
+      \binom{n}{k}\leq\left(\frac{n\cdot e}{k}\right)^k .
+    \end{equation}\index{binomialkoefficient|textbf}
+
+  \item
+    Summen af de første $n$ positive heltal:
+    \begin{equation}\label{eq:sumi}
+      \sum_{i=1}^ni = \frac{n(n+1)}{2} .
+    \end{equation}
+
+
+  \item De harmoniske tal:
+    \begin{equation}\label{eq:harmonic}
+      \ln n\leq H_n=\sum_{i=1}^n \frac{1}{i}\leq \ln n+1 .
+    \end{equation}\index{sum!harmonisk|textbf}
+
+
+  \item 
+    Geometrisk sum og geometrisk række:
+    \begin{equation}\label{eq:geometric}
+      \sum_{i=0}^{n-1}q^i=\frac{1-q^n}{1-q} \quad\text{für $q \not= 1$ und}\quad \sum_{i \ge 0} q^i =
+      \frac{1}{1 - q} \quad \text{ für $|q| < 1$} .
+    \end{equation}
+    \index{sum!geometrisk|textbf}
+
+    \begin{equation}\label{eq:ipowi}
+      \sum_{i \ge 0} 2^{-i} = 2 \quad\text{og}\quad \sum_{i\geq 0}i\cdot 2^{-i}=
+      \sum_{i\geq 1}i\cdot 2^{-i}=2 .
+    \end{equation}
+
+  \item Jensens ulighed:
+    For hver konkave funktion $f$ og hver følge $(x_1,\ldots,x_n)$ af reelle tal i definitionsområrdet for $f$ gælder:
+    \begin{equation}\label{eq:concave}
+      \sum_{i=1}^n f(x_i)\leq n\cdot f\left(\frac{\sum_{i=1}^n x_i}{n}\right)\,,
+    \end{equation}\index{ulighed!Jensens|textbf}%
+    for hver konvekse funktion $f$ og hver følge $x_1,\ldots,x_n$ af reelle tal i definitionsområrdet af $f$ gælder:
+    \begin{equation}\label{eq:convex}
+      \sum_{i=1}^n f(x_i)\ \ge n\cdot f\left(\frac{\sum_{i=1}^n x_i}{n}\right)\,.
+    \end{equation}
+\end{itemize}
+
+\subsection{Beviser}
+
+For (\lref{eq:factorial})observerer vi først, at der gælder $n! = n(n-1)\;\cdots\; 1 \le n^n$. 
+Fra analysen vides det, at eksponentialfunktionen kan skrives som 
+$\exp(x)=\sum_{i\ge 0}x^i/i!$.
+Derfor gælder $e^n \ge n^n/n!$, hvilket medføre den nedre grænse for $n!$. 
+
+\smallskip
+For de skarpere grænser bemærker vi, at der for alle $i\ge2$ gælder uligheden 
+$\ln i \ge \int_{i-1}^{i} \ln x \, dx$, hvilket medfører
+\[ \ln n! = \sum_{2 \le i \le n} \ln i \ge \int_1^{n} \ln x \, dx =
+\Bigl[ x (\ln x - 1)
+\Bigr]_{x = 1}^{x = n} = n (\ln n - 1) + 1  \,. \]
+Heraf følger
+\[ n! \ge e^{n (\ln n - 1)+1} = e(e^{\ln n - 1})^n = e\left(\frac{n}{e}\right)^n \,. \]
+På samme måde følger af uligheden $\ln (i-1) \le \int_{i-1}^{i} \ln x \, dx$,
+at der gælder $(n-1)! \le \int_1^{n} \ln x \, dx = e\left(\frac{n}{e}\right)^n$, hvilket medfører $n! \le (en)\left(\frac{n}{e}\right)^n$.
+
+Uligheden (\lref{eq:bincoeff}) følger næsten direkte af \eqref{eq:factorial}. 
+Vi har
+\[  \binom{n}{k} = \frac{n(n-1)\cdots(n - k+1)}{k!} \le \frac{n^k}{(k/e)^k} = \left(\frac{n\cdot e}{k}\right)^k \,. \]
+\smallskip
+
+
+Ligning (\lref{eq:sumi}) fås ved udregning med et enkelt kneb:
+\begin{align*}
+1 +  \cdots + n &= \tfrac{1}{2}\bigl( (1 +  \cdots  + n) + (n +  \cdots +
+ 1)\bigr)\\
+&= \tfrac{1}{2}\bigl( (1 + n) +  \cdots  + (n + 1)\bigr)\\
+        &= \frac{n (n + 1)}{2} \,.\end{align*}
+Det er ikke vanskelig at begrænse de tilsvarende summer af højere potenser.
+For eksempel gælder
+ $\int_{i-1}^i x^2\,
+dx \le i^2 \le \int_i^{i+1} x^2\, dx$; heraf følger
+\[ \sum_{1 \le i \le n} i^2 \le \int_1^{n+1} x^2\, dx = \Bigl[
+\frac{x^3}{3}\Bigr]_{x = 1}^{x = n+1} =
+\frac{(n+1)^3 - 1}{3} \]
+og 
+\[ \sum_{1 \le i \le n} i^2 \ge \int_0^{n} x^2\, dx = \Bigl[ \frac{x^3}{3}
+\Bigr]_{x = 0}^{x = n} =
+\frac{n^3}{3} \,.\]\smallskip
+
+For (\lref{eq:harmonic}) benytter vi ligeledes begrænsningen baseret på integralet\index{sum!integralbegrænsning}. 
+Der gælder
+$\int_i^{i+1}( 1/x)\, dx\leq  1/i\leq \int_{i-1}^i (1/x)\, dx$, og derfor
+\[ \ln n = \int_1^n \frac{1}{x} \, dx \le \sum_{1 \le i \le n} \frac{1}{i}
+\le  1 + \int_1^{n-1} \frac{1}{x}\, dx \le 1 + \ln n \,.\]
+\smallskip
+
+Ligning (\lref{eq:geometric}) følger af
+\[ (1 - q) \cdot \sum_{0 \le i \le n-1} q^i= \sum_{0 \le i \le n-1} q^i - \sum_{1 \le
+i \le n } q^i  = 1 - q^n \,. \]
+For $|q|<1$ kan vi lade $n$ gå mod uendelig, får at nå frem til  $\sum_{i \ge 0} q^i = 1/(1 - q)$. 
+For $q = 1/2$ får vi $\sum_{i \ge 0}  2^{-i} = 2$.
+Envidere gælder
+\begin{align*}
+\sum_{i \ge 1} i\cdot 2^{-i} &= \sum_{j \ge 1} 2^{-j} + \sum_{j \ge 2} 2^{-j} +
+\sum_{j \ge 3} 2^{-j} + \ldots \\
+  &= \left( 1 + \tfrac{1}{2} + \tfrac{1}{4} + \tfrac{1}{8} + \cdots\right) \cdot \sum_{i \ge 1} 2^{-i}\\
+&= 2 \cdot 1 = 2 \,.
+\end{align*}
+For den første ligning skal man blot observere, at for hvert $i$ optræder termen $2^{-i}$ netop i de første $i$ af højresidens $j$-summer.
+\smallskip
+
+Ligning (\lref{eq:concave}) kan man vise ved induktion efter $n$.
+For $n = 1$ er der intet at vise. 
+Betragt altså $n \ge 2$.
+Sæt $x^* = \sum_{1 \le i \le n} x_i/n$ og $\bar{x} = \sum_{1 \le i \le n - 1} x_i/(n-1)$. 
+Da gælder $x^* =( (n-1)\bar{x} + x_n)/n$, og derfor
+\begin{align*}
+\sum_{1 \le i \le n} f(x_i) &= f(x_n) + \sum_{1 \le i \le n -1 } f(x_i) \\
+& \le f(x_n) + (n - 1) \cdot f(\bar{x})
+ = n \cdot \left(\frac{1}{n}\cdot f(x_n) + \frac{n-1}{n} \cdot f(\bar{x})
+\right)\\
+&\le n \cdot f(x^*) \,,
+\end{align*}
+hvor den første ulighed bruger induktionshypotesen og den anden ulighed bruger definitionen af begrebet »konkav«, med
+$x = x_n$, $y = \bar{x}$ og $t = 1/n$. 
+Udvidelsen til konvekse funktioner følger umiddelbart, idet $-f$ er konkav, når $f$ er konveks.
+
