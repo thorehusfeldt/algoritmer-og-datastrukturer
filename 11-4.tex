@@ -16,9 +16,9 @@ I begyndelsen udgør hvert element $v$ fra $1..n$ en klasse for sig;
 klassens repræsentant er $v$ selv.
 Funktionen \emph{find}($v$) returnerer repræsentanten for den klasse, som indeholder $v$.
 For at afgøre, om to elementer tilhører samme klasse eller ej, bestemmer man deres repræsentanter og sammenligner disse.
-Operationen $\varname{foren}(r,s)$, anvendt på repræsentanter af forskellige%
-\footnote{I nogle fremstillinger kan $\varname{foren}$ bruges med vilkårlige elementer som argument.
-Så kaldes operationen på repræsentanter $\varname{hægt}$.
+Operationen $\Id{foren}(r,s)$, anvendt på repræsentanter af forskellige%
+\footnote{I nogle fremstillinger kan $\Id{foren}$ bruges med vilkårlige elementer som argument.
+Så kaldes operationen på repræsentanter $\Id{hægt}$.
 }
 blokke, forener disse blokke til en ny blok (og fastlægger en ny repræsentant).
 
@@ -28,33 +28,33 @@ Vi behøver bare at erstatte $\iif$-anvisningen med følgende:
 
 \begin{quote}
 \begin{tabbing}
-  $r := \varname{find}(u); s := \varname{find}(v);$\\
-  $\iif r\neq s \tthen T:= T\cup \{\{u,v\}\}; \varname{foren}(r,s);$
+  $r := \Id{find}(u); s := \Id{find}(v);$\\
+  $\iif r\neq s \tthen T:= T\cup \{\{u,v\}\}; \Id{foren}(r,s);$
 \end{tabbing}
 \end{quote}
 
 \begin{figure}
   \begin{tabbing}
     ~~~~\=~~~~\= \kill
-    $\Class \varname{Foren-og-Find}(n\colon \NN)$\\
-    \>$\varname{forælder} = \langle 1,\ldots, n\rangle\colon\Array[1..n]\of [1.. n]$ 
+    $\Class \Id{Foren-og-Find}(n\colon \NN)$\\
+    \>$\Id{forælder} = \langle 1,\ldots, n\rangle\colon\Array[1..n]\Of [1.. n]$ 
     \tikz[remember picture] \node (init) {};\\
-    \>$\varname{rang} =\langle 0,\ldots, 0\rangle\colon \Array [1..n]\of [0..\log n]$\\
+    \>$\Id{rang} =\langle 0,\ldots, 0\rangle\colon \Array [1..n]\Of [0..\log n]$\\
     \\
-    $\Function \varname{find}(v\colon 1..n)\colon 1..n$\\
-    \>$\iif \varname{forælder}[v] = v\tthen\return v$\\
-    \> $\eelse$ \=$v':= \varname{find}(\varname{forælder}[v])$
+    $\Function \Id{find}(v\colon 1..n)\colon 1..n$\\
+    \>$\iif \Id{forælder}[v] = v\tthen\return v$\\
+    \> $\eelse$ \=$v':= \Id{find}(\Id{forælder}[v])$
     \tikz[remember picture] \node (pathcompr) {};\\
-    \> \> $\varname{forælder}[v]:=v'$\\
+    \> \> $\Id{forælder}[v]:=v'$\\
     \> \> $\return v'$\\
     \\
-    $\Procedure \varname{foren}(r,s\colon 1..n)$\\
-    \> $\assert r, s \text{ repræsentanter af forskellige klasser}$
+    $\Procedure \Id{foren}(r,s\colon 1..n)$\\
+    \> $\Assert r, s \text{ repræsentanter af forskellige klasser}$
     \tikz[remember picture] \node (margin) {}; \\
-    \> $\iif\varname{rang}[r]< \varname{rang}[s]\tthen \varname{forælder}[r]:= s$
+    \> $\iif\Id{rang}[r]< \Id{rang}[s]\tthen \Id{forælder}[r]:= s$
     \tikz[remember picture] \node (different) {};\\
-    \> $\eelse$ \=$\varname{forælder}[s]:=r$\\
-    \>\>$\iif \varname{rang}[r] =   \varname{rang}[s]\tthen \varname{rang}[r]++$
+    \> $\eelse$ \=$\Id{forælder}[s]:=r$\\
+    \>\>$\iif \Id{rang}[r] =   \Id{rang}[s]\tthen \Id{rang}[r]++$
     \tikz[remember picture] \node (same) {};
   \end{tabbing}
 
@@ -132,24 +132,24 @@ Vi behøver bare at erstatte $\iif$-anvisningen med følgende:
 
 Foren-og-find-datastrukturen er nemt at realisere som følger.
 Hver blok fremstilles som et rodfæstet træ, hvor roden tjener som repræsentant.
-Forgængeren til elementet $v$ i træet gemmes i indgangen $\varname{forælder}[v]$ i rækken $\varname{forælder}[1..n]$.
-For en rod $r$ gælder $\varname{forælder}[r]=r$, hvilket svarer til en løkke ved roden.
+Forgængeren til elementet $v$ i træet gemmes i indgangen $\Id{forælder}[v]$ i rækken $\Id{forælder}[1..n]$.
+For en rod $r$ gælder $\Id{forælder}[r]=r$, hvilket svarer til en løkke ved roden.
  
 Implementationen af operationen \emph{find}$(v)$ er triviel.
 Man følger forælderviseren, til en løkke er fundet.
 Denne løkke sider ved $v$s repræsentant.
-Implementationen af $\varname{foren}(u,v)$ er lignende enkel.
+Implementationen af $\Id{foren}(u,v)$ er lignende enkel.
 Vi gør den ene repræsentant til den andens forælder.
 Den senere mister herved sin rolle som repræsentant; den første tjener som repræsentant repræsentant for den nyskabte klasse.
 Den proces, vi har beskrevet indtil nu, leder til en realisering af foren-og-find-datastrukturen, som er korrekt, men ineffektiv.
-Det er fordi $\varname{forælder}$-referencerne kan danne lange kæder, som skal gennemløbes gentagne gange for hver \emph{find}-operation.
+Det er fordi $\Id{forælder}$-referencerne kan danne lange kæder, som skal gennemløbes gentagne gange for hver \emph{find}-operation.
 I værste fald skal vi bruge lineær tid for hver \emph{find}-operation.
 
 På grund af dette problem er der foretaget to forbedringer i algoritmen i fig.~11.6.
 Den første forbedring forhindrer, at de træer, som udgør klasserne, bliver for dybe.
 Hertil gemmes for hver repræsentant et naturligt tal, repræsentantens \emph{rang}.
 I begyndelsen er hvert element selv en repræsentant, med rang $0$.
-Når $\varname{forælder}$-operationen udføres på to repræsentanter af forskellig rang, bliver repræsentanten med den lavere rang barn til den anden.
+Når $\Id{forælder}$-operationen udføres på to repræsentanter af forskellig rang, bliver repræsentanten med den lavere rang barn til den anden.
 Når rangene er ens, kan den nye repræsentant vælges vilkårligt, men vi øger den nye repræsentants rang med $1$.
 Denne første forbedring hedder \emph{forening efter rang}.
 
@@ -160,7 +160,7 @@ Vis, at rangen af en repræsentant er lig med dybden af det træ, den er rod i.
 
 Den anden forbedring hedder \emph{vejforkortning}.
 Den sikrer, at en kæde af forælderhenvisninger aldrig gennemløbes to gange.
-Hertil ændres ved hver udførelse af $\varname{find}(v)$ alle de besøgte kunders forælderpegere til at pege på repræsentanten for $v$s klasse.
+Hertil ændres ved hver udførelse af $\Id{find}(v)$ alle de besøgte kunders forælderpegere til at pege på repræsentanten for $v$s klasse.
 I fig.~11.6 er denne regel formuleret som rekursiv procedure.
 Proceduren gennemløber først vejen fra $v$ til dennes repræsentant og benytter så rekursionsstakken for påny att gennemløbe denne vej til $v$ i modsat retning.
 Mens rekursionsstakken reduceres, ændres forælderpegerne.
@@ -182,7 +182,7 @@ Da er rangen af en repræsentant altid lig med dybden af det træ, den er rod i 
 Vi kan altså nøjes med at begrænse rangen af hver rod til $\log n$.
 Hertil vil  vi vise (ved induktion), at et træ, hvis rod har rang $k$, indeholder mindst $2^k$ knuder.
 For $k=0$ gælder udsagnet åbenbart.
-  Den eneste tidspunkt, hvor rangen af en rod forandres under en $\varname{foren}$-operation, og i så fald fra $k-1$ til $k$, er når den får et nyt barn, som hidtil var repræsentant med rang $k-1$.
+  Den eneste tidspunkt, hvor rangen af en rod forandres under en $\Id{foren}$-operation, og i så fald fra $k-1$ til $k$, er når den får et nyt barn, som hidtil var repræsentant med rang $k-1$.
 Ifølge induktionshypotesen indeholdt rodens og det nye barns træer inden operationen hver især mindst $2^{k-1}$ knuder.
 Efter operationen har det nye træ derfor mindst $2^k$ knuder, og vi har bevist påstanden.
 Vi konkluderer, at den største rang er højst $\log n$, idet der kun er $n$ knuder i det hele.
@@ -251,53 +251,53 @@ Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for 
 
 \begin{proof}
   (Beviset går tilbage til [104].)
-  Vi betragter en vilkårlig følge af $m$ $\varname{find}$- og $n-1$ $\varname{foren}$-operationer, med udgangspunkt i initialiseringen for mængden $1..n$.
-  Idet $\varname{foren}$ tager konstant tid, kan vi indskrænke os til analysen af $\varname{find}$.
+  Vi betragter en vilkårlig følge af $m$ $\Id{find}$- og $n-1$ $\Id{foren}$-operationer, med udgangspunkt i initialiseringen for mængden $1..n$.
+  Idet $\Id{foren}$ tager konstant tid, kan vi indskrænke os til analysen af $\Id{find}$.
 
   Hidtil har kun rodknuderne haft tildelt en rang.
   Disse range kan vokse i løbet af operationsfølgen.
-  Nu  definerer vi for hver knude $v$ dens \emph{sidste rang} $\varname{sr}(v)$ som rangen af $v$ i det øjeblik, da den for første gang gøres til barn af en anden knude.
+  Nu  definerer vi for hver knude $v$ dens \emph{sidste rang} $\Id{sr}(v)$ som rangen af $v$ i det øjeblik, da den for første gang gøres til barn af en anden knude.
   Skulle $v$ stadig være en rod til sidst, sætter vi $\emph{sr}(v)$ til $v$s endelige rang.
   Vi gør følgende observationer:
   \begin{enumerate}[(i)]
-    \item Langs hver vej i træerne er $\varname{sr}$-værdierne skarpt voksende nedefra og op.
+    \item Langs hver vej i træerne er $\Id{sr}$-værdierne skarpt voksende nedefra og op.
     \item Når en knude $v$ får sin slutrang $h$, indeholder $v$s undertræ mindst $2^h$ knuder.
     \item Der er højst $n/2^h$ knuder med slutrang $h$.
   \end{enumerate}
   \emph{Bevis} for observationerne:
-  (i) Ved induktion i operationerne vil vi vise, at der altid gælder $\varname{sr}(v)<\varname{sr}(u)$, når $v$ er barn til $u$.
+  (i) Ved induktion i operationerne vil vi vise, at der altid gælder $\Id{sr}(v)<\Id{sr}(u)$, når $v$ er barn til $u$.
   I begyndelsen er alle range $0$, og ingen knude er barn til en anden.
-  I det øjeblik, hvor $v$ med gøres til barn af rodknuden $u$ ved en forening, gælder efter operationen at $\varname{rang}(v)<\varname{rang}(u)$ ifølge algoritmen og $\varname{sr}(v)=\varname{rang}(v)$ ifølge definitionen af $\varname{sr}$.
-  Idet der for alle rodknuder gælder $\varname{rang}(u)\leq \varname{sr}(u)$, har vi $\varname{sr}(u)<\varname{sr}(v)$.
+  I det øjeblik, hvor $v$ med gøres til barn af rodknuden $u$ ved en forening, gælder efter operationen at $\Id{rang}(v)<\Id{rang}(u)$ ifølge algoritmen og $\Id{sr}(v)=\Id{rang}(v)$ ifølge definitionen af $\Id{sr}$.
+  Idet der for alle rodknuder gælder $\Id{rang}(u)\leq \Id{sr}(u)$, har vi $\Id{sr}(u)<\Id{sr}(v)$.
   En \emph{find}-operation ændrer ikke ved denne egenskab, da den kun kan gøre $v$ til barn af en af sine aner, som har endnu højere slutrang ved induktion.
 
   (ii)
   I beviset for sætning 11.3 så vi, at en rod af rang $h$ indeholder mindst $2^h$ knuder i sit undertræ. 
   % (TODO orig confused)
-  Det vil sige, at en knude $v$ med slutrang $\varname{sr}(v)= h$ i det øjeblik, hvor den bliver barn til en anden knude, har mindst $2^h$ knuder i sit undertræ.
+  Det vil sige, at en knude $v$ med slutrang $\Id{sr}(v)= h$ i det øjeblik, hvor den bliver barn til en anden knude, har mindst $2^h$ knuder i sit undertræ.
   (Bemærk, at $v$ senere kan miste knuder fra sit undertræ på grund af vejforkortning.)
 
   (iii)
   Betragt for fast $h$ og hver knude $v$ med slutrang $h$ mængden $M_v$ af knuder i $v$s undertræ i det øjeblik, hvor $v$ bliver gjort til barn af en anden knude $u$ (hhv. til sist, hvis $v$ da stadig er en rod).
   Vi påstår at mængderne $M_v$ er disjunkte.
   (Heraf følger påstanden, fordi (ii) medfører, at hver mængde $M_v$ indeholder højst $2^h$ elementer, og der er $n$ elementer i det hele.)
-  Ifølge (i) gælder $\varname{sr}(u)>h$.
+  Ifølge (i) gælder $\Id{sr}(u)>h$.
   Betragt nu $w\in M_v$.
   På grund af foreninger kan $w$ få nye aner i det videre forløb.
-  Men i det øjeblik, hvor $v'$ bliver sådan en ny ane, må $v'$ være rod i et undertræ som også indeholder $u$; ifølge (i) har vi altså $\varname{sr}(v')>\varname{sr}(u)>h$.
+  Men i det øjeblik, hvor $v'$ bliver sådan en ny ane, må $v'$ være rod i et undertræ som også indeholder $u$; ifølge (i) har vi altså $\Id{sr}(v')>\Id{sr}(u)>h$.
   Derfor kan $w$ aldrig tilhøre undertæet til nogen anden knude med slutrang $h$.
   %(TODO still confused.)
 
 \medskip
-  Knuderne med $\varname{sr}$-værdi større end $0$ inddeles nu i \emph{ranggrupper} $G_0,G_1,\ldots$.
+  Knuderne med $\Id{sr}$-værdi større end $0$ inddeles nu i \emph{ranggrupper} $G_0,G_1,\ldots$.
   Ranggruppe $G_k$ indeholder alle knuder med slutrang i $\{T_{k-1}+1,\ldots, T_k\}$, hvor vi tolker $T_{-1}$ som $0$.
   For eksempel indeholder $G_4$ alle knuder med slutrang i intervallet $\{17,\ldots, 65536\}$.
   Da ifølge sætning 11.3 ingen rang kan blive større end $\log n$, kan vi allerede nu ane, at der for praktisk forekommende $n$ aldrig vil være en knude in ranggruppe $G_5$ eller højere. 
   For at være nøjagtig betragter man følgende:
   Når en knude $v$ ligger i ranggruppe $G_k$ for $k\geq 1$, så gælder 
-  \( T_{k-1}<\varname{sr}(v)\leq \log n\).
+  \( T_{k-1}<\Id{sr}(v)\leq \log n\).
   Heraf følger, at 
-  \( T_k = 2^{k-1} < 2^{\varname{sr}(v)} \leq n\),
+  \( T_k = 2^{k-1} < 2^{\Id{sr}(v)} \leq n\),
   hvoraf $k < \log^* n$.
   % (TODO confused)
   Antallet af ikketomme ranggrupper er altså begrænset af $\log^* n$.
@@ -308,8 +308,8 @@ Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for 
   I bund og grund fordeler vi omkostningerne på knuderne $v_i$ langs vejen, med omkostning 1 per knude.
   Vi undtager dog følgende knuder, hvis omkostning vi direkte tilskriver \emph{find}$(v)$-operationen.
   \begin{enumerate}[(a)]
-    \item omkostningen for knuder $v$ med $\varname{sr}(v)=0$ (da må gælde, at $v$ er et blad).
-    \item omkostningen for knuder $v_i$ med $\varname{sr}(v_i)>0$ og hvis forælder $v_{i+1}$ tilhører en højere ranggruppe.
+    \item omkostningen for knuder $v$ med $\Id{sr}(v)=0$ (da må gælde, at $v$ er et blad).
+    \item omkostningen for knuder $v_i$ med $\Id{sr}(v_i)>0$ og hvis forælder $v_{i+1}$ tilhører en højere ranggruppe.
     \item omkostningen for rodknuden $v_r$ og dens umiddelbare efterfølger $v_{r_1}$.
   \end{enumerate}
   Fordi vi fra (i) har, at rangen langs vejen er voksende, og der ikke er mere end $\log^*n$ ikketomme ranggrupper, kan der ikke findes mere end $(\log^*n)-1$ knuder, der er omfattet af (b).
@@ -320,7 +320,7 @@ Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for 
   Betragt en knude $v$ i ranggruppe $G_k$.
   Når $v$ tildeles omkostningen 1 ved en \emph{find}-operation, har $v$ en forælder $u$ (som tilhører $G_k$ pga. (b)), som ikke er roden $s$.
   Derfor får $v$ ved vejforkortningen $s$ som ny forælder.
-  Ved betragtning (i) gælder $\varname{sr}(u)<\varname{sr}(s)$.
+  Ved betragtning (i) gælder $\Id{sr}(u)<\Id{sr}(s)$.
   Det betyder, at når $v$ tildeles omkostningen 1, får den en ny forælder af højere slutrang.
   Efter højst $T_k$ af disse hændelser må $v$ have fået en forælder i en højere ranggruppe, herefter tildeles ikke flere omkostninger til $v$.
   Knuden $v$ tildeles altså højst omkostning $T_k$.

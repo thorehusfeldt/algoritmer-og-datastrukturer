@@ -1,0 +1,152 @@
+\section{Pseudokode}
+
+Rammodellen, dens abstrakion og forenkling af maskinprogrammer, som skal udføres på en mikroprocessor, skal muliggøre en nøjagtig definition af begrebet »regnetid«.
+Modellen er derimod på grund af sin enkelhed ikke egnet til formuleringen af komplekse algoritmer, fordi de tilsvarende ramprogrammer bliver alt for lange og svære at læse.
+I stedet skal vi formulere vores programmer i \emph{pseudokode}, som fremstiller er abstraktion og forenkling af imperative programmeringssprog som C, C++, Java, C\# og Pascal, kombinered med rundhåndet anvendelse af matematisk notation.
+Vi skal nu beskrive vores konventioner for pseudokodenotation i denne bog, og udlede en tidsmålingsmodel for pseudokodeprogrammer.
+Denne er meget enkel: 
+\emph{Grundlæggende pseudokodeinstruktioner behøver konstant tid; procedure- og funktionskald behøver konstant tid plus tiden for at udføre deres krop.}
+Vi skal retfærdiggøre dette ved at skitsere, hvordan man kan oversætte pseudokode til ækvivalent ramkode, som netop har denne tidsopførsel.
+Vi skal nøjes med at forklare denne oversættelse så langt, at tidsmålingsmodellen bliver forståelig.
+Man skal altså ikke gøre sig overvejelser om compileroptimeringsteknikker, idet kontante faktorer ikke spiller nogen rolle i vores teori.
+Læseren er dog velkommen til at bladre forbi de næste afsnit og acceptere tidsmålingsmodellen for pseudokode som aksiomatisk.
+Den her benyttede syntax ligner Pascal [110], fordi denne notation virker typografisk mere behagelig for bogformen end den velkendte syntax fra C og dette sprogs videreudviklinger som C++ og Java.
+
+\subsection{Variabler og elementære datatyper}
+
+En \emph{variabelerklæring} »$v=x\colon T$« stiller en variabel $v$ af typen $T$ til rådighed og initialiserer den med værdien $x$.
+For eksempel skaber »$\Id{svar} = 42:\NN$« en variabel $\Id{svar}$, som kan antage ikkenegative heltalsværdier, og initialiserer den med værdien $42$.
+Muligvis undlader vi at nævne typen af en variabel, hvis den fremgår af sammenhængen.
+Som typer forekommer elementartyper som fx heltal, boolesk værdier og pegere (referencer) og sammensatte typer.
+Hertil findes fordefinerede sammensatte typer som rækker og anvendelsesspecifikke klasser (se nedenfor).
+Når typen af en variabel er irrelevant for fremstillingen, benytter vi den uspecificerede type $\Element$ som pladsholder for en vilkårlig type.
+Sommetider udvides de numeriske typer med værdierne $+\infty$ og $-\infty$, når det er bekvemt.
+Ligeledes udvider vi sommetider typer med den udefinerede værdi (betegnet med symbolet $\bot$), som skal kunne skelnes fra »egentlige« objekter af typen $T$.
+Især ved pegertyper er en udefineret værdi nyttig.
+Værdier af pegertypen »$\Kw{Peger på} T$« er »håndtag« for objekter af typen $T$.
+I rammodellen er sådan en håndtag bare indeks (»adressen«) af den første celle af et lagersegment, som indeholder et objekt af typen $T$.
+
+Den erklæring »$a\colon \Array[i..j]\Of T$« stiller en \emph{række $a$} til rådighed, som består af $j-i+1$ \emph{indgange} af typen $T$, som er gemt i $a[i].a[i+1],\ldots,a[j]$.
+Rækker er realiserede som sammenhængende lagersegmenter.
+For at finde indgangen ved $a[k]$ er det nok kende startadressen af $a$ og størrelsen af objekter af typen $T$.
+Hvis fx registeret $R_a$ indeholder startadressen for objektet $a[0..k]$ og $R_i$ indeholder indeks $42$, og hvis hver indgang er et lagerord, så læser kommandosekvensen »$R_1:= R_a+R_i; R_2:=S[R_1]$« inholdet af $a[42]$ ind i register $R_2$.
+Størrelsen af rækken bliver lagt fast, så snart erklæringen er udført; den slags rækker hedder \emph{statiske}.
+I afsnit 3.2 skal vi se, hvordan man implementerer \emph{dynamiske rækker}, som kan vokse og krympe i løbet af programudførelsen.
+
+En erklæring $c\colon\Class\Id{alder}:\NN, \Id{indkomst}\colon\NN\Kw{ end}$ stiller en variable $c$ til rådighed, hvis værdier er heltalspar.
+Komponenterne angives som $a.\Id{alder}$ og $a.\Id{indkomst}$.
+For en variabel $c$ giver $\Kw{adresse på } c$ et håndtag til $c$ (dvs. $c$s adresse).
+Når $p$ er en variabel af en passende pegertype, så kan vi gemme dette håndtag i $p$ med kommandoen »$p:= \Kw{adress på } c$«; mens utrykket »$*p$« giver objektet $c$ tilbage.
+De to »\emph{felter}« i $c$ kan også betegnes som $p\rightarrow \Id{alder}$ og $p\rightarrow\Id{indkomst}$.
+Den alternative skrivemåde $(*p).\Id{alder}$ og $(*p).\Id{indkomst}$ er mulig, men sjældent brugt.
+
+Rækker og objekter, som refereres til af pegere, stilles til rådighed og navngives med kommandoen $\allocate$ og frigøres igen med kommandoen $\dispose$.
+For eksempel stiller kommandoen »$p:=\allocate \Array[1..n] \Of T$« en række med $n$ objekter af typen $T$ til rådighed, dvs. at der reserveres et sammenhængende lagersegment, hvis længe akkurat rækker til $n$ objekter af typen $T$, og variablen $p$s værdi sættes til rækkens håndtag (lagersegmentets startadresse).
+Anvisningen $\dispose$ frigiver lagerområdet, så det kan anvendes til andet brug.
+Med operationerne $\allocate$ og $\dispose$ kan vi opdele rækken $S$ af ram-lagerceller i disjunkte segmenter, som kan tilgår enkeltvis.
+Begge funktioner kan implementeres på en sådan måde, at de kun kræver konstant tid, fx på følgende ekstremt nemme måde:
+Adressen til den første ledige lagercelle i $S$ holdes i specialvariablen $\Id{fri}$.
+% TODO konsekvensret bestemt ental af variabel
+Et kald til $\allocate$ reserverer et lagerafsnit, som begynder ved $\Id{fri}$, og øger $\Id{fri}$ med omfanget af det reserverede afsnit.
+Et kald til $\dispose$ har ingen effekt.
+Denne implementation er tidseffektiv men ikke lagereffektiv:
+Godtnok kræver både $\allocate$ og $\dispose$ kun konstant tid, men det totale lagerforbrug er summen af længderne af samtlige nogenside reserverede segmenter i stedet for maksimum af den til et bestemt tidspunkt brugte (dvs. reserverede, men endnu ikke frigivne) plads.
+Om det er muligt, at realisere en vilkårlig følge af $\allocate$- og $\dispose$-operationer både lagereffektivt og med konstant tidsforbrug per operation, er et åbent problem.
+For de algoritmer, som præsenteres i denne bog, kan $allocate$ og $\dispose$ dog realiseres både tids- og pladseffektivt på samme tid.
+
+Vi vil overtage nogle sammensatte datatyper fra matematiken.
+Især vil vi bruge tupler, endelige følger og mængder.
+[TODO orig close paren] Ordnede par, tripler og andre tupler skriver vi i parenteser som fx $(3,1)$, $(3,1,4)$ og $(3,1,4,1,5)$.
+Idet de indholder et at typen fastlagt antal komponenter, kan operationer på tupler opdeles i operationer på deres komponenter på en oplagt måde.
+En \emph{følge}, skrevet i spise parenteser, gemmer objeter af samme type i en specifik rækkefølge; herved bestemmer typen ikke antallet af indgange.
+For eksempel erklærer tildelingen »$s=\langle 3,1,4,1\rangle\colon\Id{Følge }\Kw{ af } \ZZ$ en følge $s$ af heltal og initialiserer den med følgen $\langle 3,1,4,1\rangle$ af tallene $3$, $1$, $4$ og $1$ i rækkefølge.
+Den tomme følge skrives som $\langle\,\rangle$.
+Følger er naturlige abstraktioner af mange datastrukturer som fx arikver (eng. \emph{files}), strenge (tegnfølger), lister, stakke, køer og prioritetskøer.
+I kap.~3 skal vi betragte mange forskellige muligheder for at repræsentere følger.
+I senere kapitler vil vi bruge følger som matematisk abstraktion på mange måder, uden at tage videre hensyn til implementationsdetaljer.
+
+Mængder spiller en vigtig rolle i matematiske overvejelser; vi vil også benytte dem i vores pseudokode.
+Der vil altså forekomme erklæringer som fx »$M=\{3,1,4\}\colon\Id{ Mængde } \Kw{ af }\NN$«, som skal forstås på samme måde som erklæringer af rækker eller mængder.
+Implementationen af datatypen »mængde« sker for det mest ved hjælp af følger.
+
+\subsection{Anvisninger}
+
+Den enkleste anvisning er \emph{tildelningen} »$x:=E$«, hvor $x$ er en variabel og $E$ er et udtryk.
+En tildeling kan transformeres til en følge af ram-operationer af konstant længde.
+For eksempel bliver tildelingen $a:=a+b\cdot c$ oversat til »$R_1:=R_b*R_c;\allowbreak R_a:= R_a+R_1$«, hvor $R_a$, $R_b$ og $R_c$ angiver de registre, som indholder $a$, $b$ hhv. $c$.
+Fra programmeringssproget C låner vi forkortelserne $++$ og $--$ for øgning og mindskning af en variabel med $1$.
+Vi vil også bruge simultan tildeling af flere variabler.
+Hvis fx $a$ og $b$ er variabler af samme type, så bytter »(a,b):=(b,a)« indholdet af $a$ og $b$.
+
+Den betingede anvisning $\iif C\tthen I \eelse J$, hvor $C$ er et boolsk udtryk og $I$ og $J$ er anvisninger, oversættes til kommandofølgen
+\[
+\Id{eval}(C); \mathtt{JZ} \Id{sEllers}, R_C; \Id{oversæt}(I); \mathtt{J} \Id{sEnde}; \Id{oversæt}(J)\,.\]
+De enkelte dele skal læses som følger:
+$\Id{eval}(C)$ er en følge af anvisninger, som evaluerer udtrykket $C$ og gemmer resultatet i registret $R_C$;
+$\Id{oversæt}(I)$ er en følge af anvisninger, som implementerer anvisningen $I$;
+$\Id{oversæt}(J)$ implementerer anvisningen $J$;
+$\Id{sEllers}$ er nummeret på den første kommando i $\Id{oversæt}(J)$;
+endelig er $\Id{sEnde}$ nummeret på den første kommando som følger efter $\Id{oversæt}(J)$.
+Denne følge beregner først værdien af $C$.
+Hvis denne er $\Id{falsk}$ ($=0$), hopper ram-programmet til den første kommando i oversættelsen af $J$.
+Hvis resultatet derimod er $\Id{sand}$ ($=1$),  udfører programmet oversættelsen af $I$ og hopper derefter videre til den første kommando, som følger efter oversættelsen af $J$.
+Anvisningen $\iif C \tthen I$ er en forkortelse for $\iif C \tthen I\eelse ;$, dvs. en betinget udførelse med tom ellers-gren.
+
+Man kan gruppere enkelte anvisninger ved at sætte dem efter hinanden som $I_1;ldots;I_r$, og kan opfatte denne gruppe som (kompleks) anvisning.
+Ved oversættelsen til et maskinprogram bliver oversættelserne af de enkelte dele sat efter hinanden.
+
+Vores pseudokodenotation for programmer er tiltænkt en menneskelig læser og følger derfor ikke en lige så streng syntaks som programmeringssprog skal gøre.
+Især vil vi bruge indrykninger for at gruppere anvisninger, hvilket sparer os for en masse parenteser sammenlignet fx med C-programmer.
+Højniveausprogrammeringssprog som C er et kompromis mellem læsbarhed for mennesker og maskinel behandling.
+Vi vil kun bruge parenteser til gruppering, hvis programmet ellers var flertydigt.
+På samme måde bruger vi linjeskift i stedet for semikolon for at dele to anvisnigner.
+
+En løkke $\Kw{ gentag } I \Kw{ indtil } C$ oversættes til $\Id{oversæt}(I); \Id{eval}(C); \texttt{JZ} sI, R_C$, hvor $\Id{sI}$ er nummeret på den første kommando i $\Id{oversæt} (I)$.
+Vi skal bruge mange andre former for løkker, som man kan forstå som forkortelser til $\Kw{gentag}$-løkker.
+I følgende tabel angives til venstre nogle eksempler på den slags forkortelser, og til højre den fulde formulering.
+
+\medskip
+\begin{tabular}{ll}
+$\Kw{mens } C \Kw{ udfør } I$ &  $\Kw{hvis } C \Kw{ så gentag } I \Kw{ indtil } \neg C$\\
+$\Kw{for } i:= a \Kw{ til } b \Kw{ udfør } I$ &  $i:=a; \Kw{mens } i\leq b \Kw{ udfør } I; i++ $\\
+$\Kw{for } i:= a \Kw{ to } \infty \Kw{ mens } C \Kw{ udfør } I$ &  $i:=a; \Kw{mens } C\Kw{ udfør } I; i++ $\\
+$\Kw{for hvert } e\in s \Kw{ udfør } I$ &  $\Kw{for} i:=1 \Kw{ til } |s|\Kw{ udfør } e:=s[i]; I$\\
+\end{tabular}
+
+Ved oversættelsen af løkker til ram-kode er mange maskinnære forbedringer mulige, som vi dog ikke tager hensyn til her.
+For vores formål er det kun af betydning, at regnetiden for udførelsen af en løkke er summen af de enkelte gennemløb, hvor man naturligvis skal tage hensyn til udførelsestiden for betingelsens evalueringer.
+
+
+\subsection{Procedurer og funktioner}
+
+[TODO]
+
+\subsection{Objektorientering}
+
+Vi vil holde os til en enkel form for objektorientering med formålet at adskille datastrukturers specifikation (eller \emph{grænsefladen}) fra implementationen.
+Vi vil forklare den tilsvarende notation ved hjælp af et eksempel.
+Definitionen
+
+\begin{quote}
+\begin{tabbing}
+~~~~\=~~~~\=\kill
+$\Kw{Klasse }\Id{Komplekst}(x,y\colon\Id{tal}) \Kw{ af } \Id{tal}$\\
+\>$\Id{re} = x\colon \Id{tal}$\\
+\>$\Id{im} = y\colon \Id{tal}$\\
+\>$\Kw{Funktion }\Id{abs}\colon \RR \Kw{ returner } \sqrt{\Id{re}^2+ \Id{im}^2}$\\
+\>$\Kw{Funktion }\Id{add}(c'\colon\Id{ Komplekst})\colon
+\Id{Komplekst}$\\
+\>\>$\Kw{ returner }\Id{ Komplekst}(\Id{re} + c'.\Id{re}, \Id{im} + c'.\Id{im})$\\
+\end{tabbing}
+\end{quote}
+
+stiller en (delvis) implementation af en taltype for komplekse tal til rådighed, som kan bruge vilkårlige taltyper som $\ZZ$, $\QQ$ eller $\RR$ til real- og imaginærdelen.
+(»$\Id{Komplekst}$« er også et eksempel på, at vi ofte vil skrive vores klassenavne med stort begyndelsesbogstav.)
+Real- og imaginærdel holdes i \emph{instansvariablerne} $\Id{re}$ hhv. $\Id{im}$.
+Deklarationen »$c\colon\Id{Komplekst}(2,3)\Kw{ af }\RR$« skaber et komplekst tal $c$, som initialiseres til $2+3i$, hvor $i$ angiver den imaginære enhed.
+Med $c.\Id{im}$ får man $c$s imaginærdel, og med metodekaldet $c.\Id{abs}$ absolutværdien af $c$ -- et reelt tal.
+
+Angivelsen af en type efter $\Kw{af}$ i variabeldeklarationen gør det muligt at parameterisere klasser på lignende måde som \emph{template}-mekanismen i C++ og de generiske typer i Java.
+Læg mærke til, at de tidligere deklarationer »$\Id{Mænge }\Kw{af }\Id{Element}$« og »$\Id{Følge }\Kw{af }\Id{Element}$« med denne notation definerer helt almindelge parameteriserede klasser.
+Objekter i en klasse intialiseres ved at tildele instansvariablerne de værdier, som er angivet i variabeldeklarationen.
+
