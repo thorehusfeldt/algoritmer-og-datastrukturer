@@ -53,7 +53,7 @@ Denne tilgang svarer til den sædvandlige adgang for en række,
 \index{række!statisk}
 hvor man med udtrykket $s[i]$ får adgang til den $i$te indgang i følgen $s$.
 Vores pseudokode (se afsnit~\ref{s:array}) stiller \emph{statiske rækker} til rådighed.
-Vi taler om en \emph{statisk} datastruktur, når dens størrelse er givet på forhånd og ikke kan ændres ved indføjelser og fjernelser.
+Vi taler om en \emph{statisk} datastruktur, når dens størrelse er givet på forhånd og ikke kan ændres ved tilføjelser og fjernelser.
 Vi kalder datastrukturen \emph{begrænset},
 \index{begrænset række|textbf}
 \index{række!begrænset|textbf}
@@ -134,7 +134,7 @@ Ved siden af den lokale linearitet er det desuden nødvendigt at sørge for, at 
     \> $e\colon \Element$\\
     \> $\nnext\colon\Handle$\> \tikz[remember picture] \node (lnode) {};\\
     \> $\prev\colon\Handle$\\
-    \> $\invariant \nnext\rightarrow\prev = \prev\rightarrow\nnext = \this$
+    \> $\Invariant \nnext\rightarrow\prev = \prev\rightarrow\nnext = \this$
   \end{tabbing}
   \tikzset{ 
     lnode/.style={rectangle split, rectangle split parts=3, draw}, 
@@ -323,8 +323,8 @@ I opgave 3.3 spørges og i afsnit 3.6 diskuteres hvordan denne funktion kan impl
     \qquad \comment{Position før alle indgange}\\
     \\
     \> $\Function\Id{tom}\colon\{0,1\} \quad\return h.next = \this$\\
-    \> $\Function\Id{først}\colon\Handle \quad\Assert \neg\Id{tom}; \return h.\Id{næste} $\\
-    \> $\Function\Id{sidst}\colon\Handle \quad\Assert \neg\Id{tom}; \return h.\Id{forrige} $\\
+    \> $\Function\Id{første}\colon\Handle \quad\Assert \neg\Id{tom}; \return h.\Id{næste} $\\
+    \> $\Function\Id{sidste}\colon\Handle \quad\Assert \neg\Id{tom}; \return h.\Id{forrige} $\\
     % TODO removed semicolons after function head
     \\
     \>\comment{Flytning af enkelte indgange inden for samme følge.}\\
@@ -333,21 +333,21 @@ I opgave 3.3 spørges og i afsnit 3.6 diskuteres hvordan denne funktion kan impl
    \langle \ldots, a,c,\ldots,a',b,c',\ldots\rangle$.}\\
     \>$\Procedure \Id{flytEfter}(b,a'\colon\Handle) \quad\Id{splejs}(b,b,a')$\\
     \>$\Procedure \Id{flytForrest}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{hoved})$\\
-    \>$\Procedure \Id{flytBagerst}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{sidst})$\\
+    \>$\Procedure \Id{flytBagerst}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{sidste})$\\
     \\
     \>\comment{Indsættelse og fjernelse af enkelte indgange.}\\
     % TODO added "enkelte"
     \>\comment{$\langle \ldots, a,b,c,\ldots\rangle \mapsto
    \langle \ldots, a,c,\ldots\ldots\rangle$.}\\
     \>$\Procedure \Id{fjern}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{friListe}.\Id{hoved})$\\
-    \>$\Procedure \Id{fjernForrest} \quad\Id{fjern}(\Id{først})$\\
-    \>$\Procedure \Id{fjernBagerst} \quad\Id{fjern}(\Id{sidst})$\\
+    \>$\Procedure \Id{fjernForrest} \quad\Id{fjern}(\Id{første})$\\
+    \>$\Procedure \Id{fjernBagest} \quad\Id{fjern}(\Id{sidste})$\\
     \\
     \>\comment{$\langle \ldots, a,b,\ldots\rangle \mapsto
    \langle \ldots, a,e,b,\ldots\ldots\rangle$.}\\
     \>$\Function \Id{indsætEfter}(x\colon\Element, a\colon\Handle)\colon \Handle$ \\
     \>\>$\Id{sikrFriListe}$\hspace{2cm}\=\comment{Sikr at $\Id{friListe}$ er ikketom. Se opg. 3.3.}\\
-    \>\>$a':=\Id{friListe}.\Id{først}$\>\comment{Skaf ny knude $a'$ til at indeholde $x$,}\\
+    \>\>$a':=\Id{friListe}.\Id{første}$\>\comment{Skaf ny knude $a'$ til at indeholde $x$,}\\
     \>\>$\Id{flytEfter}(a',a)$\>\comment{indsæt den på rette plads,}\\
     \>\>$a'\rightarrow e:= x$\>\comment{og fyld den med det rette indhold.}\\
     \>\>$\return a'$\\
@@ -355,13 +355,13 @@ I opgave 3.3 spørges og i afsnit 3.6 diskuteres hvordan denne funktion kan impl
     \>$\Function\Id{indsætFør}(x\colon\Element; b\colon\Handle)\colon\Handle \quad \return\Id{indsætEfter}(e, b\rightarrow\Id{forrige})$\\
     % TODO wft er pred(b)
     \>$\Procedure\Id{tilføjForrest}(x\colon\Element) \quad \Id{indsætEfter}(x, \Id{hoved})$\\
-    \>$\Procedure\Id{tilføjBagerst}(x\colon\Element) \quad \Id{indsætEfter}(x, \Id{sidst})$\\
+    \>$\Procedure\Id{tilføjBagerst}(x\colon\Element) \quad \Id{indsætEfter}(x, \Id{sidste})$\\
     \\
     \>\comment{Behandling af hele lister.}\\
     \>\comment{$(\langle a, \ldots, b\rangle, \langle c,\ldots,d\rangle) \mapsto
 		(\langle a, \ldots, b, c,\ldots,d\rangle, \langle \,\rangle)$}\\
     \>$\Procedure\Id{sammenføj}(L'\colon\Id{Liste})\quad 
-    \Id{splejs}(L'.\Id{først}, L'.\Id{sidst},\Id{sidst})$\\
+    \Id{splejs}(L'.\Id{første}, L'.\Id{sidste},\Id{sidste})$\\
     \\
     \>\comment{$\langle a, \ldots, b\rangle \mapsto \langle \,\rangle$}\\
     \>$\Procedure\Id{tøm}\quad \Id{friListe}.\Id{sammenføj}(\this)$
@@ -375,8 +375,8 @@ I fig.~\ref{alg:dlist} finder man mange eksempler på den slags operationer.
 For at afgøre, om en liste er tom, behøver man bare at undersøge, om $h$ er sin egen efterfølger.
 \index{liste!tom@\Id{tom}}
 Når en liste ikke er tom, finder man dens første og sidste indgang som efterfølger hhv. forgænger til $h$.
-\index{liste!fzrst@\Id{først}}
-\index{liste!sidst@\Id{sidst}}
+\index{liste!fzrste@\Id{første}}
+\index{liste!sidste@\Id{sidste}}
 For at flytte en knude $b$ til positionen efter en knude $a'$, klipper man bare den delliste, som begynder og ender ved $b$, ud og føjer den ind efter $a$.
 \index{liste!flytning af enkelt knude|textbf}
 Dette gøres med kaldet \emph{splejs}$(b,b', a)$.
@@ -549,7 +549,7 @@ En nyttig tilføjelse til enkelthægtede lister er en peger på den sidste list
   Implementer klassene $\Id{EGreb}$, $\Id{EElement}$,$\Id{EListe}$ på basis af enkelthægtede lister svarende til
   $\Id{Greb}$, $\Id{Element}$ og $\Id{Liste}$.
   Vis, at alle de følgende operationer kan implementeres, så de tager konstant tid.
-  Hertil skal operationerne $\Id{hoved}$, $\Id{først}$, $\Id{sidst}$, $\Id{tom}$, $\Id{fjernForrest}$, $\Id{indsætForrest}$, $\Id{indsætForrest}$, $\Id{indsætEfter}$, $\Id{sammenføj}$ og $\Id{gørTom}$ have den samme grænseflade som for dobbelhægtede lister;
+  Hertil skal operationerne $\Id{hoved}$, $\Id{første}$, $\Id{sidste}$, $\Id{tom}$, $\Id{fjernForrest}$, $\Id{indsætForrest}$, $\Id{indsætForrest}$, $\Id{indsætEfter}$, $\Id{sammenføj}$ og $\Id{gørTom}$ have den samme grænseflade som for dobbelhægtede lister;
   hvorimod operationerne $\Id{flytEfter}$, $\Id{flytTilForrest}$, $\Id{flytTilBagest}$, $\Id{fjern}$, $\Id{fjernForrest}$ og $\Id{findNæste}$ har brug for ændringer i grænsefladen.
 \end{exerc}
 
@@ -565,7 +565,7 @@ Vi betragter nu en datastruktur for rækker, som ved siden af den indeksbaseret 
 \index{række!fjernBagest@\Id{fjernBagest}|textbf}
 \index{række!indsætForrest@\Id{indsætForrest}|textbf}
 \index{række!størrelse@\Id{størrelse}|textbf}
-\index{række!adgang@adgang $[{}\cdot{}]$|textbf}
+\index{række!adgang@adgang med $[{}\cdot{}]$|textbf}
 \begin{align*}
   \langle e_1,\ldots, e_n\rangle.\Id{indsætBagest}(e) &=
 \langle e_1,\ldots, e_n, e\rangle\,,\\
@@ -611,7 +611,7 @@ Forneden før vi rede for vores valg af værdierne for $\alpha$ og $\beta$.
     \>$\Constant \alpha = 4\colon \RR_{>0}$\\
     \>$w=1\colon\NN$\\
     \>$n=0\colon\NN$\\
-    \>$\invariant n\leq w\leq \alpha n\text{ eller }n=0\text{ og }w\leq\beta$\\
+    \>$\Invariant n\leq w\leq \alpha n\text{ eller }n=0\text{ og }w\leq\beta$\\
     \>$b\colon\Id{Række} [1..w] \Of \Id{Element}$\\
     \\
     \>$\mathbf{Operator} [i\colon\NN]\colon\Id{Element}$\\
@@ -739,7 +739,7 @@ Vi skal se nærmere på to variationer over beviset for lemma~\ref{lem: UArray a
 Hidtil har vi anslået to mønter for hvert $\Id{indsætBagest}$- og en mønt for hvert $\Id{fjernBagest}$-kald.
 Alternativt kunne vi have regnet med tre mønter for $\Id{indsætBagest}$ og ingen mønter for $\Id{fjernBagest}$.
 Afregningen er ligetil:
-Af de tre mønter bruges de to til at finansiere en indgangs indføjelse og den tredje til dens fjernelse, som altså er blevet betalt lang tid i forvejen.
+Af de tre mønter bruges de to til at finansiere en indgangs tilføjelse og den tredje til dens fjernelse, som altså er blevet betalt lang tid i forvejen.
 
 \begin{exerc}[Fortsættelse af opg.~\ref{exerc: alpha beta costs}]
   Vis, at det er nok med en afgift på $\beta(\beta-1)+\beta)(\alpha-\beta)$ mønter for hver $\Id{indsætBagest}$-operation.
@@ -771,9 +771,9 @@ Hun har en \emph{stak} af ubehandlede sagsmapper på sit skrivebord.
 Nyt sagsmapper bliver lagt på toppen af stakken.
 Når sagsbehandleren vil behandle en sag, vælger hun den mappe, der ligger øverst på stakken.
 Denne »datastruktur« af sagsmapper er nem at bruge; selvom den kan ske, at visse mapper længere nede i stakken ender med at forblive ubehandlede i lang tid $\ldots$.
-I terminologien for klassen $\Id{Liste}$ fra afs.~3.1 er en \emph{Stak} en følge, som kun bruger operationerne $\Id{tilføjBagest}$, $\Id{fjernBagest}$, $\Id{sidst}$ og $\Id{tom}$.
+I terminologien for klassen $\Id{Liste}$ fra afs.~3.1 er en \emph{Stak} en følge, som kun bruger operationerne $\Id{tilføjBagest}$, $\Id{fjernBagest}$, $\Id{sidste}$ og $\Id{tom}$.
 Når vi taler om stakke, forkorter vi gerne de første tre operationer til $\Id{stak}$,
-\footnote{O.a.: I mange fremstillinger og programbiblioteker dækker funktionen $\Id{afstak}$ over en kombination af $\Id{sidst}$ og $\Id{fjernBagest}$, som både returnerer det sidste element (dvs. staktoppen) og fjerner det fra stakken.}
+\footnote{O.a.: I mange fremstillinger og programbiblioteker dækker funktionen $\Id{afstak}$ over en kombination af $\Id{sidste}$ og $\Id{fjernBagest}$, som både returnerer det sidste element (dvs. staktoppen) og fjerner det fra stakken.}
 $\Id{afstak}$ og $\Id{top}$.
 \index{stak!stak@\Id{stak}|textbf}
 \index{stak!afstak@\Id{afstak}|textbf}
@@ -784,17 +784,17 @@ En anden opførsel kan man se, når folk står i kø hos bageren:
 Kunder stiller sig bagest i køen og forlader en forrest, når de når frem til disken.
 Sådan en følge kaldes \emph{kø}, \emph{fifu-liste} eller \emph{fifu-kø} (»først ind, først ud«).
 \index{kø|textbf}
-I terminologien for klassen $\Id{Liste}$ fra afs.~\ref{s:list} er en kø en følge, som kun bruger operationerne $\Id{tilføjBagest}$, $\Id{fjernForrest}$, $\Id{først}$ og $\Id{tom}$, hvoraf de første kan omdøbes til $\Id{kø}$ og $\Id{afkø}$%
+I terminologien for klassen $\Id{Liste}$ fra afs.~\ref{s:list} er en kø en følge, som kun bruger operationerne $\Id{tilføjBagest}$, $\Id{fjernForrest}$, $\Id{første}$ og $\Id{tom}$, hvoraf de første kan omdøbes til $\Id{kø}$ og $\Id{afkø}$%
 \index{kø!kø@\Id{kø}|textbf}
 \index{kø!afkø@\Id{afkø}|textbf}
-\index{kø!først@\Id{først}|textbf}
-\footnote{O.a.: I mange fremstillinger og programbiblioteker dækker funktionen $\Id{afkø}$ over en kombination af $\Id{først}$ og $\Id{fjernForrest}$, som både returnerer det første element i køen og fjerner det fra køen.}.
+\index{kø!første@\Id{første}|textbf}
+\footnote{O.a.: I mange fremstillinger og programbiblioteker dækker funktionen $\Id{afkø}$ over en kombination af $\Id{første}$ og $\Id{fjernForrest}$, som både returnerer det første element i køen og fjerner det fra køen.}.
 
 En mere almen \emph{dobbeltkø} 
 \index{dobbeltkø|textbf}
 stiller operationerne
-$\Id{først}$,
-$\Id{sidst}$,
+$\Id{første}$,
+$\Id{sidste}$,
 $\Id{tilføjForrest}$, 
 $\Id{tilføjBagest}$, 
 $\Id{fjernForrest}$,
@@ -855,7 +855,8 @@ I fig~.\ref{fig:queues} er funktionaliteten af datastrukturerne stak, kø og dob
    Præster bærer disse skiver enkeltvis frem og tilbage mellem tre lange nåle i overenstemmelse med Brahmas urokkelige lov: ingen skive må anbringes på en mindre skive.
    Da jorden blev skabt, lå alle 64 skiver på samme nål; die dannede Brahmas tårn.
    For tiden er transporten af skiverne til den anden nål i fuld gang.
-   Når endelig Brahmas tårn genopstår i sin helhed på den anden nål, så er verdens undergang kommet og alt bliver støv.} [103] 
+   Når endelig Brahmas tårn genopstår i sin helhed på den anden nål, så er verdens undergang kommet og alt bliver støv.} 
+ \cite{Hof83}
    \footnote{I virkligheden blev denne historie fundet på i 1883 af den franske matematiker Édouard Lucas som matematisk gåde.}
    \index{Lucas, Édouard}
 
@@ -880,7 +881,7 @@ For den andet tillader smallere grænseflader en større fleksibilitet ved imple
 På grund af deres enkelhed kan stakke og køer bruge specialiserede implmentationer, som er mere pladsbesparende end implentationen af den almindelige type $\Id{Liste}$.
 Vi vil se nærmere på denne algoritmiske aspekt i resten af afsnittet.
 Især vil vi stræve efter implementationer, som er baserede på rækker i stedet for lister.
-For det tredje er lister uegnede til brug af baggrundslageret, idet hver adgang til en listeknude kan udløse en i/u-operation.
+For det tredje er lister uegnede til brug af fjernlageret, idet hver adgang til en listeknude kan udløse en i/u-operation.
 Når man derimod fremstiller stakke og køer med rækker, føre deres sekventielle adgangsmønster til gentagen adgang til samme blok i skyggelageret, hvilket leder til en stor forbedring af effektiviteten.
 
 Begrænsede stakke, hvis maksimale størrelse er kendt på forhånd, kan umiddelbart implementateres som begrænsede rækker.
@@ -900,7 +901,7 @@ Dobbeltkøer kan derimod ikke fremstilles som enkelthægtede lister på nogen ef
   \DeclareInit{$h$}{$\NN$}{$0$}\qquad\comment{Indeks på første indgang\hspace*{3.2cm}}\\
   \DeclareInit{$t$}{$\NN$}{$0$}\qquad\comment{Indeks på første ledige position\hspace*{0.5cm}\unitlength1cm\begin{picture}(2.5,0)\includegraphics[width=2.3cm]{img/cycle-queue.eps}\end{picture}}\\[2mm]
     \TFunct{tom}{$\{0,1\}$}; \Return $h=t$\\[2mm]
-    \TFunct{først}{Element}; \Assert $\neg\Id{tom}$; $\Return b[h]$\\[2mm]
+    \TFunct{første}{Element}; \Assert $\neg\Id{tom}$; $\Return b[h]$\\[2mm]
   \TFunct{størrelse}{$\NN$}; \Return $(t-h+n+1) \bmod (n+1)$\\[2mm]
     \Procedure \Id{tilføjBagest}(\Declare{$x$}{\Id{Element}})\+\\
     \Assert $\Id{størrelse}<n$\\
@@ -935,12 +936,14 @@ Med ugangspunkt i begrænsede køer og dobbeltkøer kan man med teknikkerne for 
 Nu har vi set de væsentlige teknikker, som man har brug for til implementationen af stakke, køer og dobbeltkøer.
 Disse teknikker kan kombineres for at opnå løsninger, som er specielt velegnede til meget lange følger, og til beregninger, som benytter eksterne lagermedier.
 
-\begin{exerc}[Lister af rækker.]
+\begin{exerc}[Lister af rækker]
   \index{liste!af rækker}
+  TODO
 \end{exerc}
 
-\begin{exerc}[Stakke og køer i fjernlageret.]
+\begin{exerc}[Stakke og køer i fjernlageret]
     \index{liste!fjernlager}
+    TODO
 \end{exerc}
 
 \section{Sammenligning af lister og rækker}
@@ -962,14 +965,14 @@ Dog skal det siges, at rækker mere effektivt udnytter det skjulte lager, mens l
   $[\cdot]$ & $n$ & $n$ & 1 & 1 \\
   $\Id{størrelse}$ & $1^*$ & $1^*$ & 1 & 1  & ikke med $\Id{splejs}$ for flere lister
   \\
-  $\Id{først}$ & $1$ & $1$ & 1 & 1  \\
-  $\Id{sidst}$ & $1$ & $1$ & 1 & 1  \\
+  $\Id{første}$ & $1$ & $1$ & 1 & 1  \\
+  $\Id{sidste}$ & $1$ & $1$ & 1 & 1  \\
   $\Id{indsæt}$ & $1$ & $1^*$ & $n$ & $n$  & kun for $\Id{indsætEfter}$\\
   $\Id{fjern}$ & $1$ & $1^*$ & $n$ & $n$  & kun for $\Id{fjernEfter}$\\
   $\Id{tilføjForrest}$ & $1$ & $1$ & $1^*$ & $1^*$  & amortiseret \\
   $\Id{tilføjBagest}$ & $1$ & $1$ & $n$ & $1^*$  & amortiseret \\
   $\Id{fjernForrest}$ & $1$ & $n$ & $1^*$ & $1^*$  & amortiseret \\
-  $\Id{fjernForrest}$ & $1$ & $1$ & $n$ & $1^*$  & amortiseret \\
+  $\Id{fjernBagest}$ & $1$ & $1$ & $n$ & $1^*$  & amortiseret \\
   $\Id{sammenføj}$ & $1$ & $1$ & $n$ & $n$  & \\
   $\Id{splejs}$ & $1$ & $1$ & $n$ & $n$  & \\
   $\Id{findNæste},\ldots$ & $n$ & $n$ & $n^*$ & $n^*$  & \text{cacheeffektiv}\\
@@ -1067,3 +1070,44 @@ Python råder ikke over begrænsede rækker som del af sprogets grundlæggende d
 For numeriske typer har man dog adgang til begrænsede rækker ved hjælp af modulet $\Id{array}$; den konkrete repræsentation er dog maskinafhængig.
 Ellers er den primære følgetype i Python typen $\Id{List}$, som er implementeret som en ubegrænset række.
 Standardmodulet $\Id{collections}$ indeholder datatypen $\Id{deque}$ for dobbelkøer, som er implementeret som en dobbelthægtet liste for hurtig manipulation af begge ender af følgen, men uden at understøtte hverken hurtig sammenføjning eller operationer på følgens interne indgange som fx $\Id{splejs}$.
+
+\section{Historiske anmærkninger og videre resultater}\label{s:further}
+
+Alle resultaterne i dette kapitler kan betragtes som »folkore«
+\index{folklore@»folkore« (resultat)}
+i den forstand, at de er kendt meget længe, og ingen gør krav på at have opfundet dem.
+Faktisk har vi set, at en hel række af de grundlæggende abstrakte ideer er ældre end computeren.
+Amortisering er lige så gammel som selve algoritmeanalysen.
+\emph{Bankkontometoden} og \emph{potentialemetoden} blev foreslået i betyndelsen af 1980erne af 
+\index{Brown, M. R.}%
+\index{Mehlhorn, K.}%
+\index{Sleator, D.}%
+\index{Tarjan, R. E.}%
+\index{Huddlestone, S.}
+R.\,E.\,Brown, S.\,Huddlestone,
+K.\,Mehlhorn, D.\,D.\,Sleator og R.\,E.\,Tarjan
+\cite{Brown-Tarjan,Huddlestone-Mehlhorn,
+SleTar83,ST85}.
+Oversigtsartiklen~\cite{Tarjan:Amortized-Complexity} gjorde betegnelsen \emph{amortiseret analyse} alment anvendt;
+sætning~\ref{thm:universal} er fra~\cite{Me:amortisierte-Analyse}.
+
+Der findes en rækkelignende datastruktur for følger, som tillader indiceret adgang i konstant tid samt indføjelse og fjernelse på vilkårlig plads i amortiseret tid
+$O(\sqrt{n})$.
+Dette opnår man med et relativt enkelt kneb.
+Rækker realisers som en følge af delrækker, hvoraf hver indeholder et antal
+$n'=\Theta(\sqrt{n})$ af indgange, borset fra den sidste, som muligvis indholder færre indgange.  
+Hver delrække organiseres cyklisk som beskrevet i afsnit ~\ref{s:stack}.
+Adgang $[i]$ til position $i$ forskydes defor med en værdi $h$.
+Indgangen med indeks $i$ finder man på plads $i\bmod n'$ af delrække nummer $\floor{i/n'}$. 
+En ny indgang tilføjes i tid $O(\sqrt{n})$ i den delrække, som bestemmes af indeks $i$.
+Denne delrække får nu en overskydende indgang.
+For at opretholde invarianten, at hver delrække har eksakt $n'$ indgange, tilføjes den overskydende indgang som første element til den næste delrække.
+Denne proces af gentagen videresending af en overskydende indgang gentages nu
+$n/n'= O(\sqrt{n})$ gange, indtil den sidste delrække er nået.
+Fjernelser gøres på lignende måde.
+Sommetider skal der skabes en ny delrække, eller størrelsen $n'$ skal ændres og alle indgange omfordeles.
+De amortiserede omkostninger ved disse ekstraoperationer kan holdes små.
+Med yderligere en modifikation kan desuden alle dobbeltkøoperationer gennemføres i konstant tid.
+I~\cite{MorKat01}\index{Katajainen, J.} kan den interesserede læser finde nogle snedige implementationer af dobbeltkøer og et implementationsstudie.
+
+
