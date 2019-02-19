@@ -28,12 +28,15 @@
 \newcommand{\seq}[1]{\langle #1\rangle }
 \newcommand{\set}[1]{\{ #1\}}
 \newcommand{\ceil}[1]{\lceil #1\rceil }
+\newcommand{\floor}[1]{\lfloor #1\rfloor }
 
 \newcommand{\Id}[1]{\protect\ensuremath{\operatorname{\emph{#1}}}}
 \newcommand{\Kw}[1]{\protect\ensuremath{\operatorname{\textbf{\upshape #1}}}}
 \newcommand{\Declare}[2]{#1{\ensuremath{\colon}} #2}   
 \newcommand{\DeclareInit}[3]{#1\ensuremath{{}={}}#3\mbox{ \rm : }#2} 
 \newcommand{\Is}{{\ensuremath{\mathbin{:=}}}}
+\newcommand{\Increment}{\mathrel{{+}{+}}}
+\newcommand{\Decrement}{\mathrel{{-}{-}}}
 
 \newcommand{\Procedure}{\Kw{Procedure~}}
 \newcommand{\Function}{\Kw{Funktion~}}
@@ -43,8 +46,11 @@
 \newcommand{\Constant}{\Kw{Konstant~}}
 \newcommand{\Of}{\Kw{af\ }}
 \newcommand{\iif}{\Kw{hvis~}}
-\newcommand{\tthen}{\Kw{:~}}
+\newcommand{\If}{\Kw{hvis~}}
+\newcommand{\tthen}{\Kw{så~}}
+\newcommand{\Then}{\Kw{så~}}
 \newcommand{\eelse}{\Kw{ellers~}}
+\newcommand{\Else}{\Kw{ellers~}}
 \newcommand{\return}{\Kw{returner~}}
 \newcommand{\Return}{\Kw{returner~}}
 \newcommand{\while}{\Kw{mens~}}
@@ -53,9 +59,25 @@
 \newcommand{\dispose}{\Kw{afalloker~}}
 \newcommand{\PointerTo}{\Kw{Peger på~}}
 \newcommand{\adressof}{\Kw{adressen på~}}
-\newcommand{\invariant}{\Kw{invariant~}}
+\newcommand{\Invariant}{\Kw{invariant~}}
 \newcommand{\Assert}{\Kw{antag~}}
 \newcommand{\this}{\Kw{dette}}
+
+\newcommand{\Do}       {{\bf udfør\ }}
+\newcommand{\For}      {{\bf for\ }}
+\newcommand{\Downto}       {{\bf ned til\ }}
+\newcommand{\ForFromTo}[3]{{\For $#1 \Is #2$ \To $#3$ \Do}}
+\newcommand{\ForFromToWhile}[4]{{\For $#1 \Is #2$ \To $#3$ \While $#4$ \Do}}
+\newcommand{\ForFromDowntoWhile}[4]{{\For $#1 \Is #2$ \Downto $#3$ \While $#4$ \Do}}
+\newcommand{\ForFromDownto}[3]{{\For $#1 \Is #2$ \Downto $#3$ \Do}}
+\newcommand{\ForFromUpto}[3]{{\For $#1 \Is #2$ \Upto $#3$ \Do}}
+\newcommand{\ForFromWhile}[3]{{\For $#1 \Is #2$ \To $\infty$ \While $#3$ \Do}}
+\newcommand{\ForFromdownWhile}[3]{{\For $#1 \Is #2$ \Downto $-\infty$ \While $#3$ \Do}}
+\newcommand{\ForFromToStep}[4]{{\For $#1 \Is #2$ \To $#3$ \Step $#4$  \Do}}
+\newcommand{\ForFromDowntoStep}[4]{{\For $#1 \Is #2$ \Downto $#3$  \Step $#4$ \Do}}
+\newcommand{\ForFromStepWhile}[4]{{\For $#1 \Is #2$ \To $\infty$ \Step $#3$  \While $#4$
+    \Do}}    
+
 
 \newcommand{\Array}{\Id{Række}}
 
@@ -92,7 +114,7 @@
 \usepackage{enumerate}
 
 \newcommand{\comment}[1]{\textcolor{callout}{/\!\!/ #1}}
-\newcommand{\myurl}[1]{\tt #1}
+\newcommand{\myurl}[1]{{\tt #1}}
 
 \input{vc.tex}
 \begin{document}
@@ -103,13 +125,16 @@
 \setcounter{chapter}{1}
 \chapter{Inledning}
 %\setcounter{section}{1}
-\input{2-2.tex}
-\input{2-3.tex}
+%\input{2-2.tex}
+%\input{2-3.tex}
 \setcounter{section}{8}
   \input{2-9.tex}
 
 \chapter{Fremstilling af følger med rækker og hægtede lister}
 \input{3-0.tex}
+
+\setcounter{chapter}{5}
+\input{6.tex}
 
 \setcounter{chapter}{10}
 \chapter{Minimale spændetræer}

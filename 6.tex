@@ -1,0 +1,656 @@
+\chapter{Prioritetskøer}
+\label{ch:pq}
+\vspace*{-4.5cm}
+\begin{flushright}
+\includegraphics[width=6cm]{img/queue2.eps}
+\end{flushright}
+\vspace*{1cm}
+
+\noindent
+{\itshape
+Virksomheden \emph{KnM} sælger skræddersyet tøj af højeste kvalitet.
+Virksomheden er ansvarlig for markedsføring, opmåling, forsendelse, osv. men selve fremstillingen er overladt til uafhængige skrædderier.
+Virksomheden beholder 20\% af overskuddet.
+Da den blev grundlagt i det nittende århundrede, fandtes der fem kontraktskrædderier.
+I dag behersker den 15\% af verdensmarkedet, på verdensplan arbejder tusindvis af skrædderier for \emph{KnM}.
+
+Din opgaver er at tildele ordrer til kontraktskrædderierne.
+Herved følges den enkle regel, at næste ordre går til det skrædderi, hvis samlede ordreværdi i indeværende år er mindst.
+Grundlæggerne af \emph{KnM} benyttede en kridttavle for at holde rede på de løbende ordresummer -- i datalogisk terminologi havde de en lineær liste af værdier og brugte lineær tid til at finde det rigtig skrædderi.
+Imidlertid er virksomheden blevet for stor til denne løsning.
+Kan du give en »skalerbar« løsning, som kun kræver, at man kigger på et lille antal indgange for at finde ud af, hvem der skal få næste ordre?
+
+Næste år ændres reglen.
+For at gøre det attraktivt at levere til tiden, modtager skrædderiet nu den næste ordre, hvis dens \emph{udestående} bestillinger har den mindste totale værdi.
+Det betyder, at så snart en ny bestilling leveres, skal dens værdi trækkes fra det pågældende skrædderis udestående ordreværdi.
+Er din strategi for fordeling af bestillinger tilstrækkelig fleksibel til også at tage hensyn til den nye regel uden tab af effektivitet?
+}
+
+\footnotetext[1]{Billedet viser en kø foran Mao-mausoleet (V. Berger, se \texttt{http://commons.wikimedia.org/wiki/Image:Zhengyangmen01.jpg}).}
+\setcounter{footnote}{1}
+
+\bigskip\noindent
+Den datatype,
+% TODO orig uses datastruktur
+som bedst løser problemet foroven, kaldes for \emph{prioritetskø}.
+\index{prioritetskø|textbf}
+Vi begynder med at angive datatypens specifikation.
+Prioritetskøer forvalter en mængde $Q$ af \emph{indgange} med \emph{nøgler}
+\index{nzgle@nøgle}
+under følgende operationer:
+
+\begin{tabular}{ll}
+$Q.\Id{opbyg}(\set{e_1,\ldots,e_n})$ & $Q \Is \set{e_1,\ldots,e_n}$ \\
+$Q.\Id{tilføj}(e)$ & $Q\Is Q\cup\set{e}$ \\
+$Q.\Id{mindste}$ &  \Return $\min Q$
+\index{prioritetskø!minimum|textbf}\index{prioritetskø!mindste@\Id{mindste}|textbf}  
+ (indgang med mindste nøgle).\\
+$Q.\Id{fjernMindste}$& $e\Is\min Q$;\quad 
+   $Q\Is Q\setminus\set{e}$;\quad \Return $e$\index{prioritetskø!fjernMindste@\Id{fjernMindste}|textbf}.
+\end{tabular}
+
+Disse operationer rækker til den første del af vores eksempel.
+Hvert år bygger vi en ny prioritetskø, som for hvert skrædderi har en indang med en nøgle, som sættes til 0 i begyndelsen.
+For at uddele en ny ordre, udtager vi en indgang $e$ med minimal nøgle, adderer ordrens værdi til denne nøgle, og putter den modificere indgang tilbage i køen.
+I afsnit \ref{s:heap} præsenterer vi en enkel og effektiv implementation af denne grundfunktionalitet.
+
+[TODO udeladt afsnit om adresserbare prioritetskøer] 
+
+[TODO udeladt afsnit om anvendelsesområder] 
+
+\begin{exerc}[Naiv prioritetskø]
+Vis, hvordan man implementerer en (størrelsesbegrænset) prioritetskø
+\index{prioritetskø|naiv}
+som række.
+Når køen maksimale størrelse er $w$, bruges en række af størrelse $w$; de faktisk eksisterende indgange i prioritetskøen indtager rækkens første $n$ pladser.
+Sammenling udførelsestiderne for operationerne af to varianter af denne implementation:
+den ene holder rækkens elementer i sorteret orden, den anden holder elementerne usorteret.
+\end{exerc}
+
+\begin{exerc}[Addresserbar prioritetskø som dobbelthægtet liste] 
+Vis, hvordan man implementerer en  adresserbar prioritetskø
+som dobbelthægtet liste.
+Hver listeknude fremstiller en indgang i prioritetskøen. 
+Sammenling udførelsestiderne for operationerne af to varianter af denne implementation:
+den ene holder listens elementer i sorteret orden, den anden holder elementerne usorteret.
+implementieren kann. 
+\end{exerc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Binærhobe}\label{s:heap}\index{prioritetskø!binærhob|textbf}%
+\index{binærhob|sieheunter{prioritetskø}}
+
+En hob (eller binærhob) er en enkel og effektiv implementation af en ikke-adresserbar prioritetskø \cite{Williams64}\index{Williams, J. W. J.}.
+Ganske som en række kan den udvides til en ubegrænsede udgave
+\index{prioritetskø!begrænset}\index{prioritetskø!ubegrænset}
+(s. afs.~\ref{s:array}). 
+Man kan sågar bruge hobe til at implementere adresserbare prioritetskøer, men vi skal lære endnu bedre muligheder at kende senere.
+
+\begin{figure}
+\begin{tikzpicture}[yscale =.4, xscale = .45]
+\foreach \i in {1,...,13} \node (\i) at (\i,0) {\i};
+  \node at (0,0) {$j$};
+
+  \node at (0,-1) {$h[j]$};
+  \node (A1) at (1,-1) [font = \ttfamily] {A};
+  \node (C1) at (2,-1) [font = \ttfamily] {C};
+  \node (G1) at (3,-1) [font = \ttfamily] {G};
+  \node (R1) at (4,-1) [font = \ttfamily] {R};
+  \node (D1) at (5,-1) [font = \ttfamily] {D};
+  \node (P1) at (6,-1) [font = \ttfamily] {P};
+  \node (H1) at (7,-1) [font = \ttfamily] {H};
+  \node (W1) at (8,-1) [font = \ttfamily] {W};
+  \node (J1) at (9,-1) [font = \ttfamily] {J};
+  \node (S1) at (10,-1) [font = \ttfamily] {S};
+  \node (Z1) at (11,-1) [font = \ttfamily] {Z};
+  \node (Q1) at (12,-1) [font = \ttfamily] {Q};
+  \node (new1) at (13,-1) [rectangle, font = \ttfamily, nearly transparent, blue,draw] {\phantom P};
+
+  \node (A2) at (1,-2) [inner sep = 1pt, font = \ttfamily] {A};
+  \node (C2) at (2,-4) [inner sep = 1pt, font = \ttfamily] {C};
+  \node (G2) at (3,-4) [inner sep = 1pt, font = \ttfamily] {G};
+  \node (R2) at (4,-6) [inner sep = 1pt, font = \ttfamily] {R};
+  \node (D2) at (5,-6) [inner sep = 1pt, font = \ttfamily] {D};
+  \node (P2) at (6,-6) [inner sep = 1pt, font = \ttfamily] {P};
+  \node (H2) at (7,-6) [inner sep = 1pt, font = \ttfamily] {H};
+  \node (W2) at (8,-9) [inner sep = 1pt, font = \ttfamily] {W};
+  \node (J2) at (9,-9) [inner sep = 1pt, font = \ttfamily] {J};
+  \node (S2) at (10,-9) [inner sep = 1pt, font = \ttfamily] {S};
+  \node (Z2) at (11,-9) [inner sep = 1pt, font = \ttfamily] {Z};
+  \node (Q2) at (12,-9) [inner sep = 1pt, font = \ttfamily] {Q};
+  \node (new2) at (13,-9) [rectangle, font = \ttfamily, dotted ,draw] {\phantom P};
+
+
+  \draw [myblue] (A1) -- (A2);
+  \draw [myblue] (C1) -- (C2);
+  \draw [myblue] (G1) -- (G2);
+  \draw [myblue] (R1) -- (R2);
+  \draw [myblue] (D1) -- (D2);
+  \draw [myblue] (P1) -- (P2);
+  \draw [myblue] (H1) -- (H2);
+  \draw [myblue] (W1) -- (W2);
+  \draw [myblue] (J1) -- (J2);
+  \draw [myblue] (S1) -- (S2);
+  \draw [myblue] (Z1) -- (Z2);
+  \draw [myblue] (Q1) -- (Q2);
+  \draw [myblue] (new1) -- (new2);
+  
+  \draw (A2) -- (C2); 
+  \draw (A2) -- (G2); 
+  \draw (C2) -- (R2); 
+  \draw (C2) -- (D2); 
+  \draw (G2) -- (P2); 
+  \draw (G2) -- (H2); 
+  \draw (R2) -- (W2); 
+  \draw (R2) -- (J2); 
+  \draw (D2) -- (S2); 
+  \draw (D2) -- (Z2); 
+  \draw (P2) -- (Q2); 
+  \draw [dotted] (P2) -- (new2);  
+\begin{scope}[xshift = 20cm]
+\tikzstyle{treenode} = [circle, draw, inner sep = 1pt, font = \ttfamily];
+  \node (A3) at ( 0,-2)   [treenode, label = right:1] {A};
+  \node (C3) at (-2,-4)   [treenode, label = right:2] {C};
+  \node (G3) at ( 2,-4)   [treenode, label = right:3] {G};
+  \node (R3) at (-3.5,-6) [treenode, label = right:4] {R};
+  \node (D3) at (-1.5,-6) [treenode, label = right:5] {D};
+  \node (P3) at ( 1.5,-6) [treenode, label = right:6] {P};
+  \node (H3) at ( 3.5,-6) [treenode, label = right:7] {H};
+  \node (W3) at (-4,-9)   [treenode, label = below:8] {W};
+  \node (J3) at (-3,-9)   [treenode, label = below:9] {J};
+  \node (S3) at (-2,-9)   [treenode, label = below:10] {S};
+  \node (Z3) at (-1,-9)   [treenode, label = below:11] {Z};
+  \node (Q3) at ( 1,-9)   [treenode, label = below:12] {Q};
+  \node (B3) at ( 2,-9) [treenode, label = below:13, dotted] {\phantom P};
+  \draw (A3) -- (C3); 
+  \draw (A3) -- (G3); 
+  \draw (C3) -- (R3); 
+  \draw (C3) -- (D3); 
+  \draw (G3) -- (P3); 
+  \draw (G3) -- (H3); 
+  \draw (R3) -- (W3); 
+  \draw (R3) -- (J3); 
+  \draw (D3) -- (S3); 
+  \draw (D3) -- (Z3); 
+  \draw (P3) -- (Q3); 
+  \draw [dotted] (P3) -- (B3); 
+\end{scope}
+\end{tikzpicture}
+\caption{\label{fig:heapex-bijection}
+En hob med $n=12$ indgange, som er gemt i en række med $w=13$ pladser.
+Figuren fremstiller hoben både som række og som det implicitte binærtræ, her tegnet på to måder.
+Knuderne svarer til indeksmængden $\{1,\ldots,n\}$, hvor $1$ står for roden.
+Rodens børn har indeks $2$ og $3$.
+Generelt har børnene til knude $j$ indeks $2j$ og $2j+1$ (forudsat at disse tal ligger i $\{1,\ldots, n\}$).
+%TODO index error in original
+Forgængeren til knude $j$ for $j\in\{2,\ldots, h\}$ har indeks $\floor{j/2}$.
+Der gælder invariant i dette implicitte træ, at nøglen i en forgængerknude aldrig er større end nøglerne i nogen af dens børneknuder, dvs. at hele træet er hobordnet.
+%TODO einem Kinderknoten -> seinem
+}
+\end{figure}
+
+
+\begin{figure}
+\begin{tikzpicture}[scale = .4]
+\foreach \i in {1,...,13} \node (\i) at (\i,0) {\i};
+  \node at (0,0) {$j$};
+
+  \node at (0,-1) {$h[j]$};
+  \node (A1) at (1,-1) [font = \ttfamily] {A};
+  \node (C1) at (2,-1) [font = \ttfamily] {C};
+  \node (G1) at (3,-1) [font = \ttfamily] {G};
+  \node (R1) at (4,-1) [font = \ttfamily] {R};
+  \node (D1) at (5,-1) [font = \ttfamily] {D};
+  \node (P1) at (6,-1) [font = \ttfamily] {P};
+  \node (H1) at (7,-1) [font = \ttfamily] {H};
+  \node (W1) at (8,-1) [font = \ttfamily] {W};
+  \node (J1) at (9,-1) [font = \ttfamily] {J};
+  \node (S1) at (10,-1) [font = \ttfamily] {S};
+  \node (Z1) at (11,-1) [font = \ttfamily] {Z};
+  \node (Q1) at (12,-1) [font = \ttfamily] {Q};
+  \node (new1) at (13,-1) [rectangle, font = \ttfamily, nearly transparent, blue,draw] {\phantom P};
+
+  \node (A2) at (1,-2) [inner sep = 1pt, font = \ttfamily] {A};
+  \node (C2) at (2,-4) [inner sep = 1pt, font = \ttfamily] {C};
+  \node (G2) at (3,-4) [inner sep = 1pt, font = \ttfamily] {G};
+  \node (R2) at (4,-6) [inner sep = 1pt, font = \ttfamily] {R};
+  \node (D2) at (5,-6) [inner sep = 1pt, font = \ttfamily] {D};
+  \node (P2) at (6,-6) [inner sep = 1pt, font = \ttfamily] {P};
+  \node (H2) at (7,-6) [inner sep = 1pt, font = \ttfamily] {H};
+  \node (W2) at (8,-9) [inner sep = 1pt, font = \ttfamily] {W};
+  \node (J2) at (9,-9) [inner sep = 1pt, font = \ttfamily] {J};
+  \node (S2) at (10,-9) [inner sep = 1pt, font = \ttfamily] {S};
+  \node (Z2) at (11,-9) [inner sep = 1pt, font = \ttfamily] {Z};
+  \node (Q2) at (12,-9) [inner sep = 1pt, font = \ttfamily] {Q};
+  \node (new2) at (13,-9) [rectangle, font = \ttfamily, dotted, draw] {\phantom P};
+
+
+  \draw [myblue] (A1) -- (A2);
+  \draw [myblue] (C1) -- (C2);
+  \draw [myblue] (G1) -- (G2);
+  \draw [myblue] (R1) -- (R2);
+  \draw [myblue] (D1) -- (D2);
+  \draw [myblue] (P1) -- (P2);
+  \draw [myblue] (H1) -- (H2);
+  \draw [myblue] (W1) -- (W2);
+  \draw [myblue] (J1) -- (J2);
+  \draw [myblue] (S1) -- (S2);
+  \draw [myblue] (Z1) -- (Z2);
+  \draw [myblue] (Q1) -- (Q2);
+  \draw [myblue] (new1) -- (new2);
+  
+  \draw (A2) -- (C2); 
+  \draw [very thick] (A2) -- (G2); 
+  \draw (C2) -- (R2); 
+  \draw (C2) -- (D2); 
+  \draw (G2) -- (H2); 
+  \draw [very thick] (G2) -- (P2); 
+  \draw (R2) -- (W2); 
+  \draw (R2) -- (J2); 
+  \draw (D2) -- (S2); 
+  \draw (D2) -- (Z2); 
+  \draw (P2) -- (Q2); 
+  \draw [very thick, dotted] (P2) -- (new2); 
+
+  \node (A3) at (1,-7) [inner sep = 1pt, font = \ttfamily] {A};
+  \node (C3) at (2,-9) [inner sep = 1pt, font = \ttfamily] {C};
+  \node (G3) at (3,-9) [inner sep = 1pt, font = \ttfamily] {G};
+  \node (R3) at (4,-11) [inner sep = 1pt, font = \ttfamily] {R};
+  \node (D3) at (5,-11) [inner sep = 1pt, font = \ttfamily] {D};
+  \node (P3) at (6,-11) [inner sep = 1pt, font = \ttfamily] {P};
+  \node (H3) at (7,-11) [inner sep = 1pt, font = \ttfamily] {H};
+  \node (W3) at (8,-14) [inner sep = 1pt, font = \ttfamily] {W};
+  \node (J3) at (9,-14) [inner sep = 1pt, font = \ttfamily] {J};
+  \node (S3) at (10,-14) [inner sep = 1pt, font = \ttfamily] {S};
+  \node (Z3) at (11,-14) [inner sep = 1pt, font = \ttfamily] {Z};
+  \node (Q3) at (12,-14) [inner sep = 1pt, font = \ttfamily] {Q};
+  \node (new3) at (13,-14) [inner sep = 1pt, font = \ttfamily] {P};
+
+  \draw [myblue] (A2) -- (A3);
+  \draw [myblue] (C2) -- (C3);
+  \draw [myblue] (G2) -- (G3);
+  \draw [myblue] (R2) -- (R3);
+  \draw [myblue] (D2) -- (D3);
+  \draw [myblue] (P2) -- (P3);
+  \draw [myblue] (H2) -- (H3);
+  \draw [myblue] (W2) -- (W3);
+  \draw [myblue] (J2) -- (J3);
+  \draw [myblue] (S2) -- (S3);
+  \draw [myblue] (Z2) -- (Z3);
+  \draw [myblue] (Q2) -- (Q3);
+  \draw [myblue] (new2) -- (new3);
+  
+  \draw (A3) -- (C3); 
+  \draw  (A3) -- (G3); 
+  \draw (C3) -- (R3); 
+  \draw (C3) -- (D3); 
+  \draw (G3) -- (P3); 
+  \draw  (G3) -- (H3); 
+  \draw (R3) -- (W3); 
+  \draw (R3) -- (J3); 
+  \draw (D3) -- (S3); 
+  \draw (D3) -- (Z3); 
+  \draw (P3) -- (Q3); 
+  \draw  (P3) -- (new3); 
+
+  \node (ins) at (13,-11)[fill = white] {\Id{indsæt}($\mathtt B$)};
+  \draw [callout,thick,->] (ins) -- (new2.center);
+
+  \begin{scope}[xshift = 15cm]
+    \foreach \i in {1,...,13} \node (\i) at (\i,0) {\i};
+  \node at (0,0) {$j$};
+
+  \node at (0,-1) {$h[j]$};
+  \node (A1) at (1,-1) [font = \ttfamily] {A};
+  \node (C1) at (2,-1) [font = \ttfamily] {C};
+  \node (G1) at (3,-1) [font = \ttfamily] {G};
+  \node (R1) at (4,-1) [font = \ttfamily] {R};
+  \node (D1) at (5,-1) [font = \ttfamily] {D};
+  \node (P1) at (6,-1) [font = \ttfamily] {P};
+  \node (H1) at (7,-1) [font = \ttfamily] {H};
+  \node (W1) at (8,-1) [font = \ttfamily] {W};
+  \node (J1) at (9,-1) [font = \ttfamily] {J};
+  \node (S1) at (10,-1) [font = \ttfamily] {S};
+  \node (Z1) at (11,-1) [font = \ttfamily] {Z};
+  \node (Q1) at (12,-1) [font = \ttfamily] {Q};
+  \node (new1) at (13,-1) [rectangle, font = \ttfamily, nearly transparent, blue,draw] {\phantom P};
+
+  \node (A2) at (1,-2) [inner sep = 1pt, font = \ttfamily] {A};
+  \node (C2) at (2,-4) [inner sep = 1pt, font = \ttfamily] {C};
+  \node (G2) at (3,-4) [inner sep = 1pt, font = \ttfamily] {G};
+  \node (R2) at (4,-6) [inner sep = 1pt, font = \ttfamily] {R};
+  \node (D2) at (5,-6) [inner sep = 1pt, font = \ttfamily] {D};
+  \node (P2) at (6,-6) [inner sep = 1pt, font = \ttfamily] {P};
+  \node (H2) at (7,-6) [inner sep = 1pt, font = \ttfamily] {H};
+  \node (W2) at (8,-9) [inner sep = 1pt, font = \ttfamily] {W};
+  \node (J2) at (9,-9) [inner sep = 1pt, font = \ttfamily] {J};
+  \node (S2) at (10,-9) [inner sep = 1pt, font = \ttfamily] {S};
+  \node (Z2) at (11,-9) [inner sep = 1pt, font = \ttfamily] {Z};
+  \node (Q2) at (12,-9) [inner sep = 1pt, font = \ttfamily] {Q};
+  \node (new2) at (13,-9) [rectangle, font = \ttfamily, dotted, draw] {\phantom P};
+
+  \draw [myblue] (A1) -- (A2);
+  \draw [myblue] (C1) -- (C2);
+  \draw [myblue] (G1) -- (G2);
+  \draw [myblue] (R1) -- (R2);
+  \draw [myblue] (D1) -- (D2);
+  \draw [myblue] (P1) -- (P2);
+  \draw [myblue] (H1) -- (H2);
+  \draw [myblue] (W1) -- (W2);
+  \draw [myblue] (J1) -- (J2);
+  \draw [myblue] (S1) -- (S2);
+  \draw [myblue] (Z1) -- (Z2);
+  \draw [myblue] (Q1) -- (Q2);
+  \draw [myblue] (new1) -- (new2);
+  
+  \draw [very thick] (A2) -- (C2); 
+  \draw (A2) -- (G2); 
+  \draw (C2) -- (R2); 
+  \draw [very thick] (C2) -- (D2); 
+  \draw (G2) -- (H2); 
+  \draw (G2) -- (P2); 
+  \draw (R2) -- (W2); 
+  \draw (R2) -- (J2); 
+  \draw [very thick] (D2) -- (S2); 
+  \draw (D2) -- (Z2); 
+  \draw (P2) -- (Q2); 
+    \draw [dotted] (P2) -- (new2); 
+
+  \node (A3) at (1,-7) [inner sep = 1pt, font = \ttfamily] {C};
+  \node (C3) at (2,-9) [inner sep = 1pt, font = \ttfamily] {D};
+  \node (G3) at (3,-9) [inner sep = 1pt, font = \ttfamily] {G};
+  \node (R3) at (4,-11) [inner sep = 1pt, font = \ttfamily] {R};
+  \node (D3) at (5,-11) [inner sep = 1pt, font = \ttfamily] {Q};
+  \node (P3) at (6,-11) [inner sep = 1pt, font = \ttfamily] {P};
+  \node (H3) at (7,-11) [inner sep = 1pt, font = \ttfamily] {H};
+  \node (W3) at (8,-14) [inner sep = 1pt, font = \ttfamily] {W};
+  \node (J3) at (9,-14) [inner sep = 1pt, font = \ttfamily] {J};
+  \node (S3) at (10,-14) [inner sep = 1pt, font = \ttfamily] {S};
+  \node (Z3) at (11,-14) [inner sep = 1pt, font = \ttfamily] {Z};
+  \node (Q3) at (12,-14)  [rectangle, font = \ttfamily, dotted, draw] {\phantom P};
+  \node (new3) at (13,-14)  [rectangle, font = \ttfamily, dotted, draw] {\phantom P};
+[
+
+  \draw [myblue] (A2) -- (A3);
+  \draw [myblue] (C2) -- (C3);
+  \draw [myblue] (G2) -- (G3);
+  \draw [myblue] (R2) -- (R3);
+  \draw [myblue] (D2) -- (D3);
+  \draw [myblue] (P2) -- (P3);
+  \draw [myblue] (H2) -- (H3);
+  \draw [myblue] (W2) -- (W3);
+  \draw [myblue] (J2) -- (J3);
+  \draw [myblue] (S2) -- (S3);
+  \draw [myblue] (Z2) -- (Z3);
+  \draw [myblue] (Q2) -- (Q3);
+  \draw [myblue] (new2) -- (new3);
+  
+  \draw (A3) -- (C3); 
+  \draw  (A3) -- (G3); 
+  \draw (C3) -- (R3); 
+  \draw (C3) -- (D3); 
+  \draw (G3) -- (P3); 
+  \draw  (G3) -- (H3); 
+  \draw (R3) -- (W3); 
+  \draw (R3) -- (J3); 
+  \draw (D3) -- (S3); 
+  \draw (D3) -- (Z3); 
+  \draw [dotted] (P3) -- (Q3); 
+  \draw [dotted] (P3) -- (new3); 
+
+  \node (del) at (-2,-3) [fill=white]{\Id{fjernMindste}};
+  \draw [callout,thick,->] (A2) -- +(-2,0);
+  \draw [callout,thick,->] (Q2) to [bend right] (A2);
+\end{scope}
+\end{tikzpicture}
+\caption{\label{fig:heapex}
+Operationer på hoben fra fig.~\ref{fig:heapex-bijection}.
+\emph{Til venstre} vises effekten af at tilføje den nye indgang \texttt{B}.
+Vi skriver \texttt{B} i en ny knude med index 13, som bliver et blad.
+De tykke kanter markerer vejen fra den nye bladknude til roden.
+Indgang \texttt{B} vandrer ad denne vej op til den første knude, hvis forgænger ikke er støore end \texttt{B}.
+For at skabe plads til \texttt{B}, bliver de andre indgange på vejen forskudt et niveau længere ned.
+\emph{Til højre} vises effekten af at fjerne rodindgangen.
+(Denne indeholder altid den mindste nøgle.)
+De tykke kanter markerer den vej $p$ ned fra roden, som i hver knude følger den mindre nøgle.
+Indgangen \texttt{Q}, fundet i bladet med størst indeks, flyttes først til roden, for derefter at vandre nedad langs $p$, til den finder en knude, hvis efterfølger (på $p$) ikke er mindre end {\tt Q} eller ikke eksisterer.
+De andre indgange på vejen forskydes et niveau opad, for at gøre plads til \texttt{Q}.
+}
+\end{figure}
+
+\begin{figure}
+\begin{tabbing}
+~~~~\=~~~~\=~~~~\kill
+\Class \Id{BinærHobPK}$(\Declare{w}{\NN})$ \Of Element\+\\
+   \Declare{$h$}{\Array$[1..w]$ \Of \Id{Element}}\comment{Hoben $h$ er}\\
+   \DeclareInit{$n$}{$\NN$}{$0$}\comment{tom i begyndelsen.}\\
+   \Invariant$\forall j\in 2..n\colon h[\floor{j/2}] \le h[j\,]$\comment{hobreglen}\\
+   \Function $\Id{mindste}$ \Assert $n>0$ ; \Return $h[1]$\comment{$\Rightarrow$ roden indeholder den mindste nøgle}
+\end{tabbing}
+\caption{
+  \label{alg:heap}
+  En klasse for prioritetskøer på basis af binærhobe med fast størrelsesbegrænsning $w$.}
+\end{figure}
+
+\index{invariant!datastrukturinvariant}
+\index{prioritetskø!binærhob!invariant}
+\index{træ!implicit defineret}
+For at gemme prioritetskøens $n$ indgange benytter vi de første $n$ positioner i rækken $h[1..w]$.
+Vi siger at en række en \emph{hobordnet} eller bare »udgør en hob«, dersom den opfylder \emph{hobreglen}
+\[h[\floor{\,j/2}] \le h[\,j\,]\quad\text{for alle }j\in\{2,\ldots,n\}\,.\]
+Hvad skal hobreglen betyde?
+For at forstå denne definition betragter vi en bijektion mellen tallene $\{1,\ldots, n\}$ og knuderne i et \emph{venstrefuldstændigt} binærtræ med $n$ knuder, som er vist i fig.~\ref{fig:heapex-bijection}.
+\index{binærtræ!venstrefuldstændigt}
+\index{binærtræ!fuldstændigt}
+Hobreglen medfører, at nøglerne langs hver vej fra en knude til roden er monotont svagt aftagende;
+især gælder at at indgangen ved roden, dvs. rækkeposition 1, indeholder den minimale nøgle.
+Operationen $\Id{mindste}$, som skan finde sådan en indgang, behøver altså tid  $O(1)$.
+Konstruktionen af en tom hob med plads til $n$ indgange behøver ligeledes konstant tid, fordi der blot skal stilles en række af størrelse $w$ til rådighed.
+\footnote{O.a.: Vi går her ud fra vores antagelser om maskinmodellen. 
+TODO.}
+Fig.~\ref{alg:heap} angiver pseudokoden for disse enkle operationer.
+
+At celle $h[1]$
+\index{prioritetskø!minimum}
+indeholder et mindsteelement svarer til situationen i en ordnet række, som er indekseret fra $1$.
+% TODO  clarify indexing in orig
+Hobreglen
+\index{hobregel|textbf} 
+er dog et meget svagere krav på rækkestrukturen end at være sorteret.
+For eksempel findes der kun én sorteret udgave af mængden $\set{1,2,3}$, men både $\seq{1,2,3}$ og $\seq{1,3,2}$ er lovlige fremstillinger af denne mængde som hob. 
+
+\begin{exerc}
+Angiv samtlige fremstillinger af mængden $\set{1,2,3,4}$ som hob.
+% 1  1  1  1
+% 23 24 32 34
+% 4  3  4  2
+% Kommentar Martin: Der letzte Baum ist kein Heap. 
+\end{exerc}
+
+Vi skal nu se, at denne større fleksibilitet tillader meget effektive implementationer af \Id{tilføj} og \Id{fjernMindste}.
+Vi skal beskrive disse procedurer så de er lette at forstå og deres korrekthed er let at vise.
+I afsnittet~\ref{s:implementation} skal vi skitsere, hvordan en effektiv implementation kunne se ud. 
+Instættelsesoperationen $\Id{tilføj}(e)$ placerer en ny indgang $e$ i første omgang sidst i hoben, dvs. den øger $n$ med 1 og sætter $e$ på position $h[n]$.
+Derefter flyttes $e$ til en passende position på vejen fra bladet $h[n]$ til roden:
+\begin{quote}
+\begin{tabbing}
+~~~~\=~~~~\=~~~~\kill
+\Procedure \Id{tilføj}(\Declare{$e$}{\Id{Element}})\+\\
+  \Assert $n < w$\\
+  $n \Increment$; $h[n] \Is e$\\
+  \Id{sigtOp}$(n)$
+\end{tabbing}
+\end{quote}
+\index{prioritetskø!binærhob!tilføj@\Id{tilføj}|textbf}
+\index{prioritetskø!binærhob!sigtOp@\Id{sigtOp}|textbf}%
+Herved skubber operationen \Id{sigtOp}$(j)$ indgangen i knude $j$ i retning af roden,  indtil denne er nået eller den møder en forgænger, vhis nøgle ikke er større (s.~fig.~\ref{fig:heapex}).
+Vi skal vise, at $h$ herefter er en hob igen.
+Lad os sige at »kun $h[j]$  er måske for lille«, når $h$ enten selv er en hob eller kan gøres til en hob ved at erstatte nøglen $x$ i $h[j]$ med en passende nøgle $x'$ med $x'>x$.
+
+\begin{quote}
+\begin{tabbing}
+~~~~\=~~~~\=\kill
+\Procedure \Id{sigtOp}$(\Declare{j}{\NN})$\+\\
+\Assert kun $h[j]$ er måske for lille\\
+\If $j = 1\vee h[\floor{j/2}] \le h[j]$ \Then \Return\\
+\Id{ombyt}$(h[j],h[\floor{j/2}])$\\
+\Assert kun $h[\floor{j/2}]$ er måske for lille\\
+  $\Id{sigtOp}(\floor{j/2})$\\
+\Assert $h$ er en hob
+\end{tabbing}
+\end{quote}
+
+\begin{exerc}
+Vis: 
+(a) Antagelserne i algoritmen etabler dens korrekthed.
+Hertil skal man vise, at hvis kun $h[j]$ måske er for lille, så er enten $h$ en hob eller ombytningen $\Id{ombyt}(h[j],h[\floor{j/2}])$ medfører, at kun $h[\floor{j/2}]$ måske er for lille.
+(b) \Id{sigtOp}$(n)$ har udførelsestid $O(\log n)$.
+(Dette medfører samme grænse for \Id{tilføj}.)  
+\end{exerc}
+
+Et kald af \Id{fjernMindste} returnerer indholdet i roden og erstatter det med inholdet i knude $n$.
+Fordi $h[n]$ måske er større end $h[2]$ eller $h[3]$, kan hobreglen nu være brudt.
+Den genoprettes ved et kald til proceduren \Id{sigtNed}$(1)$.
+\index{prioritetskø!binærhob!fjernMindste@\Id{fjernMindste}|textbf}
+\index{prioritetskø!binærhob!sigtNed@\Id{sigtNed}|textbf}
+
+\begin{quote}
+\begin{tabbing}
+~~~~\=~~~~\=\kill
+\Function \Declare{\Id{fjernMindste}}{\Id{Element}}\+\\
+\Assert $n>0$\\
+\DeclareInit{\Id{resultat}}{\Id{Element}}{$h[1]$}\\
+$h[1]\Is h[n]$;\quad $n\Decrement$\\
+\Id{sigtNed}$(1)$\\
+\Return \Id{resultat}
+\end{tabbing}
+\end{quote}
+
+Proceduren \Id{sigtNed}$(1)$ skubber den nye indgang i roden nedad, til hobreglen gælder igen.
+For at være mere nøjagtig, betragt vejen $p$, som begynder ved roden og ved hver knude fortsætter ved det barnm som har den mindre nøgle (s. fig.~\ref{fig:heapex});
+i tilfælde af nøglelighed er beslutningen ligegyldig. 
+Man følger denne vej, til man når en knude, hvis børn (hvis de findes) indeholder nøgler, som er mindst lige så store som $h[1]$s nøgle.
+Indgangen $h[1]$ sættes på denne plads; alle indgange på vejen $p$ vandrer et niveau opad.
+På denne måde gælder hobreglen igen.
+Strategien formuleres enklest rekursivt.
+\index{algoritmekonstruktion!rekursion}
+Vi benytter en lignende invariant som ved \Id{sigtOp}, og siger at »kun $h[j]$ er måske for stor«, hvis enten $h$ selv er en hob eller kan gøres til en hob ved at erstatte nøglen $x$ i  $h[j]$ med en passende nøgle $x'$ med  $x' < x$. 
+
+\begin{quote}
+\begin{tabbing}
+~~~~\=~~~~\=~~~~\=~~~~\=\kill
+\Procedure\Id{sigtNed}$(\Declare{j}{\NN})$\+\\
+\Assert kun $h[j]$ er muligvis for stor \\
+\If $2j \leq n$ \Then\+\comment{$j$ er ikke et blad}\\
+  \If $2j + 1 > n \vee h[2j] \le h[2j + 1]$ \Then $m \Is 2j$ \Else $m\Is 2j + 1$\\
+  \Assert nøglen i søskendeknuden til  $m$,\+\+\\
+  såvidt den findes, er ikke større end nøglen i $m$\-\-\\
+  \If $h[j] > h[m]$ \Then\+\comment{$h[j]$ er for stor}\\
+    \Id{ombyt}$(h[j],h[m])$\\
+    \Assert kun $h[m]$ er muligvis for stor\\
+  \Id{sigtNed}$(m)$\-\-\\
+\Assert $h$ er en hob
+\end{tabbing}
+\end{quote}
+
+
+\begin{exerc}
+Vis: 
+(a) Angtagelserne i algoritmen sikrer dens korrekthed. 
+Hertil skal man vise, at hvis kun $h[j]$ måske er for stor,
+så er enten $h$ en hob, eller operationen \Id{ombyt}$(h[j],h[m])$ medfører, at kun $h[m]$ måske er for stor.
+(b)
+Prodeduren \Id{sigtNed} behøver ikke mere end $2\log n$ nøglesammenligninger. 
+(c) Vis, at antallet af nøglesammenligninger kan reduceres til $\log n +O(\log\log n)$.
+\emph{Vink}: 
+Bestem først »vejen af mindre børn« $p$ fra roden til et blad.
+Brug nu binærsøgning for at finde den rigtige plads til $h[1]$.
+(Se afsnit~\ref{s:further} for andre varianter af \Id{sigtNed}.)
+\end{exerc}
+
+Vi betragter nu operationen \Id{opbyg} for hobe.
+Det er åbenlyst, at man kan opbygge en hob af $n$ givne indgange i tid $O(n\log n)$ 
+\index{prioritetskø!binærhob!opbygning}
+ved at tilføje dem en efter en.
+Interessant nok kan dette gøres bedre ved at opbygge hoben nedefra og op.
+Med proceduren \Id{sigtNed} kan man etablere hobreglen i et undertræ af højde $k+1$, hvis den allerede gjaldt i begge undertræer af højde $k$.
+I den følgende opgave behandles denne ide i detaljer.
+\index{algoritmekonstruktion!rekursion}
+\index{algoritmekonstruktion!del-og-hersk!hobopbygning}
+
+\begin{exerc}[\emph{Opbyg} for binærhob] \label{heapify}
+Betragt en vilkårlig række $h[1..n]$ af indgange. 
+Disse skal permuteras således, at hobreglen gælder.
+Hertil bruges følgende to procedurer:
+\begin{tabbing}
+~~~~\=~~~~\=\kill
+\Procedure \Id{opbygHobBaglæns}\+\\
+  \ForFromDownto{j}{\floor{n/2}}{1} \Id{sigtNed}$(j)$\-\\[2mm]
+\Procedure \Id{opbygHobRekursivt}$(\Declare{j}{\NN})$\+\\
+    \If $4j\leq n$ \Then\+\\
+       \Id{opbygHobRekursivt}$(2j)$\\
+       \Id{opbygHobRekursivt}$(2j+1)$\-\\
+    \Id{sigtNed}$(j)$
+\end{tabbing}
+
+\begin{enumerate}[(a)]
+\item Vis, at både \Id{opbygHobBaglæns} og \Id{opbygHobRekursivt}$(1)$ etablerer hobreglen.
+\item Implementer begge algoritmer effektivt og sammenlign deres udførelsestider for tilfældige tal  som nøgler og $n\in\{\,10^i\colon 2\leq i\leq 8\}$.
+Det kommer meget an på, hvor effektiv implementationen af \Id{opbygHobRekursivt} bliver.
+For små undertræer kan det være meningsfuld at »udrede« rekursionen for små undertræer, dvs. at erstatte den med direkte opdeling i forskellige tilfælde.
+\item (*) For store $n$ udgøres forskellen mellem de to algoritmer hovedsageligt af de effekter, som lagerhierarkiet 
+\index{fjernlager!hobopbygning}
+medfører.
+Analyser begge algoritmer med henblik på antallet af nødvendige i/u-operationer i fjernlagermodellen, som beskrevet sidst i afsnit~\ref{ch:intro:s:model}. 
+Vis især, at \Id{opbygHobRekursivt} kun behøver $O(n/B)$ i/u-operationer, når blokstørrelsen er $b$ og det hurtige lager har størrelse $M=\Omega(B\log B)$ hat. 
+\end{enumerate}
+\end{exerc}
+
+Følgende sætning sammenfatter vores resultater om hobe:
+
+\begin{thm}\label{heap priority queue}
+Betragt en ikke-adresserbar prioritetskø implementeret som hob.
+Konstruktionen af en tom hob og funktionen \Id{mindste} tager konstant tid, operationerne \Id{fjernMindste} og \Id{tilføj} kan udføres i logaritmisk tid $O(\log n)$, og \Id{opbyg} tager lineær tid.
+\end{thm}
+\begin{proof} 
+Det implicitte binærtræ, som svarer til en hob med $n$ indgange, har dybde $k = \floor{\log n}$.
+Operationerne \Id{tilføj} og \Id{fjernMindste} gennemløber en del af vejen fra roden til et blad og har derform logaritmisk udførelsestid.
+Operationenen \Id{mindste} rapporterer indholdet af roden, hvilket tager konstant tid.
+Konstruktionen af en tom hob kræver blot allokering af en række, hvilket tager konstant tid.
+Uanset hvilken af de to procedurer for \Id{opbyg} man bruger:
+Operationen \Id{sigtNed} kaldes højst en gang for de hver af de højst $2^l$ knuder på dybde $l$. 
+Et sådant kald tager tid $O(k- l)$. 
+Den totale udførelsestid for  \Id{opbyg} er derfor asymptotisk begrænset af
+\[
+	 \sum_{l=0}^{k-1} 2^l (k - l) =
+	 2^k \sum_{l=0}^{k-1} \frac{k - l}{2^{k - l}} \leq
+	 2^k \sum_{j \ge 1} \frac{j}{2^j} =
+	 O(n) \,.
+ \]
+%TODO orig uses more Landau symbols
+Den sidste ulighed benytter formel (\ref{app:notation:eq:ipowi}).
+\end{proof}
+
+Hobe danner grundlaget for sorteringsmetoden \emph{hobsortering}\index{sortering!hobsortering@\Id{hobsortering}|textbf}. 
+Ud fra $n$ indgange, som skal sorteres, dannes i første omgang en hob $h$ med proceduren \Id{opbyg}. 
+Derefter følger $(n-1)$ kald af \Id{fjernMindste}.
+Herved forkortes hoben med en indgang ad gangen.
+Inden det $i$te kald af \Id{fjernMindste} står den $i$te-mindste indgang i roden $h[1]$.
+Vi ombytter $h[1]$ og $h[n-i+1]$ og lader den nye rodindgang vandre nedad til sin rette plads i den resterende hob $h[1..n-i]$ med  \Id{sigtNed}.
+Til sidst står indgangene i rækken i faldene orden.
+Selvfølgeligt kan man også sortere i stigende orden ved at bruge en »størsteprioritetskø«, dvs. en datastruktur, som tillader tilføjelse af en indgang samt fjernelse af den \emph{største} indgang.
+Hertil skal man blot erstatte »$\le$« med »$\ge$« hhv. »$<$« med »$>$« i samtlige procedurer.
+
+Binærhobe implementerer ikke umiddelbart datatypen »adresserbar prioritetskø«, fordi indgange flyttes omkring i rækken ved tilføjelse og fjernelse, og man derfor ikke kan benytte indgangens position i rækken som greb.
+
+\begin{exerc}[Adresserbar binærhob]\index{prioritetskø!binærhob!adresserbar} 
+Udvid hoben så den implementer en adresserbar prioritetskø (men uden operationen (\Id{flet}). 
+Hvor mange yderligere peger per indgang er nødvendige?
+Der findes en løsning, som klarer sig med to ekstra pegere per indgang.
+\end{exerc}
+
+\begin{exerc}[Massetilføjelse]\index{prioritetskø!binærhob!massetilføjelse}
+Konstruer en algoritme, som tillader tilføjelsen af $k$ nye indgange til en binærhob med $n$ indgange, og som har udførelsestid $O(k+\log n)$.
+\emph{Vink}: Gennemgå hoben nedefra og op, som ved hobopbygning.
+\end{exerc}
+
