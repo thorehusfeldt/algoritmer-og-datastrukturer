@@ -1,0 +1,462 @@
+\section{Grundlæggende algoritmeanalyse}
+\llabel{s:analysis}
+
+
+\index{algoritmeanalyse|textbf}
+\index{programanalyse|siehe{algoritmeanalyse}}
+\index{analyse|siehe{algoritmeanalyse}}%
+
+Vi kan sammenfatte de hidtil betragtede principper for algoritmeanalyse som følger.
+Vi har bortabstraheret komplikationerne i en reel datamat ved at betragte ram-modellen.
+I denne model måles beregningstid ved at tælle antallet af udførte kommandoer.
+Vi forenkler analysern yderligere ved at inddele indput efter størrelse og fokussere på værstefald.
+Den asympotiske notation gør det muligt at ignorere konstante faktorer og lavereordens termer.
+Dette grove perspektiv tilloder os også at betragte øvregrænser
+\index{øvregrænse|siehe{beregningstid, værstefald}}
+for udførelsestiden, så længe det asympototiske resultater forbliver uændret.
+Samlet leder disse forenklinger til, at vi kan analysere beregningstiden af pseudokode direkte, uden at behøve at oversætte programmet til en maskinsprog.
+
+Vi skal nu præsentere et sæt enkle regler for analyse af pseudokode.
+\index{algoritmeanalyse}
+\index{beregningstid} 
+Lad $T_n(I)$ være den maksimale beregningstid for en programstump $I$ på indput af en bestemt størrelse $n$.
+\index{indputstørrelse}
+\index{stzrrelse@størrelse!indput-} 
+For beregningstiden af større programmer gælder da følgende:
+\begin{itemize}
+\item For på hinanden følgende kommandoer: $T_n(I; J)\le T_n(I)+T_n(J)$.
+\item For betingede kommandoer: $T_n(\text{\If $C$ \Then $I$ \Else $J$})=
+  T_n(C)+\max\set{T_n(I),T_n(J)}$.
+\item For løkker: $T_n(\text{\Repeat $I$ \Until $C$})=\sum_{i=1}^{k(n)} T_n'(I,C,i)$, hvor $k(n)$ angiver det maksimale antal løkkegennemløg på indput at størrelse $n$, og 
+$T_n'(I,C,i)$ er beregningstiden for det $i$te gennemløb af løkken, inklusive betingelsen $C$.
+\end{itemize}
+Underprogrammer betragtes i afsnit~\lref{s:recurrences}.
+Bland de reglerne foroven er det kun løkkereglen, der kan give anledning til vanskeligheder, idet man skal vurdere summer.
+
+\subsection{Summer}
+
+\index{algoritmeanalyse!sum|textbf}%
+Vi viser nu nogle grundlæggende teknikker til evaluering af summer.
+Summer dukker op i forbindelse med analyse af løkker samt ved analysen af gennemsnitlige og forventede udførelsestider.
+
+For eksempel består algoritmen \Id{indsættelsessortering},
+\index{sortering!indsættelses-}
+\index{indsættelsessortering|siehe{sortering, indsættelses-}}
+som forklares i afsnit~\ref{ch:sort:s:simple}, af to indlejrede løkker.
+\index{løkke}
+Den ydre løkke tæller variablen $i$ fra $2$ op til  $n$.
+Den indre løkke gennemløbes højst $(i-1)$ gange. 
+Derfor er det samlede antal gennemløb gennem den indre løkke højst
+\[
+\sum_{i=2}^n (i-1)
+ =\sum_{i=1}^{n-1} i 
+ =\frac{n(n-1)}{2} = O(n^2)\,,\]
+hvor den anden ligning følger af (\ref{app:notation:eq:sumi}).
+Iden udførelsen af den indre lykke kræver tid $O(1)$, bliver udførelsestid i værstefald $\Theta(n^2)$.
+Alle indlejrede løkker hvis antal iterationer kan forudsiges let, kan analyseres på en tilsvarende måde:
+man arbejder »indfra og ud«, og prøver at finde et estimat for udførelsestiden af den aktuelle »indre løkke« som et lukket udtryk.
+Med simple omformninger som
+$\sum_i ca_i=c\sum_ia_i$,
+$\sum_i(a_i + b_i)=\sum_i a_i + \sum_i b_i$ eller
+$\sum_{i=2}^n a_i=-a_1+\sum_{i=1}^n a_i$
+kan man ofte få summerne på en pæn form, som man kan finde i et katalog over summeformler.
+Et lille udvalg af den slags formler findes i appendix~\ref{app:notation:}.
+Idet vi normal kun interesserer os for asympototisk opførsel, kan vi se bort fra præcise formler for disse summer og i stedet nøjes med estimater.
+For eksempel kan vi i stedet for at udregne summen foroven eksakt begrænse den opad- og nedadtil meget nemmere (for $n\ge 2$):
+\begin{align*}
+\sum_{i=2}^n (i-1) &\leq \sum_{i=1}^n n = n^2 = O(n^2)\,,\\
+\sum_{i=2}^n (i-1) &\geq \sum_{i=\ceil{n/2}+1}^n n/2 = \left\lfloor\frac{n}{2}\right\rfloor \cdot\frac{n}{2}=
+\Omega(n^2) \,. \end{align*}
+
+%----------------------------------------------------------------------
+\subsection{Rekursionsligninger}\llabel{s:recurrences}
+
+\index{rekursionsligning|textbf}
+\index{algoritmeanalyse!rekursion}
+\index{rekursion|sieheauchunter{algoritmekonstruktion; algoritmeanalyse}}%
+I vores regler for algoritmeanalyse har vi hidtil ikke bekymret os om kald til underprogrammer.
+Ikkerekursive underprogrammer er lette at håndtere, fordi vi kan analysere underprogrammet for sig og sætte den resulterende grænse ind i udtryk for beregningstiden for det kaldende program.
+Men når vi bruger denne fremgangsmåde på rekursive underprogrammer, fører den in ikke til en lukket formel, men en rekurstionligning.
+
+For eksempel optræder ved analysen af antallet af elementaroperationer i den rekursive udgave af skolemetoden for multiplikation ligningerne
+ $T(1)=1$ og $T(n)=4T(\ceil{n/2})+4n$.
+De tilsvarnde ligninger for Karatsubas algoritme lyder
+$T(n)=3n^2$ for $n \le 3$ og 
+$T(n)=3T(\ceil{n/2} + 1)+8n$ for $n > 3$.
+Generelt definerer en \emph{rekursionsligning} en funktion i termer af funktionens værdier på mindre argumenter.
+Definition fuldstændiggøres ved udtrykkelige definitioner af små parameterværdier (»basis«). 
+Løsningen af rekursionsligninger, dvs. at finde en ikke-rekursiv, lukked formel for en rekursivt definieret funktion, er en interessant og omfattende del af matematikken.
+I vores kontekst skal vi hovedsageligt koncentere os på den slags rekursionsligninger, som optræder i forbindelse med analysen af del-og-hersk-algoritmer.
+\index{algoritmekonstruktion!del-og-hersk}
+Vi begynder med et enkelt specialtilfælde for at gøre hovedidéen forståelig.
+Givet indput af størrelse $n=b^k$ for et naturligt tal $k$.
+For $k \ge 1$ benytter vi lineært meget arbejde for at opdele instansen i $d$ mindre instanser af størrelse $n/b$ og for at kombinere resultaterne af de rekursive kald på de enkelte delinstanster.
+For $k=0$ finder ingen rekursive kald sted, og vi bruger $a$ meget arbejde for at løse opgaven for instansen direkte.
+\index{del-og-hersk-ligninger|sieheunter{algoritmeanalyse}}\index{algoritmeanalyse!del-og-hersk-ligninger|textbf} 
+
+\begin{thm}[Klassifikation af del-og-hersk-ligninger, enkel form]\llabel{thm:master}
+For positive konstanter $a$, $b$, $c$ og $d$, og $n=b^k$ for et naturligt tal $k$, lad $r$ være en rekursionsligning givet ved
+\[ r(n)=
+\begin{cases}
+a & \text{ for }n=1\,,\\
+d \cdot r(n/b) + cn & \text{ for } n > 1 \,.
+\end{cases} \]
+Da gælder
+\[ r(n)=
+\begin{cases}
+\Theta(n) & \text{ for }d<b\,,\\
+\Theta(n\log n) & \text{ for }d=b\,,\\
+\Theta(n^{\log_bd}) & \text{ for }d>b \,.
+\end{cases} \]
+\end{thm}
+
+\begin{figure}
+  \begin{tikzpicture}[scale = .36]
+    \node at (-16,-1) [anchor = west]{$d=2, b=4$};
+    \foreach \y in {0,...,3} {
+      \pgfmathtruncatemacro\n{2^\y};
+      \pgfmathtruncatemacro\m{\n-1};
+      \foreach \i in {0,...,\m} {
+      \pgfmathsetmacro\w{32/4^\y};
+      \pgfmathsetmacro\hw{\w/2};
+      \pgfmathsetmacro\x{-(\w*\m/2) +\i*\w};
+      \draw [fill = white, rounded corners = 1pt]  (\x,-\y) ++(-\hw,-.2) rectangle ++(\w,.4);
+      \begin{scope}[on background layer]
+      \ifthenelse{\y=3}{}{
+	%\draw [blue] (\x,-\y) -- (-\w*\n/4, -\y-1);
+	\draw [callout] (\x,-\y) -- (-\w*\n/4 + \i*\w/2 + \hw/4, -\y-1);
+	\draw [callout] (\x,-\y) -- (-\w*\n/4 + \i*\w/2 + \hw/4 + \hw/2 , -\y-1);
+    }
+      \end{scope}
+    }
+  }
+    \begin{scope}[yshift = -6cm]
+      \node at (-16,1)[anchor = west] {$d= b=2$};
+      \foreach \y in {0,...,4} {
+	\pgfmathtruncatemacro\m{2^\y-1};
+	\foreach \i in {0,...,\m} {
+	\pgfmathtruncatemacro\w{32/2^\y};
+	\pgfmathtruncatemacro\hw{\w/2};
+	\pgfmathtruncatemacro\x{-(\w*\m/2) +\i*\w};
+	\draw [fill = white, rounded corners = 1pt]  (\x,-\y) ++(-\hw,-.2) rectangle ++(\w,.4);
+	\begin{scope}[on background layer]
+	  \ifthenelse{\y=4}{}{
+	\draw [callout] (\x,-\y) -- ++(-\hw/2, -1);
+	\draw [callout] (\x,-\y) -- ++( \hw/2, -1);
+	  }
+	\end{scope}
+      }
+    }
+    \end{scope}
+    \begin{scope}[yshift = -12cm]
+      \node at (-16,-1)[anchor = west] {$d=3, b=2$};
+      \node at (0,0) {+};
+      \foreach \y in {0,...,3} {
+        \pgfmathtruncatemacro\m{3^\y-1};
+        \pgfmathtruncatemacro\n{3^\y};
+        \foreach \i in {0,...,\m} {
+          \pgfmathsetmacro\w{(32/27)*2^(3-\y)};
+	  \pgfmathsetmacro\hw{\w/2};
+        \pgfmathsetmacro\x{-(\w*\m/2)  +\i*\w};
+        \draw [fill = white, rounded corners = 1pt]  (\x,-\y) ++(-\hw,-.2) rectangle ++(\w,.4);
+        \begin{scope}[on background layer]
+          \ifthenelse{\y=3}{}{
+	    \draw [callout] (\x,-\y) -- (-3*\w*\n/4 + 3*\i*\w/2 + \hw/2,-\y -1);
+	    \draw [callout] (\x,-\y) -- (-3*\w*\n/4 + 3*\i*\w/2 +\w/2+\hw/2,-\y -1);
+	    \draw [callout] (\x,-\y) -- (-3*\w*\n/4 + 3*\i*\w/2 + \w+\hw/2 ,-\y -1);
+          }
+        \end{scope}
+      }
+    }
+    \end{scope}
+  \end{tikzpicture}
+\caption{\llabel{fig:master}
+Illustration af de tre fald i klassifikationen af del-og-hersk-ligninger.
+Instanser fremstilles som rektangler, hvis længde repræsenterer instansens størrelse.
+Delinstanserne, som opstår ud fra en instans, er vist et niveau længere nede.
+  Figurens øvre del viser faldet $d = 2$ og $b = 4$, i hvilket en instans leder til to delinstanser med en fjerdedel af størrelsen -- den samlede størrelse af delinstanserne udgør altså halvdelen af den oprindelige instans.
+  Figurens midterste del viser faldet 
+ $d = b = 2$, og den nederste del faldet $d =3$ og $b = 2$.}
+\end{figure}
+%
+Figur \lref{fig:master} illustreren den centrale indsigt, som ligger til grund for sætning~\lref{thm:master}.
+Vi betragter tidsforbruget på hvert niveau af rekursionen.
+Vi begynder med en instans af størrelse $n$.
+På nivau $i$ af rekursionen har vi $d^i$ delinstanser af størrelse $n/b^i$ hver.
+Det samlede størrelse af alle instanser på niveau $i$ er derfor
+\[ d^i \frac{n}{b^i} = n \left( \frac{d}{b} \right)^i \,. \]
+Tidsforbruge for en instans (bortset fra de rekursive kald, den selv måtte lede til) er $c$ gange instansstørrelse.
+Derfor er det samlede tidsforbrug på et rekursionsniveau proportionalt med den samlede størrelse af alle instanser på dette niveau.
+Afhængigt af, om $d/b$ er mindre end $1$, lig med $1$, eller større end $1$, opstår der forskellige opførsler.
+
+For $d<b$ er tidsforbruget \emph{geometrisk aftagende}
+\index{sum!geometrisk} 
+med rekursionsniveauet, og det \emph{første} niveau i rekursionen er allerede ansvarlig for en konstant til af det samlede tidsforbrug.
+
+For $d=b$ bruges på \emph{hvert} rekursionsniveau \emph{præcis den samme} tid.
+Idet der findes logaritmisk mange niveauer, er det samlede tidsforbrug $\Theta(n\log n)$.
+
+For $d>b$ er tidsforbruget \emph{geometrisk voksende} i rekursionsniveauet, og en konstant del af den samlede tid bruges på rekursionens \emph{sidste} niveau. 
+Vi skal nu gennemgå disse overvejelser i detaljer.
+
+\begin{proof} 
+  Vi begynder med en enkelt instans af størrelse $n = b^k$. 
+  Lad os kalde den for niveau $0$ i rekursionen.%
+  \footnote{I beviset holder vi os til terminologien af rekursive programmer med henblik på at støtte intuitionen for, hvad der foregår.
+  De matematiske overvejelser kan dog bruges for alle ligninger af sætning~\lref{thm:master}, uanset om de stammer fra et rekursivt program eller ej.}
+  På niveau 1 findes $d$ instanser af størrelse $n/b = b^{k - 1}$ hver.
+  På niveau 2 findes  $d^2$ instanser af størrelse $n/b^2 = b^{k - 2}$ hver.
+  Generlt finder der på det $i$te niveau  $d^i$ instanser af størrelse $n/b^i = b^{k - i}$ hver.
+  I bunden af rekursionen, på niveau $k$, findes $d^k$ instanser af størrelse $n/b^k = b^{k - k} = 1$ hver.
+  Hver sådan instans forårsager omkostning $a$, så den samlede omkostning på rekursionens sidste niveau er $ad^k$.
+
+  Hernæst beregner vi den samlede omkostning for del-og-hersk-skridtene på nivau $i$ for $i\in\{0,\ldots, k - 1\}$. 
+  På niveau $i$ forekommer $d^i$ rekursive kald, hver til én instans af størrelse $b^{k-i}$. 
+  Hvert sådant kald forårsager omkostning $ c \cdot b^{k - i}$;
+  den samlede omkostning på niveau $i$ er derfor $d^i\cdot c\cdot b^{k-i}$. 
+  Ved at summere bidraget fra alle niveauer fra $0$ bis $k-1$, fås
+  \[ \sum_{i=0}^{k-1}d^i\cdot c\cdot b^{k-i}=
+  c\cdot
+  b^k \cdot \sum_{i=0}^{k-1}\left(\frac{d}{b}\right)^i=cn \cdot \sum_{i=0}^{k-1}\left(\frac{d}{b}\right)^i\,.
+  \]
+  Vi deler op i tilfælde afhængigt af størrelseforholdet mellem $d$ og $b$:
+  \begin{description}
+    \item[$d=b$:]
+      Vi får omkostning $ad^k=ab^k=an=\Theta(n)$ for rekursionens sidste niveau $k$ og
+      samlet omkostning $cnk=cn\log_{b}n=\Theta(n\log n)$ for del-or-hersk-skridtene.
+
+\item[$d<b$:] Vi får omkostning $ad^k<ab^k=an=O(n)$ for rekursionens sidste niveau.
+  Til del-og-hersk-skridtene benytter vi ligning (\ref{app:notation:eq:geometric}) for summen af en geometrisk række,
+  \index{række|siehe{sum}}\index{geometrisk række|sieheunter{sum}}  
+  nemlig $\sum_{i=0}^{k-1} q^i = (1 - q^k)/(1 - q)$ for
+  $q > 0$ og $q \not= 1$, og opnår grænserne
+  \begin{align*}
+    cn \cdot \sum_{i=0}^{k-1}\left(\frac{d}{b}\right)^i & = cn \cdot
+    \frac{1-(d/b)^k}{1-d/b} < cn \cdot \frac{1}{1-d/b} =O(n)\\
+    \intertext{og}      %\mbox{\MDcommentout{Schon der erste Summand liefert $cn(d/b)^0=cn=\Om(n)$}}
+    cn \cdot \sum_{i=0}^{k-1}\left(\frac{d}{b}\right)^i &= cn \cdot
+    \frac{1-(d/b)^k}{1-d/b}>cn =\Omega(n)\,.
+  \end{align*}
+
+\item[$d>b$:] Der gælder
+  \[ d^k
+  =(b^{\log_b d})^k
+  =b^{k\log_b d}
+  =(b^k)^{\log_b d}
+  =n^{\log_b d}\,. \]
+  Derfor har det sidste niveau af rekursionen omkostning $an^{\log_b d}=\Theta(n^{\log_b d})$.
+      For del-og-hersk-skridtene benytter vi igen formlen (\ref{app:notation:eq:geometric}) for den geometriske række og får 
+  \begin{equation}
+    cb^k\frac{(d/b)^k-1}{d/b-1} =
+    c\frac{d^k-b^k}{d/b-1} =
+    cd^k\frac{1-(b/d)^k}{d/b-1} =
+    \Theta(d^k) =
+    \Theta(n^{\log_b d})\,. 
+  \end{equation}
+  \end{description}
+\end{proof}
+
+Vi kommer til at bruge del-og-hersk-klassifikationen i sætning~\lref{htm:master} mange gange i denne bog.
+Desværre dækkes fx rekursionsligningen $T(n) \le 3n^2$ for $n \le 3$ og  $T(n) \le 3T(\ceil{n/2} + 1) + 8n$ for $n>3$, som optræder i analysen af Karatsubas algoritme, ikke af sætningen i sin enkle form, fordi den ikke tager hensyn til hverken uligheder eller afrundinger i de indgående udtryk.
+Det kan også forekomme, at den additive term i rekursionsligningen ikke er lineær.
+Vi skal nu vise, hvordan man kan udvide sætningen til at gælde for mere generelle utryk i form af en 
+\emph{rekursionsrelation}.
+\index{rekursionsrelation}
+%
+\begin{equation}
+  \llabel{eq:1000}
+  r(n)\leq
+  \begin{cases}
+    a\,, & \text{hvis }n\leq n_0\,;\\
+    cn^s + d \cdot r(\ceil{n/b} + e_n)\,, & \text{hvis } n > n_0\,.
+  \end{cases}
+\end{equation} 
+Her er $a>0$, $b>1$, $c>0$, $d>0$ og $s\ge 0$ konstante reelle tal, og  værdierne $e_n$ for $n>n_0$ er reelle tal med $-\ceil{n/b} < e_n \le e$ for noget heltal $e\ge0$.
+%
+\addtocounter{theorem}{-1}
+\begin{thm}[Klassifikation af del-og-hersk-relationer]\llabel{master:full}
+  Lad $r$ være en rekursionsrelation som opfylder (\lref{eq:1000}).
+  Da gælder
+\[ r(n)=
+\begin{cases}
+O(n^s) & \text{for $d < b^s$, dvs. $\log_b d < s$}\,;\\
+O(n^s\log n) & \text{for $d = b^s$, dvs. $\log_b d = s$}\,;\\
+  O(n^{\log_bd}) & \text{for $d > b^s$, dvs. $\log_b d > s$}\,.
+\end{cases} \]
+\end{thm}
+
+\begin{proof}
+  \emph{Udeladt.}
+%  TODO
+%  \hspace*{-0.5em}{}\footnote{Dieser Beweis kann beim ersten Lesen überblättert werden.}
+%Über die Parameter dürfen wir
+%ohne Beschränkung der Allgemeinheit die folgenden technische Annahmen machen:
+%\begin{description}[(iii)]
+%	\item[(i)] $\ceil{n/b} + e < n$ für $n > n_0$,
+%  \item[(ii)] $n_0 \ge 2(e+1)/(1-1/b)$,
+%  \item[(iii)]  $a\le c(n_0+1)^s$. 
+%\end{description}
+%Wenn nötig, lassen sich (i) und (ii) erreichen, indem man $n_0$ erhöht.
+%Eventuell muss dann auch $a$ erhöht werden, um
+%sicherzustellen, dass für $n\le n_0$ die Ungleichung $r(n)\le a$ gilt.
+%Nachher kann man auch (iii) garantieren, indem man $c$ erhöht.
+%
+%Wir "`glätten"' die Rekurrenz (\lref{eq:1000}),  
+%indem wir $\hat r(n)\Is\max(\{0\}\cup\{r(i) \mid i\le n\})$ definieren.
+%Offensichtlich gilt dann $0 \le r(n) \le \hat r(n)$ für alle $n$.
+%Daher genügt es, die angegebenen Schranken für $\hat r(n)$ zu beweisen.
+%Wir behaupten, dass $\hat r(n)$ die folgende einfachere Rekurrenz erfüllt:
+%%
+%%\begin{equation}
+%%\llabel{eq:2000}
+%\[
+% \hat r(n)\leq
+%\begin{cases}
+%a & \text{, wenn }n\leq n_0\text{,}\\
+%cn^s + d \cdot \hat r(\ceil{n/b} + e) & \text{, wenn } n > n_0\text{.}
+%\end{cases}
+%\] 
+%%\end{equation}
+%%
+%Um dies einzusehen, betrachte ein $n$.
+%Wenn $n\le n_0$, gilt offenbar $\hat r(n)\leq a$.
+%Sei also $n>n_0$. Dann gibt es ein $i\le n$ mit $\hat r(n) = r(i)$. 
+%Wenn $i\le n_0$, ergibt sich aus Annahme~(iii) und $\hat r(\ceil{n/b} + e)\ge0$
+%die Ungleichung $\hat r(n) = r(i) \le a \le c(n_0+1)^s \le cn^s + d \cdot \hat r(\ceil{n/b} + e)$.
+%Wenn $i>n_0$, haben wir $\hat r(n) = r(i) \le  ci^s + d \cdot  r(\ceil{i/b} + e_i) \le cn^s + d \cdot \hat r(\ceil{n/b} + e)$,
+%weil $\ceil{i/b} + e_i \le \ceil{n/b} + e$ gilt.
+%
+%Nun beweisen wir die in Satz~\lref{master:full} behaupteten Schranken
+%für jede Funktion $r(n)\ge0$,
+%die die Rekurrenz 
+%%
+%\begin{equation}\llabel{eq:3000}
+%r(n)\leq
+%\begin{cases}
+%a & \text{, wenn }n\leq n_0\text{,}\\
+%cn + d \cdot r(\ceil{n/b} + e) & \text{, wenn } n > n_0\text{,}
+%\end{cases}
+%\end{equation}
+%%
+%erfüllt, wobei für die Konstanten die Annahmen (i)--(iii) gelten.
+%Daraus folgt der Satz. 
+%
+%Sei $n > n_0$ beliebig.
+%Zunächst betrachten wir die Argumente für $r(\cdot)$,
+%die entstehen, wenn die Rekurrenz (\lref{eq:3000}) wiederholt angewendet wird. 
+%Sei $N_0=n$ und
+%$N_i =\ceil{N_{i-1}/b} + e$, für $i=1,2,\ldots$.
+%Nach Annahme (i) gilt $N_i < N_{i-1}$, solange $N_{i-1} > n_0$.
+%Sei $k$ die kleinste Zahl mit $N_k\le n_0$.
+%
+%\medskip
+%
+%\noindent\emph{Behauptung} 1:
+%%\begin{equation}\llabel{eq:5000}
+%\[
+%N_i \le 2n/b^i,\text{ für \ } 0\le i < k.
+%%\end{equation}
+%\]
+%\emph{Beweis} von Beh. 1: Sei $\beta = b^{-1} < 1$. Durch Induktion über $i$ zeigen wir Folgendes:
+%\begin{equation}\llabel{eq:4000}
+%N_i \le \beta^i n +(e+1)\sum_{0\le j<i}\!\!\beta^j,\text{ für \ } 0\le i < k. 
+%\end{equation}
+%Der Fall $i=0$ ist trivial. Sei also $0 < i < k$. Dann haben wir:
+%\begin{eqnarray*}
+%N_i &=& \ceil{\beta N_{i-1}} + e \\
+%&\stackrel{\text{I.V.}}{\le}& \ceil{\beta\cdot\left(\beta^{i-1}n +(e+1)\sum_{0\le j<i-1}\!\!\beta^j\right)} + e \\
+%&\le& \beta^i n +(e+1)\sum_{0\le j<i-1}\!\!\beta^{j+1} + 1 +e\\
+%&=&\beta^i n +(e+1)\sum_{0\le j<i}\beta^j\eqndot
+%\end{eqnarray*}
+%Weil $\sum_{0\le j<i}\beta^j = (1-\beta^i)/(1-\beta) < 1/(1-\beta)$ (siehe~(\ref{app:notation:eq:geometric})), 
+%folgt aus (\lref{eq:4000}) die Ungleichung $n_0 < N_i \le \beta^i n + (e+1)/(1-\beta)$. 
+%Nach Annahme (ii) haben wir $(e+1)/(1-\beta) \le n_0/2$.
+%Es folgt $(e+1)/(1-\beta) < \beta^i n$,
+%also $N_i \le 2 \beta^i n = 2n/b^i$.
+%
+%\medskip
+%
+%\noindent\emph{Behauptung} 2: $\log_b(n/n_0) \le k < \log_b(2n/n_0) + 1$ und $b^k =\Th{n}$.\\
+%\emph{Beweis} von Beh. 2: Weil $2 n/b^{k-1}\ge N_{k-1} > n_0$ gilt,
+%haben wir $b^k < 2bn/n_0$, also $b^k=\Oh{n}$, und $k < \log_b(2n/n_0) + 1$.
+%Auf der anderen Seite sieht man mit 
+%Induktion ganz leicht, dass $N_i\ge n/b^i$ gilt, für $0\le i \le k$.
+%Daher ist $n_0 \ge N_k \ge n/b^k$; daraus folgt $b^k \ge n/n_0$, also $b^k=\Om{n}$, und $k\ge \log_b(n/n_0)$.
+%\medskip
+%
+%Wiederholtes Anwenden der Rekurrenz (\lref{eq:3000}) liefert Folgendes:
+%\begin{eqnarray}
+%r(n) & \le &  d r(N_1) + c N_0^s \nonumber\\
+%&\le & d^2 r(N_2) + cdN_1^s +cN_0^s\nonumber\\
+%&\vdots& \vdots \nonumber\\
+%&\le & d^k r(N_k) + cd^{k-1}N_{k-1}^s +\ldots + cdN_1^s +cN_0^s\nonumber\\
+%&\stackrel{\text{(Beh.\,1)}}{\le} & d^k a + c\sum_{0\le i < k} d^i(2n/b^i)^s\nonumber\\
+%& =  & d^k a + 2^s c \cdot n^s \sum_{0\le i < k} (d/b^s)^i.\llabel{eq:6000}
+%\end{eqnarray}
+%%
+%
+%\vspace{0.8ex}
+%\noindent\mbox{\bf Fall} $d<b^s$. --
+%Dann ist die Summe $\sum_{0\le i < k} (d/b^s)^i$ in~(\lref{eq:6000})
+%nach (\ref{app:notation:eq:geometric}) durch eine Konstante beschränkt,
+%woraus sich $r(n) \le d^k a +  \Oh{n^s}$ ergibt. Weil $d<b^s$, gilt 
+%$d^k < (b^k)^s$, und nach Beh.~2 gilt $(b^k)^s=\Oh{n^s}$. Damit erhalten wir $r(n)= \Oh{n^s}$.
+%
+%\vspace{0.8ex}
+%\noindent
+%\noindent\mbox{\bf Fall} $d=b^s$. -- Die $k$ Terme in der Summe in (\lref{eq:6000})
+%sind alle gleich $1$; daher gilt $r(n) \le d^k a + 2^s c n^s k$. 
+%Mit $d^k = (b^{k})^s =\Oh{n^s}$ (nach Beh.~2) erhalten wir
+%$r(n) = \Oh{n^s} +  \Oh{n^s k}  = \Oh{n^s}  + \Oh{n^s\log_b n} = \Oh{n^s\log n}$.
+%
+%\vspace{0.8ex}
+%\noindent\mbox{\bf Fall} $d>b^s$. -- Dann steigen die 
+%Terme in der Summe in (\lref{eq:6000}) an. 
+%Weil $b^k=\Om{n}$ (nach Beh.~2), also $(b^s)^k=\Om{n^s}$, liefert (\ref{app:notation:eq:geometric}) in diesem Fall
+%\[n^s \sum_{0\le i < k} (d/b^s)^i < n^s\cdot\frac{(d/b^s)^k}{d/b^s-1} =\Oh{d^k}.\]
+%Mit (\lref{eq:6000}) folgt $r(n)=\Oh{d^k}$.
+%Nach Beh.~2 haben wir $d^k = b^{k\,{\log_b d}} = \Oh{n^{\log_b d}}$, und wir erhalten $r(n) = \Oh{n^{\log_b d}}$.
+%%
+%\qed
+\end{proof}
+
+Der findes mange yderligere generaliseringer af sætning~\ref{thm:master}:
+Man kan  afbryde rekursionen tidligt, variere delinstansernes størrelse mere, lade antallet af delinstanser afhænge af instansstørrelsen osv.
+For mere information henvises læseren til bøgerne~\cite{GKP94,Sedgewick-Flajolet}\index{Sedgewick, R.}\index{Flajolet, P.}\index{Knuth, D.}\index{Graham, R.
+ L.}\index{Patashnik, O.}.
+
+\begin{exerc}
+  \llabel{ex:mergesortrecurrence}
+  Betragt rekursionsligningen
+\[ C(n) = \begin{cases}    1 & \text{for $n = 1$},\\
+           C(\floor{n/2})+C(\ceil{n/2})+ cn & \text{for $n > 1$.}
+\end{cases} \]
+Vis, at $C(n) = O(n\log n)$.
+\end{exerc}
+
+\begin{exerc}
+  Angiv en del-og-hersk-algoritme, hvis udførelsestid er givet af rekursionsligningen
+  $T(1)=a$ og \[
+    T(n)=\ceil{\sqrt{n}\,\,}\cdot T\left(\left\lceil\frac{n}{\ceil{\sqrt{n}\,\,}}\right\rceil\right)  + cn\quad \text{for }n>1\,.\]
+  Vis, at $T(n)=O(n\log\log n)$.
+\end{exerc}
+
+\begin{exerc}
+  Tidsforbruget for opslag i en datastruktur beskrives ofte af rekursionsligningen
+$T(1)=a$, $T(n)=T(n/2) + c$.
+Vis, at $T(n)=O(\log n)$.
+\end{exerc}
+
+\subsection{»Globale« betragtninger} 
+
+\index{algoritmenanalyse!global|textbf}
+De teknikker for algoritmeanalyse, vi har introduceret foroven, er »syntaktiske« i følgende forstand:
+For at analysere et større program, betragter vi i første omgang de enkelte dele og kombinerer derefter deres analyseresultater til en samlet analyse af hele programmet.
+Ved kombinationsskridtet benyttes summer og rekursionsligninger.
+
+Vi skal dog også bruge en helt anden fremgångsmåde, so man kunne kalde »semantisk«.
+Her associerer vi dele af programmets udførelse til dele af en kombinatorisk struktur og argumenter siden i termen af denne struktur.
+For eksempel kan vi observere, at en bestemt programstump udføres højst én gang per kant i en graf, og at derfor den samlede omkostning svarer til antallet af kanter i grafen.
+Eller vi kan observere, at udføreslsen af en vis del af programmet fordobler størrelsen af en vis struktur;
+hvis man derudover ved, at strukturens størrelse begynder med 1 og ender som højst $n$ i slutningen af programmet, kan den pågældende del af programmet højst udføres $\log n$ gange.
+

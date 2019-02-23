@@ -16,6 +16,8 @@
 \usepackage{booktabs}
 \usepackage{multicol}
 
+\usepackage{ifthen}
+
 \title{Algoritmer og datastrukturer}
 \subtitle{Grundværktøjerne}
 \author{Martin Dietzfelbinger \and Kurt Mehlhorn \and Peter Sanders}
@@ -64,7 +66,12 @@
 \newcommand{\this}{\Kw{dette}}
 
 \newcommand{\Do}       {{\bf udfør\ }}
+\newcommand{\Loop}       {{\bf løkke\ }}
+\newcommand{\Repeat}       {{\bf gentag\ }}
+\newcommand{\Until}       {{\bf indtil\ }}
 \newcommand{\For}      {{\bf for\ }}
+\newcommand{\To}      {{\bf til\ }}
+\newcommand{\While}      {{\bf mens\ }}
 \newcommand{\Downto}       {{\bf ned til\ }}
 \newcommand{\ForFromTo}[3]{{\For $#1 \Is #2$ \To $#3$ \Do}}
 \newcommand{\ForFromToWhile}[4]{{\For $#1 \Is #2$ \To $#3$ \While $#4$ \Do}}
@@ -91,6 +98,7 @@
 \newcommand{\nnext}{\Id{næste}}
 \newcommand{\prev}{\Id{forrige}}
 
+\usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{amsmath}
 \newtheorem{lem}{Lemma}[chapter]
@@ -99,6 +107,11 @@
 \theoremstyle{definition}
 \newtheorem{exerc}{Opgave}[chapter]
 \renewcommand*{\proofname}{Bevis}
+
+ % local reference
+\newcommand{\lref}[1]{\ref{\labelprefix:#1}}
+\newcommand{\llabel}[1]{\label{\labelprefix:#1}}
+\newcommand{\labelprefix}{} % later redefined using renewcommand    
 
 
 \usepackage{xcolor}
@@ -113,7 +126,7 @@
 \usepackage{multirow}
 \usepackage{enumerate}
 
-\newcommand{\comment}[1]{\textcolor{callout}{/\!\!/ #1}}
+\newcommand{\comment}[1]{\textcolor{callout}{/\!\!/\text{\itshape #1}}}
 \newcommand{\myurl}[1]{{\tt #1}}
 
 \input{vc.tex}
@@ -127,13 +140,16 @@
 %\setcounter{section}{1}
 %\input{2-2.tex}
 %\input{2-3.tex}
+\setcounter{section}{5}
+\input{2-6.tex}
 \setcounter{section}{8}
-  \input{2-9.tex}
+\input{2-9.tex}
 
 \chapter{Fremstilling af følger med rækker og hægtede lister}
 \input{3-0.tex}
 
-\setcounter{chapter}{5}
+\setcounter{chapter}{4}
+\input{5.tex}
 \input{6.tex}
 
 \setcounter{chapter}{10}

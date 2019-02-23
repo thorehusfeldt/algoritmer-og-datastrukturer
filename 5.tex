@@ -1,0 +1,515 @@
+\chapter{Sortering og udvalg}
+\label{ch:pq}
+\vspace*{-4.5cm}
+\begin{flushright}
+\includegraphics[width=6cm]{img/queue2.eps}
+\end{flushright}
+\vspace*{1cm}
+
+\renewcommand{\labelprefix}{ch:sort}
+\llabel{}
+\providecommand{\key}{{\mathit key}}
+\index{Sortieren|textbf}
+
+Sandsynligvis har læseren en intuitiv opfattelse af, hvad \emph{sortering} drejer sig om.
+Alligevel vil vi definere opgaven formelt.
+Indput er en følge $s=\seq{e_1,\ldots,e_n}$ af $n$ indgange.
+\index{indgang}
+Hver indgang $e_i$ er forsynet med en \emph{nøgle}
+\index{nzgle@nøgle}
+ $k_i = \Id{key}(e_i)$.
+Nøglerne er taget fra et ordnet univers, dvs. at der defineret en \emph{lineær} (også kaldt \emph{total}) ordning $\leq$, se appendix~\ref{app:math}.
+\index{ordning!lineær}
+\index{ordning!total}
+For at holde notationen overskuelig, overfører vi ordningsrelationen fra nøgler til indgange, så vi skriver $e\leq e'$ når vi mener $\Id{key}(e)\leq \Id{key}(e')$.
+(Idet forskellige indgange kan have samme nøgle, danner den lineære ordning $\le$ altså en lineær \emph{præ}ordning på indgangene, se appendix~\ref{app:math}).
+Opgaven består i at skabe en følge $s'=\seq{e'_1,\ldots,e'_n}$, som er en permutation
+\index{permutation}
+af $s$, så der gælder $e'_1\leq \cdots\leq e'_n$.
+Læg mærke til, at rækkefølgen af indgange med samme nøgle er vilkårlig.
+\index{sortering|textbf}
+
+Selvom en og samme datatype kan tillade mange forskellige sammenligningrelationer, har visse datatyper en naturlig ordningsrelation:
+For tal er dette den sædvanlige ordning.
+For tupler, strenge og følger bruges den leksikografiske ordning (se appendix~\ref{app:notation:}).
+Den leksikografiske ordning på strenge findes i forskellige udgaver.
+Man kan se store og små bogstaver som ens eller forskellige, og i mange sammenhænge behandles bogstaver med accenter eller ligaturer på forskellige måder.
+
+\begin{exerc}
+Givet lineære ordninger $\le_A$ på $A$ og $\le_B$ på $B$, definer en lineær ordning på $A \times B$. 
+\end{exerc}
+
+% TODO: removed complex number exercise from orig
+
+Sortering er et allestedsnærværende algoritmisk værktøj, som ofte optræder som forberedende skridt
+\index{sortering!andvendelse}
+\index{algoritmekonstruktion!sortering (andvendelse)}
+i mere komplekse algoritmer.
+Vi skal se nærmere på nogle eksempler.
+
+\begin{itemize}
+\item 
+\emph{Forberedelse til hurtig søgning}.
+\index{algoritmekonstruktion!forberedelse}
+  I afsnit~\ref{ch:intro:s:binary search}, som omhandlede binærsøgning, så vi at søgning i en ordnet telefonbog er lettere at gennemføre, såvel for mennesker som for datamaskiner.
+\index{søgning!binærsøgning}
+Derudover understøtter en ordnet telefonbog flere operationer som at finde samtlige indgange inden for et område \index{søgning!område}.
+Søgning behandles indgående i kap.~\ref{ch:search:}.
+For at søge i uordnede mængder kan man også bruge spredning.
+ \index{spredning}
+\item \emph{Gruppering}.
+\index{gruppering}
+\index{sortering!anvendelse}
+\index{algoritmekonstruktion!sortering (andvendelse)}
+Ofte ønsker man at bringe identiske indgange på en og samme plads, måske for at tælle dem, eller for at identificere og fjerne eller håndtere dubletter.
+  Også her tilbyder spredning\index{spredning!andvendelse} en alternativ løsning. 
+Men sortering byder på flere fordele: vi skal møde hurtige, pladseffektive, deterministiske 
+\index{algoritmekonstruktion!deterministisk}
+sorteringsmåder, som skalerer til kæmpestore datamængder.
+\item \emph{Behandling i sorteret rækkefølge}.
+\index{sortering!anvendelse}
+\index{algoritmekonstruktion!sortering (anvendelse)}
+Mange algoritmer bliver ekstra enkle, hvis indputtet kan behandles i sorteret rækkefølge.
+I opgave~\lref{ex:schedule} finder man et eksempel. 
+Andre eksempler er Kruskals algoritme i afsnit~\ref{ch:mst:s:kruskal}  og nogle af algoritmerne for rygsæksproblemet i kap.~\ref{ch:optimization:}.
+Det kan også være nyttigt at tænke på sortering, når man prøver at løse opgave~\ref{ch:grepresent:ex:interval} om intervalgrafer \index{graf!intervalgraf}.
+\end{itemize}
+
+I afsnit~\lref{s:simple} skal vi præsentere nogle enkle sorteringsalgoritmer.
+Deres tidsforbrug er kvadratisk, men de er allivel brugbare for små indputmængder.
+Vi skal også se på nogle maskinnære optimeringer.
+I afsnit~\lref{s:merge} præsenteres \emph{flettesortering}, en enkel del-og-hersk-algoritme, som har udførelsestid $\O(n\log n)$.
+Som vi skal vise i afsnit~\lref{s:lower}, er denne tidsgrænse optimal for alle \emph{sammenligningsbaserede} sorteringsalgoritmer, dvs. algoritmer, so betragter indgangene som »sorte kasser«, som kan tillader parvis sammenligning og flytning.
+\emph{Kviksortering}, som behandles i  afsnit~\lref{s:quick}, beror ligeledes på en del-og-hersk-tilgang.
+Måske er den den mest anvendte sorteringsalgoritme.
+Kviksortering er et fremragende eksempel på en randomiseret algoritme.
+Algoritmens grundlæggende idé fører også til en enkel algoritme for \emph{udvalgsproblemet}:
+I afsnit~\lref{s:select} skal vi se, hvordan man kan finde den $k$te-mindste indgang i en mængde af størrelse $n$ i forventet tid $O(n)$.
+Når nøgler har en kendt struktur, som fx tal eller talfølger, eller kan behandles som sådan, kan man sortere hurtigere end den nedre grænser fra afsnit~\ref{s:lower}.
+Hertil skal nøgler udsættes for andre operationer end sammenligninger, fx ved at udnytte nøglens numeriske repræsentation.
+Endelig skal afsnit~\lref{s:external} præsentere meget gode algoritmer på basis af \emph{kviksortering} og \emph{flettesortering}, som tillader sortering af indput, som ikke får plads i hovedlageret.
+
+\begin{exerc}[Planlægning: Hotelreservationer]
+  \llabel{ex:schedule}
+  \index{sortering!andvendelse}
+  \index{algoritmekonstruktion!sortering (andvendelse)}
+  En hoteldirektør har $n$ reservationer til næste sæson.
+  Hotellet har $k$ identiske værelser.
+  En reservation består af en ankomstdato og en afrejsedato.
+  Hoteldirektøren vil vide, om hotellets værelser er nok til at opfylde alle ønsker.
+  Konstruer en algoritme, som efter sortering løser problemet i tid $O(n)$.
+  \emph{Vink}: 
+  Sorter først (multi-)mængden af alle ankomst- og afrejsetidspunkter.
+  Behandl derefter den denne mængde i ét gennemløb i stigende rækkefølge.
+\end{exerc}
+
+
+\begin{exerc}[Sortering med lille nølgemængde]
+  \index{spredning!anvendelse}
+  Konstruer en algoritme, som sorterer $n$ indgange i forventet tid $O(k\log k + n)$, hvis der kun forekommer $k$ forskellige nøgler i indput.
+  \emph{Vink}: 
+  Anvend et senere resultat i dette kapite, nemlig at man kan sortere $k$ nøgler i tid $O(k\log k)$. 
+  Kombiner spredning og sortering.
+\end{exerc}
+
+
+\begin{exerc}[Resultatkontroll]\llabel{ex:check}\index{algoritmekonstruktion!resultatkontroll}
+  Det er nemt at kontrollere, om en sorteringsmåde faktisk har skabt en voksende følge.
+  Det er ikke lige så nemt at kontrollere, om den resulterende følge er en permutation af indputfølgen.
+  \index{Permutation}
+  Hvis nøglerne er heltal, findes der dog en enkel og hurtig Monte Carlo-algoritme
+til formålet:
+  \index{algoritmekonstruktion!randomiseret!Monte Carlo}
+(a)
+Vis, at $\seq{e_1,\ldots,e_n}$ er en permutation  af 
+$\seq{e'_1,\ldots,e'_n}$, hvis og kun hvis polymomiet $q$ givet ved
+  \[ q(x) = \prod_{i=1}^n(x-e_i)-\prod_{i=1}^n(x-e'_i)\]
+\index{Polynom}
+  er nulpolynomiet. 
+  Her er $x$ en variabel.
+(b) For givet $\epsilon>0$ lad
+$p$ være et primtal
+  \index{primtal}
+  \index{algoritmekonstruktion!algebraisk} 
+  med
+  $p>\max\{n/\epsilon,e_1,\ldots,e_n,e'_1,\ldots,e'_n\}$.
+  Idéen er nu at evaluere polynomiet foroven modulo $p$ i $x=r$ for en tilfældig værdi
+  $r\in\{0,\ldots, p-1\}$. 
+  Vis at dersom $\seq{e_1,\ldots,e_n}$ \emph{ikke} er en permutation af  $\seq{e'_1,\ldots,e'_n}$,  så er $q(r)=0$ med sandsynlighed højst $\epsilon$.
+\emph{Vink}: Et polynomium af grad højst $n$, som ikke er nulpolynomiet modulo $p$, har højst $n$ rødder, når man regner modulo $p$.
+%TODO very clumsy with the modulo
+\end{exerc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Enkle sorteringsteknikker}\llabel{s:simple}
+
+Vi præsenterer nu to enkle sorteringsteknikker, \emph{udvalgssortering} og \emph{indsættelsessortering}. 
+
+\index{algoritmekonstruktion!grådig}%
+Ved udvalgssortering
+\index{sortering!udvalgssortering@\emph{udvalgssortering}|textbf}
+\index{sortering!udvalgs-} 
+\index{udvalgssortering}
+gentager man følgende skridt:
+Vælg den første indgang i indputfølgen, slet den der, og føj den til udputfølgen.
+Udputfølgen er tom til at begynde med;
+processen fortsætter, til indputfølgen er tom.
+For eksempel,
+\[ \seq{\,},\seq{4,7,1,1}\leadsto
+\seq{1},\seq{4,7,1}\leadsto
+\seq{1,1},\seq{4,7}\leadsto
+\seq{1,1,4},\seq{7}\leadsto
+\seq{1,1,4,7},\seq{\,}\,. \]
+Algoritmen kan implementeres sådan, at den kan nøjes med en enkelt række af $n$ indgange og arbejder \emph{på plads},
+\index{sortering!på plads@\emph{på plads}|textbf}
+dvs. at den ud over indputrækken og et konstant antal lagerceller for iterationsvariable o. lign. ikke behøver mere plads.
+Udførelsestiden er kvadratisk.
+
+I afsnit~\ref{ch:pq:s:further}
+beskrives en mere raffineret implementation af udvalgssortering, som forvalter indputfølgen som en \emph{prioritetskø}.
+\index{prioritetskø!anvendelse}
+Prioritetskøen gør det muligt at vælge og fjerne en mindste indgang effektivt.
+Det resulterende algoritme har udførelsestid $O(n\log n)$ og er meget brugt.
+Den er effektiv, deterministisk, arbejder på plads, og indputfølgen kan udvides dynamisk
+\index{sortering!dynamisk}
+med nye elementer, så længe disse er større end de allerede udtagne.
+Den sidste egenskab er af stor betydning for den hændelsesstyret diskret simulering, hvor hændelser behandles i tidslig voksende rækkefølge og en hændelse kan lede til nye hændelser, som skal udføres senere.
+
+Ved udvalgssortering udtages den næste indgang fra indputfølgen med henblik på at bevare løkkeinvarianten,
+\index{invariant!løkkeinvariant}
+nemlig at udputfølgen er sorteret under hele forløbet.
+Ved indsættelsessortering%
+\index{sortering!indsættelses-|textbf}
+\index{indsættelsessortering|textbf}
+gælder samme løkkeinvariant;
+her tager man dog en \emph{vilkårlig} indgang fra indputfølgen og sikrer i stedet, at den anbringes på rette plads i udputfølgen.
+For eksempel,
+\[
+\seq{\,},\seq{4,7,1,1}\leadsto
+\seq{4},\seq{7,1,1}\leadsto
+\seq{4,7},\seq{1,1}\leadsto
+\seq{1,4,7},\seq{1}\leadsto
+\seq{1,1,4,7},\seq{\,}\,. \]
+Fig.~\lref{alg:insert} viser en implementation af indsættelsessortering, som arbejder på plads i ind- og udputrækken $a[1..n]$. 
+Implementationen realiserer den algoritmiske idé på en oplagt måde, bortset fra et enkelt kneb, som gør det muligt at styre den indre løkke med kun én sammenligning.
+Når indgangen $e$, som er den næste at blive indføjet, er mindre end alle tidligere indføjede indgange, kan man den stilles forrest uden videre sammenligninger. 
+Ellers passerer man hele den sorterede delfølge fra højre til venstre, så længe der ikke står en indgang, som er større end $e$.
+Denne proces må nødvendigvis standse, fordi $a[1]\leq e$.
+\index{vogter@\emph{vogter}|siehe{vogterindgang}}
+\index{vogterindtang}.   
+
+I værstefald er indsættelsessortering temmelig langsom.
+Hvis fx indput er sorteret i aftagende orden, bliver hver eneste indgang flyttet hele vejen til plads $a[1]$, hvilket betyder, at den $i$te iteration af den ydre løkke skal flytte $i$ indgange.
+Samlet giver dette
+\[\sum_{i=2}^n(i-1)=
+  -n+\sum_{i=1}^ni=
+  \frac{n(n+1)}{2}-n=
+  \frac{n(n-1)}{2}=\Omega(n^2)\]
+  mange flytninger af indgange (se (\ref{app:notation:eq:sumi})).
+
+\begin{figure}
+\begin{tabbing}
+~~~~\=~~~~\=~~~~\=\kill
+  \Procedure \Id{indsættelsessortering}$($\Declare{$a$}{\Array$[1..n]$ \Of Element}$)$\+\\
+  \ForFromTo{i}{2}{n}\+\\
+    \Invariant $a[1]\leq\cdots\leq a[i-1]$\\
+    \comment{sæt $a[i]$ på rette plads}\\
+    $e \Is a[i]$\\
+    \If $e<a[1]$ \Then\+\comment{nyt minimum}\\
+      \ForFromDownto{j}{i}{2} $a[j] \Is a[j-1]$\\
+      $a[1] \Is e$ \- \\ 
+    \Else\+\comment{anvend $a[1]$ som vogterindgang}\\ 
+      \ForFromdownWhile{j}{i}{a[j-1]>e} $a[j] \Is a[j-1]$\\
+      $a[j] \Is e$
+\end{tabbing}
+\caption{\llabel{alg:insert}Indsættelsessortering.}
+\end{figure}
+
+På trods af den dårlige værstefaldsopførsel er indsættelsessortering en nyttig metode.
+Den er hurtig for små indput
+\index{sortering!små indput}
+(fx $n\le 10$) og kan derfor bruges i bunden af del-og-hersk-algoritmer for sorteringsproblemet.
+Desuden er indput i mange anvendelsesområder i forvejen allerede 
+»næsten sorteret« 
+\index{sortering!næsten sorteret indput};
+i disse siutationen er indsættelsessortering hurtig.
+
+\begin{exerc}[Næsten sorteret indput]\llabel{ex:almost-sorted}
+  Vis, at indsættelsessortering har udførelsestid $O(n + D)$ med
+ $D= \sum_i \left|r(e_i)-i\right|$, hvor
+  $r(e_i)$ er \emph{rangen}\index{rang (i sorteret orden)} (dvs. positionen) af $e_i$ i det sorterede udput.
+\end{exerc}
+
+\begin{exerc}[Gennemsnitsanalyse]\llabel{ex:average-insertion}%
+\index{algoritmeanalyse!gennemsnitligt fald}
+  Betragt mængden af alle $n!$ mange indput, som består af permutationer af tallene fra 
+  $1$ til $n$.
+  Vis, at den gennemsnitlige udførelsestid for indsættelsessortering på disse indput er 
+  $\Omega(n^2)$.
+  \emph{Vink}:
+  Vis, at der i gennemsnit en tredjedel af alle de indgange, der står i den oprindelige rækkes højre tredjedel, skal flyttes til rækkens venstre tredjedel.
+  Kan du finde et bedre bevis, som desuden viser, at der i gennemsnit kræves
+  $\frac{1}{4}n^2-O(n)$ gennemløb af den indre løkke?
+\end{exerc}
+
+
+\begin{exerc}[indsættelsessortering med få sammenligninger]
+  Modificer den indre løkke af den rækkebaserede indsættelsessorteringsalgoritme i fig.~\lref{alg:insert}, så den kun behøver $O(n\log n)$ sammenligninger mellem indgange. 
+  \emph{Vink}: Binærsøgning, se afsnit~\ref{ch:intro:s:binary search}.
+  Hvad er udførelsestiden af denne variant?    
+\end{exerc}
+
+\begin{exerc}[Effektiv indsættelsessortering?]
+  Brug datastrukturen for ordnede følger fra kap.~\ref{ch:search:} for at skabe en variant af indsættelsessortering med udførelsestid $O(n\log n)$. 
+\end{exerc}
+
+\begin{exerc}[Formel verifikation]\index{verifikation}
+  Brug din foretrukne verifikationsformalisme (fx hoarelogik) for at vise formelt, at indsættelsessortering producerer en permutation af indputfølgen.
+\end{exerc}
+
+\section{Flettesortering}
+\llabel{s:merge}%
+\index{sortering!flette-|textbf}%
+\index{flettesortering|textbf}%
+\index{algoritmekonstruktion!del-og-hersk!flettesortering}
+
+Flettesortering eller en enkel og direkte anvendelse af del-og-hersk-princippet
+Den usorterede følge deles op i to omtrent lige store dele.
+Begge dele sorteres rekursivt, hvorefter begge delfølger flettes sammen til én ordnet følge.
+Denne tilgang er effektiv, fordi fletningen af to ordnede følger $a$ og $b$ kan gøres enkelt og hurtigt.
+Den mindste indgang for begge følger er enten den første indgang i $a$ eller den første indgang i $b$.
+Vi flytter denne mindste indgang til udputfølgen, fortsætter med at finde den næstmindste indgang, osv.
+Processen gentages, indtil alle indgange er vandret over i udput.
+I fig.~\lref{alg:mergesort} vises algoritmen i pseudokode, og i fig.~\lref{fig:mergesort} vises et eksempel på en kørsel på konkret input.
+Hvis de indgående følger er (enkelt-)hægtede lister (se afs.~\ref{ch:sequence:ss:slist}), behøves hverken reservation eller frigørelse af listeindgange.
+Hver iteration i den indre løkke af proceduren \Id{flet} fører til én sammenligning af indgange og flytter én ingang til udputfølgen; dette kan gøres i konstant tid.
+Derfor er udførelsestiden for fletning lineær.
+
+\begin{figure}
+  \begin{tabbing}
+    ~~~~\=~~~~\=\kill
+    \Funct{flettesorter}{$\seq{e_1,\ldots,e_n}$}{\Id{Følge}\ \Of \Id{Element}}\+\\
+  \If $n=1$ \Then \Return $\seq{e_1}$ \\ %\RRem{base case}\\
+  \Else \Return \Id{flet}(\,\=\Id{flettesorter}$(\seq{e_1,\ldots,e_{\floor{n/2}}}),$\\
+                        \>$\Id{flettesorter}(\seq{e_{\floor{n/2}+1},\ldots, e_n})\,)$\-\\[2mm]
+
+\comment{Flet to ordnede følger, fremstillet som lister}\\
+~~~~\=~~~~\=\kill
+    \Funct{flet}{\Declare{$a,b$}{\Id{Følge}\ \Of \Id{Element}}}{\Id{Følge}\ \Of \Id{Element}}\+\\
+  $c\Is\seq{\,}$\\ 
+  \Loop\+\\
+    \Invariant både $a$, $b$ og $c$ er i stigende ordning og $\forall e\in c, e'\in a\cup b\colon e\leq e'$\\
+    \If $a.\Id{første}\leq b.\Id{første}$ \=\kill
+    \If $a.\Id{tom}$\>\Then $c.\Id{sammenføj}(b)$; \Return c \\
+    \If $b.\Id{tom}$\>\Then $c.\Id{sammenføj}(a)$; \Return c  \\
+    \If $a.\Id{første}\leq b.\Id{første}$  \>\Then\=
+    $c.\Id{flytTilBagest}(a.\Id{første})$\\
+    \Else \>\>$c.\Id{flytTilBagest}(b.\Id{første})$
+\end{tabbing}
+    \caption{\llabel{alg:mergesort}Flettesortering.}
+\end{figure}
+
+\begin{figure}[t]
+  \small
+\begin{minipage}{0.4\textwidth}
+  \begin{tikzpicture}[scale =.5,
+    s/.style = {font = \small, inner sep = 0pt}]
+    \node (2718281) at (-.5,0)  [s] {$\seq{2,7,1,8,2,8,1}$};
+    \node (1122788) at (-.5,-6) [s] {$\seq{1,1,2,2,7,8,8}$};
+    \node (271)     at (-2.5,-1)[s] {$\seq{2,7,1}$};
+    \node (127)     at (-2.5,-5)[s] {$\seq{1,2,7}$};
+    \node (2)       at (1,-3)   [s] {$\seq{2}$};
+    \node (2u)      at (-3.5,-2)[s] {$\seq{2}$};
+    \node (71)      at (-1.5,-2)[s] {$\seq{7,1}$};
+    \node (17)      at (-1.5,-4)[s] {$\seq{1,7}$};
+    \node (7)       at (-2,-3)  [s] {$\seq{7}$};
+    \node (8281)    at (1.5,-1) [s] {$\seq{8,2,8,1}$};
+    \node (1288)    at (1.5,-5) [s] {$\seq{1,2,8,8}$};
+    \node (81)      at (2.5,-2) [s] {$\seq{8,1}$};
+    \node (18)      at (2.5,-4) [s] {$\seq{1,8}$};
+    \node (1a)       at (-1,-3) [s] {$\seq{1}$};
+    \node (1b)       at (3,-3)  [s] {$\seq{1}$};
+    \node (8a)      at (0, -3)  [s] {$\seq{8}$};
+    \node (8b)      at (2,-3)   [s] {$\seq{8}$};
+    \node (82)      at (0.5,-2) [s] {$\seq{8,2}$};
+    \node (28)      at (0.5,-4) [s] {$\seq{2,8}$};
+    \node at (-5,-0.5) {del};
+    \node at (-5,-1.5) {del};
+    \node at (-5,-2.5) {del};
+    \node at (-5,-3.5) {flet};
+    \node at (-5,-4.5) {flet};
+    \node at (-5,-5.5) {flet};
+    \draw [callout] (2718281) -- (271);
+    \draw [callout] (2718281) -- (8281);
+    \draw [callout] (271) -- (2u);
+    \draw [callout] (271) -- (71);
+    \draw [callout] (8281) -- (82);
+    \draw [callout] (8281) -- (81);
+    \draw [callout] (71) -- (7);
+    \draw [callout] (71) -- (1a);
+    \draw [callout] (82) -- (8a);
+    \draw [callout] (82) -- (2);
+    \draw [callout] (81) -- (8b);
+    \draw [callout] (81) -- (1b);
+    \draw [callout] (8a) -- (28);
+    \draw [callout] (2) -- (28);
+    \draw [callout] (7) -- (17);
+    \draw [callout] (1a) -- (17);
+    \draw [callout] (8b) -- (18);
+    \draw [callout] (1b) -- (18);
+    \draw [callout] (2u) -- (127);
+    \draw [callout] (17) -- (127);
+    \draw [callout] (28) -- (1288);
+    \draw [callout] (18) -- (1288);
+    \draw [callout] (127) -- (1122788);
+    \draw [callout] (1288) -- (1122788);
+  \end{tikzpicture}
+\end{minipage}
+\begin{minipage}{0.55\textwidth}
+\begin{flushright}%
+\begin{tabular}{rrll}
+$a$ & $b$ & $c$ & Operation\\\midrule
+$\seq{1,2,7}$ &$\seq{1,2,8,8}$ &  $\seq{\,}$ & flyt fra $a$\\
+$\seq{2,7}$ &$\seq{1,2,8,8}$ &  $\seq{1}$ & flyt fra $b$\\
+$\seq{2,7}$ &$\seq{2,8,8}$ &  $\seq{1,1}$ & flyt fra $a$\\
+$\seq{7}$ &$\seq{2,8,8}$ &  $\seq{1,1,2}$ & flyt fra $b$\\
+$\seq{7}$ &$\seq{8,8}$ &  $\seq{1,1,2,2}$ & flyt fra $a$\\
+$\seq{\,}$ &$\seq{8,8}$ &  $\seq{1,1,2,2,7}$ & sammenføj $b$\\\midrule
+$\seq{\,}$ &$\seq{\,}$ &  $\seq{1,1,2,2,7,8,8}$ & \\
+\end{tabular}
+\end{flushright}%
+\end{minipage}
+\caption{
+  \llabel{fig:mergesort}
+  Kørsel af
+  $\Id{flettesorter}(\seq{2,7,1,8,2,8,1})$.
+  \emph{Til venstre} vises strukturen af de rekursive kald i
+  \index{algoritmekonstruktion!rekursion}
+  i $\Id{flettesorter}$.
+  \emph{Til højre} vises kørslen af $\Id{flet}$ i det yderste kald.}
+\end{figure}
+
+\begin{thm}\llabel{thm:merge}
+Proceduren \Id{flet} anvendt på to følger af samlet længde $n$ udføres i tid $O(n)$ og bruger højst $n-1$ sammenligninger af indgange.
+\end{thm}
+
+For udførelsestiden af flettesortering får vi følgende:
+
+\begin{thm}\llabel{thm:mergesort}
+  Flettesortering af en følge af længde $n$ udføres i tid $O(n\log n)$ og bruger højst $\floor{n\log n}$ sammenligninger af indgange.
+  %TODO n undefined in orig
+\end{thm}
+
+\begin{proof}
+  Lad $C(n)$ være antallet af sammenligninger, som i værstefald gennemføres på en indputfølge af $n$ indgange.
+  Åbenbart er $C(1)=0$, og fra sætning~\lref{thm:merge} får vi $C(n) \le C(\floor{n/2})+C(\ceil{n/2})+n-1$.
+  Hovedsætningen for rekursionsligninger (sætning~\ref{ch:intro:thm:master})
+  \index{algoritmenanalyse!hovedsætning}
+  \index{algoritmenanalyse!rekursion}
+  giver da $C(n) = O(n \log n)$.
+  Vi skal nu give to direkte beviser, som leverer eksplicitte konstanter.
+  Det første etablerer $C(n) \le 2n \ceil{\log n}$, det andet sågar
+ $C(n) \le n \log n$.
+
+ Hvis $n$  er en topotens, definerer vi $D(1) = 0$ og $D(n) = 2D(n/2) + n$. 
+ Et enkelt induktionsbevis viser, under anvendelse af ligningen $\log(n/2)=\log n - 1$, 
+ at der gælder $D(n) = n \log n$ når $n$ er en topotens.
+ Lad nu $n$ være vilkårlig.
+  Vi betragter det entydigt bestemte $k$, som opfylder $2^{k-1} < n \le 2^k$, og påstår, at der gælder $C(n) \le D(2^k)$.
+  Heraf følger direkte
+ $C(n) \le D(2^k) = 2^k\cdot k \le 2n \ceil{\log n}$. 
+ Uligheden $C(n) \le D(2^k)$ viser vi ved induktion efter $k$. 
+ For $k = 0$ gælder $n = 1$ og $C(1) = 0 = D(1) = D(2^0)$.
+ For $k > 1$ indser vi først, at der gælder $\floor{n/2} \le \ceil{n/2} \le 2^{k-1} < n$.
+ Ved at anvende rekursionsligningen og induktionsantagelsen får vi nu uligheden
+ \[ C(n) \le C(\floor{n/2})+C(\ceil{n/2})+n-1 \le 2D(2^{k-1}) + 2^k - 1 \le
+ D(2^k)\,. \] 
+ Det afslutter det første bevis.
+
+ Vi vender os nu mod den andet, mere nøjeregnende bevis, hvor vi vil etablere grænsen
+ \[ C(n)\leq n\ceil{\log n}-2^{\ceil{\log n}} + 1 \] 
+ ved induktion efter $n$. 
+ For $n = 1$ gælder påstanden åbenbart. 
+ Antag altså $n>1$.
+ Betragt det $k$, som opfylder $2^{k-1}<\ceil{n/2}\le 2^k$, dvs. $k = \ceil{\log(\ceil{n/2})}$.
+ Så gælder ifølge induktionshypotesen, at $C(\ceil{n/2})\le \ceil{n/2}k -2^k + 1$.
+ For $2^{k-1} < \floor{n/2}$ følger ligeledes af induktionshypotesen, at $C(\floor{n/2})\le \floor{n/2}k -2^k + 1$.
+ For $\floor{n/2}=2^{k-1}$ giver induktionshypotesen, at
+ $C(\floor{n/2})\le \floor{n/2}(k-1) -2^{k-1} + 1$.
+ Men højresiden er lig med
+ $2^{k-1}\cdot(k-1) -2^{k-1} + 1 = 2^{k-1}\cdot k -2^k+1=\floor{n/2}k -2^k + 1$.
+ Vi får altså i hvert fald:
+ \begin{align*}
+   C(n) &\leq C(\floor{n/2})+C(\ceil{n/2})+n-1 \\
+   &\le \big(\floor{n/2} k -2^k + 1\big)+ \big(\ceil{n/2}k -2^k + 1\big) + n - 1 \\
+   & =  n k + n - 2^{k+1} + 1 = n(k+1) - 2^{k+1} + 1 = n\ceil{\log
+   n}-2^{\ceil{\log n}} + 1 \,.
+ \end{align*}
+ Nu skal vi vise, at 
+  $k=\ceil{\log n}$ opfylder oligheden $nk-2^k + 1 \le n\log n$.
+ For $n=2^k$ gælder $2^k\cdot k - 2^k + 1\le 2^k\cdot k$ åbenbart. 
+ For $n<2^k$ indser vi $nk-2^k+1 \le n(k-1) + (n-2^k+1) \le n\log n$.
+
+ Grænsen for udførelsestiden etableres med en lignende rekursionsligning
+ (jf. opgave~\ref{ch:intro:ex:mergesortrecurrence}).
+\end{proof}
+
+Flettesortering er den foretrukne metode for at sortere hægtede lister.
+\index{liste!sortering}
+\index{sortering!liste}
+Derfor bruges denne fremgangsmåde ofte i funktions- og logikprogrammeringssprog,
+\index{programmeringssprog!funktions-}
+\index{programmeringssporg!logik-} 
+idet disse sprog bruger lister som den primære datastruktur.
+I afsnit~\lref{s:lower} skal vi se, at flettesortering i grunden er optimal med hensyn til antallet af sammenligninger.
+Derfor er det også et godt valg, når sammenligninger er dyre. 
+Ved implementationen baseret på rækker har flettesortering desuden den fordel, at den gennemgår lagerafsnit sekventielt. 
+Det fører til effektivitetsforedele i situationer med et lagerhierarki; mere om dette emne i afsnit~\lref{s:external}.
+Alligevel er flettesortering ikke det foretrukne metode til at sortere rækker, fordi \Id{flet} ikke arbejder på plads, men behøver yderligere lager.
+(En mulig udvej betragtes i opgave~\lref{ex:blockmerge}.)
+
+
+\begin{exerc}
+  Forklar, hvordan man føjer $k$ nye indgange til en ordnet liste i tid $O(k\log k +n)$.
+  \index{liste!massetilføjelse|textbf}
+\end{exerc}
+
+\begin{exerc}
+  Fig.~\lref{alg:mergesort} beskriver proceduren $\Id{flet}$ for lister, men $\Id{flettesortering}$ bare i abstrakt følgeterminologi. 
+  Beskriv $\Id{flettesortering}$ detaljeret for hægtede lister. 
+\end{exerc}
+
+\begin{exerc}
+  Implementer flettesortering i et funktionsprogrammeringssprog.
+  \index{programmgeringssprog!funktions-}
+\end{exerc}
+
+
+\begin{exerc}
+  Implementer flettesortering for rækker i dit foretrukne imperative programmeringssprog.
+  Ved siden af indputrækken bruger man en hjælperække af størrelse $n$; de to rækker skiftes til at indeholde mellemresultater og udputfølgen under opbygning.
+  Afgør eksperimentelt, om  den faktiske udførelsestid bliver bedre ved at skifte fra rekursion til indsættelsessortering for små indput.
+  \index{sortering!indsættelses-} 
+  I så fald, ved hvilken længde er det bedst at skifte?
+\end{exerc}
+
+\begin{exerc}
+  I vores beskrivelse af \Id{flet} indeholder hvert løkkegennemløb tre sammenligninger -- en sammenligning af indgange og to tomhedstest for løkkeafslutning.
+  %TODO
+  Udvikl en variant, som i stedet benytter vogterindgange
+  \index{vogterindgang} 
+  og derved klarer sig med kun én test for løkkeafslutning.
+  Går det uden brug af attrapknuder i enden af listen?
+\end{exerc}
+
+\begin{exerc}\llabel{ex:blockmerge}
+  I opgave~\ref{ch:sequence:ex:blocklist}
+  beskrives en fremstilling af følger, som er organiseret som liste af rækker kaldt »blokke«.
+  \index{Liste!von Arrays}
+  Implementer fletning og flettesortering for denne datastruktur.
+  Under fletningen bør tomme indputblokke genbruges til udput.
+  Sammenlign flettesorterings tids- og pladsbehov for denne datastruktur, for enkelthægtede lister og for rækker, også under hensyntagen til konstante faktorer.
+\end{exerc}
+
+
