@@ -1,0 +1,861 @@
+\chapter{Korteste veje}
+\index{korteste veje|textbf}
+
+\renewcommand{\labelprefix}{ch:spath}
+\llabel{}
+\vspace*{-3.7cm}
+%\mbox{}\hspace{\fill}\includegraphics[width=4cm]{\masterdir/ShortPath/figs/labyrinth.ps} 
+%\mbox{}\hspace{\fill}\includegraphics[width=4cm]{\masterdir/ShortPath/figs/Faeden.eps} 
+%\vspace*{-1.5cm}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{img/campus-plan3.eps}%
+\includegraphics[width=0.4\textwidth]{img/faeden-neu.eps}
+% für Fadenknaeuel:
+%{\tiny Copyright Universit"at Karlsruhe (TH), Institut f"ur Photogrammetrie und Fernerkundung}
+\end{center}
+%
+%\begin{flushleft}
+%\includegraphics[width=\textwidth]{\masterdir/ShortPath/figs/campus-plan.eps}
+%\end{flushleft}
+
+\aufmacher{\noindent 
+Problemet at finde en korteste, hurtigste eller billigste vej i en netværk er allestedsnærværende.
+Hver af os løser det dagligt.
+Er man på plads $s$ og ønsker at være på plads $t$, spørger man om vej for at komme fra $s$ til $t$ på den bedste måde.
+Brandvæsnet ønsker at kende den hurtigste vej fra brandstationen $s$ til samtlige pladser  $t$ i hele byen -- varianten af korteste-veje-problemet »med samme udgangspunkt« eller »med en enkelt kilde«.
+\index{korteste veje!samme udgangspunkt}
+Sommetider ønsker man til og med en fuldstændig tabel over alle parvise afstande -- denne variant hedder »korteste veje for alle par«.
+\index{korteste veje!alle par}
+Et eksempel på den slags tabeller med afstande mellem større byer kan man finde i de fleste vejatlas.
+
+Der findes en algoritme til ruteplanlægning, som kun bruger et vejkort, en rulle sytråd og en masse fingerfærdighed, men ingen computer.
+Man lægger tynde tråde langs gaderne på vejkortet.
+Ved vejkryds knytter man trådene sammen til knuder; udgangspunktet (»kilden«) får ligeledes en knude.
+Nu lyfter man forsigtigt kildeknuden lodret opad, til hele netværket dingler under den. 
+Lykkes man med dette uden at forkludre trådene, og knuderne er så små, at kun stramme tråde kan hindre dem i at falde ned, så definerer de spændte trådstykker netop de korteste veje fra udgangsknuden.
+Billedet foroven\footnote{{\copyright} KIT, Institut f\"ur Photogrammetrie und Fernerkundung.} 
+viser Instituttet for Teknologi i Karlsruhe (KIT) og den trådbaserede ruteplanlægningsalgoritme med $M$ som kilde.
+}
+
+
+Ruteplanlægning
+\index{korteste veje!anvendelse}
+\index{graf!korteste veje|siehe{korteste veje}} 
+i vejnet er en af de mange anvendelser for korteste-veje-beregninger.
+Men der er mange andre problemer, som løses bedste af korteste-veje-beregninger, når man har fundet en passende modellering i termer af grafer.
+Ahuja \emph{et al.}~\cite{AhuMagOrl93} nævner anvendelser som netværksstrømme, boligbyggeri, forvaltning af lagerbeholdning i produktion og handel, 
+dna-sekvensering, rygsæksproblemet 
+\index{rygkæksproblemet} 
+(se også kapitel~\ref{ch:optimization:}), produktionsplanlægning, skemalægning af arbejdstider fx for callcentre,
+\index{skemalægning}
+parkering, approksimation af stykvist linjære funktioner og fordeling af inspektionstid af et samlebånd.
+\index{korteste veje!anvendelse}
+
+I den mest almene formulering af korteste-veje-problemet betrager man en rettet graf $G=(V,E)$ og en omkostningsfunktion $c$, som afbilder hver kant til en reelt tal, som modellerer omkostningen ved at passere denne kant. 
+Det viser sig, at problemet i denne formulering er overordentligt tidskrævende at løse.
+Defor interesserer vi os for forskellige begrænsninger, som tillader enkle og effektive algoritmer: 
+ikkenegative kantomkostninger,
+\index{korteste veje!ikkenegative kantomkostninger}, 
+heltallige kantomkostninger
+\index{korteste veje!heltallige kantomkostninger}
+og acykliske grafer.
+\index{korteste veje!acyklisk graf}
+Læg mærke til at det meget særlige tilfælde, hvor alle kanter har omkostning~1
+\index{graf!bfs}
+\index{korteste veje!identiske kantomkostninger}
+allerede blev løst i kapitel~\ref{ch:gtraverse:s:bfs} -- bredde-først-træet med rod~$s$  er en kompakt repræsentation af de korteste veje fra $s$ til samtlige andre knuder. 
+I afsnit~\lref{s:concepts} betragter vi indledningsvist nogle grundlæggende begreber, som leder til et fælles grundlag for alle korteste-veje-algoritmer. 
+En systematisk fremgangsmåde skal hjælpe os at holde styr på de mange forskellige korteste-veje-algoritmer.
+Som første eksempel på en hurtig og enkel algoritme for en begrænset problemklasse betragter vi i afsnit~\lref{s:acyclic} en fremgangsmåde for acykliske grafer.
+I afsnit~\lref{s:Dijkstra} kommer vi til den mestbenyttede algoritme for kortest veje, nemlig Dijkstras algoritme for rettede grafer med ikkenegative kantomkostninger.
+Hvor effektiv Dijkstras algoritme i virkeligheden er, afhænger af, hvor effektive de benyttede prioritetskøer er.
+I et indledende kursus eller ved første gennemlæsning kan man sagtens afslutte temaet »korteste veje« med Dijkstras algoritme.
+Men resten af kapitlet indeholder mange andre interessante aspekter af temaet.
+Vi begynder men en analyse af gennemstnitsopførelsen af Dijkstra i afsnit~\lref{s:average}, som antyder, at operationerne på prioritetskøen i normaltilfældet er mindre dominerende end hvad værstefaldsanalysen fortæller.
+I afsnit~\lref{s:monotone} diskuterer vi \emph{monotone prioritetskøen for heltallige nøgler}, som udnytter en særlig egenskab i Dijkstras algoritme.
+Når man kombinerer disse køer med gennemsnitsanalysen, opnår man lineær forventet udførelsetid!
+Afsnit~\lref{s:arbitrary edge costs} behandler situationen med vilkårlige kantomkostninger, og i afsnit~\lref{s:potential} behandler vi problemet at finde korteste veje mellem alle par af knuder.
+Vi viser, at problemet kan reducere til først at løse en instans med én kildeknude og vilkårlige kantomkostninger, og derefter $n$ instanser med én kildeknude og ikkenegative kantomkostninger.
+I løbet af reduktionen møder læseren også det generelt nyttige koncept af knudepotentialer.
+Kapitlet afrundes med afsnit~\lref{s:query}, fokusseres på korteste-veje-\emph{forespørgsler}.
+
+%----------------------------------------------------------------------
+\section{Fra grundbegreberne til en almen metode}
+\llabel{s:concepts}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Omkostningsfunktionen for kanterne udvides til veje på den oplagte måde.
+Omkostningen af en vej er summen af omkostningerne af dens kanter, dvs.
+at omkostningen for vejen $p = \seq{e_1,\ldots,e_k}$ er givet af $c(p) = \sum_{1 \le i \le k} c(e_i)$. 
+Den tomme vej har omkostning 0.
+Vi bruger begreberne »omkostning«, »længde« og »vægt« i flæng, så »kortest« og »billigst« betyder det samme.
+
+For knuder $s$ og $v$ interesserer vi os for en \emph{korteste vej} fra $s$ til $v$, dvs. en vej fra $s$ til $v$, som koster mindst muligt. 
+Vi undgår her bevidst den bestemte artikel som i »den korteste vej«, idet der kan findes flere forskellige veje, som alle i denne forstand er kortest mulige.
+Findes der overhovedet altid en korteste vej?
+Læg mærke til, at der kan findes uendeligt mange veje fra $s$ til $v$.
+Hvis fx vejen $r = pCq$ fra $s$ til $v$ indeholder en kreds $C$, kan vi gennemløbe kredsen vilkårligt ofte og danner hver gang en ny vej fra $s$ til $v$, se figur~\lref{path with cycle}.  
+Lad os beskrive denne sitation mere nøjagtigt:
+Lad $p$ være en vej fra $s$ til $u$, lad $C$ være en kreds fra $u$ til $u$, og lad $q$ være en vej fra $u$ til $v$. 
+Betragt nu vejen $r^{(i)}=pC^iq$, som begynder med at gennemløbe $p$, derefter gennemløber $C$ præcis $i$ gange, og endeligt gennemløber $q$.
+Omkostningen for $r^{(i)}$ er $c(p) +i \cdot c(C) +c(q) $. 
+Hvis $C$ er en  \emph{negativ kreds},
+\index{korteste veje!negativ kreds}
+\index{graf!negativ kreds|sieheunter{korteste veje}}
+dvs. hvis $c(C)<0$, så findes der ingen kortest vej fra  $s$ til $v$.
+(Det er fordi mængden $\{\,r^{(i)} \colon i\ge0\,\} = \{\, c(p) + c(q) - i\cdot|c(C)|  \colon i\ge 0\,\}$ indeholder negative tal af vilkårlig stor absolutværdi.) 
+Tilsvarende skal vi nu vise, at der findes kortest veje, hvis bare grafen $G$ ikke indeholder negative kredse.
+\begin{figure}[h]
+\[\begin{tikzpicture}[>=stealth']
+\tikzstyle{vertex} = [inner sep = 1.5pt, fill, circle];
+\node (s) at (0,0) [vertex, label = below:$s$] {};
+\node (u) at (1,0) [vertex, label = below:$u$] {};
+\node (v) at (2,0) [vertex, label = below:$v$] {};
+\draw [->] (s) -- node [above] {$p$} (u);
+\draw [->] (u) -- node [above] {$q$} (v);
+\path [->] (u) edge [loop above, out = 45, in = 135, looseness = 30] node {$C$} (u);
+\begin{scope}[xshift = 3cm]
+\node (s) at (0,0) [vertex, label = below:$s$] {};
+\node (u) at (1,0) [vertex, label = below:$u$] {};
+\node (v) at (2,0) [vertex, label = below:$v$] {};
+\draw [->] (s) -- node [above] {$p$} (u);
+\draw [->] (u) -- node [above] {$q$} (v);
+\path [->] (u) edge [loop above, out = 45, in = 135, looseness = 30] node {$C^2$} (u);
+\path [->] (u) edge [loop above, out = 50, in = 140, looseness = 30] (u);
+\end{scope}
+\end{tikzpicture}
+\]
+\caption{En ikke-simpel vej $pCq$ fra $s$ til $v$}
+\llabel{path with cycle}
+\end{figure}
+
+\begin{lemma}
+\llabel{l:simple:path} 
+Hvis $G$ ikke indeholder negative kreds og $v$ kan nås fra $s$, så findes der en korteste vej $p_0$ fra $s$ til $v$. 
+Desuden kan $p_0$ antages af være simpel.
+\end{lemma}
+\begin{proof} 
+Lad $p_0$ være en  \emph{simpel} vej fra $s$ til $v$ med minimale omkostninger blandt de simple veje fra $s$ til $v$.
+Læg mærke til, at denne mængde af simple veje er endelig, og $p_0$ derfor eksisterer.
+Antag modsætningsvist, at $p_0$ ikke er en korteste vej fra $s$ til $v$.
+Da findes en kortere vej $r$ fra $s$ til $t$, som ikke er simpel.
+Vi kan skrive $r$ som $pCq$ som i figur~\lref{path with cycle}, hvor $C$ mer en kreds og $pq$ er en simpel vej.
+Vi har $c(p_0) \le c(pq)$, og derfor $c(pq) + c(C) = c(r) < c(p_0) \leq c(pq)$.
+Heraf følger $c(C)<0$, så $C$ er en negativ kreds, i modstrid med antagelsen.
+Derfor er $p_0$ en korteste vej.
+\end{proof}
+
+
+\begin{exerc}\llabel{ex:negative:cycles} 
+Giv en stærkere udgave af ovenstående lemma ved at vise følgende:
+For hver knude $v$, som kan nås fra $s$, findes en korteste vej fra $s$ til $v$ hvis og kun hvis der ikke findes en negativ kreds, som kan nås fra $s$, og fra hvilken man kan nå $v$.
+\end{exerc}
+
+For hvert par af knuder $s$ og $v$ definerer vi »korteste-veje-afstanden« eller bare \emph{afstanden $\mu(s,v)$ fra $s$ til $v$} som
+\[
+\mu(s,v) \Is
+\begin{cases}
++\infty\,, & \text{hvis der ikke findes en vej fra $s$ til $v$}\,;\\
+-\infty\,, & \parbox[t]{8cm}{hvis der findes en vej fra $s$ til $v$, men ingen korteste vej fra~$s$ til~$v$\,;}\\
+c(p)\,,&\text{hvis $p$ er en korteste vej fra $s$ til $v$}\,.
+\end{cases}
+% TODO: second case completely wrong in original (error)
+\]
+Når startknuden $s$ er underforstået, skriver vi kort $\mu(v)\Is\mu(s,v)$. 
+Læg mærke til, at når $v$ kan nås fra $s$, uden at der  findes en korteste vej, så må der findes veje fra $s$ til $v$ med vilkårlig store negative omkostninger.
+Derfor giver det mening at sætte $\mu(v) = -\infty$.
+Korteste veje har mange kønne egenskaber, som vi formulerer som øvelsesopgaver.
+ 
+\begin{exerc}[Delveje af korteste veje]
+\llabel{ex:dynamic}
+\index{korteste veje!delvej}
+Vis, at en delvej af en korteste vej selv er en korteste vej,
+  \index{algoritmekonstruktion!dynamisk programmering!korteste veje}
+dvs. at der hvis $p$, $q$ or $r$ er veje som sammen danner en korteste vej $pqr$, så er $q$ også en korteste vej.
+\end{exerc}
+
+\begin{exerc}[Korteste-veje-træer]
+\index{korteste veje!træ}
+Antag, at alle $n$ knuder i en graf kan nås fra $s$ og at der ikke forekommer negative kredse.
+Vis, at der findes et træ $T$ med $n$ knuder, som er rodfæstet i $s$ og i hvilket alle veje er korteste veje i grafen. 
+\emph{Vink}:
+Begynd med at antage, at vejen fra $s$ til $v$ er entydigt bestemt.
+\index{korteste veje!entydighed}
+Betragt delgrafen $T$, som består af alle korteste veje fra $s$.
+Anvend opgave~\ref{ex:dynamic} for at vise, at $T$ er et træ.
+Udvid argumentet til det tilfælde, hvor de korteste veje ikke er entydigt bestemte.
+\end{exerc}
+
+Vores strategi for at finde korteste veje fra startknuden $s$ er en generalisering af bredde-først-søgning fra figur~\ref{ch:gtraverse:fig:bfs}.
+Vi arbejder med to rækker af typen \Id{Knuderække}, som hedder $d$ og $\Id{forælder}$.
+\index{korteste veje!forælderpeger}
+Her indeholder indgangen $d[v]$ vores nuværende bedste bud på afstanden fra $s$ til $v$, og $\Id{forælder}[v]$ gemmer $v$s forgænger på en vej fra $s$ til $v$, som er den korteste, vi har fundet hidtil.
+Værdien $d[v]$ kan man opfatte som \emph{skønnet afstand} til $v$, et »pessimistisk« skøn som aldrig undervurderer den sande afstand.
+\index{korteste veje!afstandsskøn}
+I begyndelsen har vi  $d[s]=0$ og $\Id{forælder}[s]=s$.
+Alle andre knuders afstand skønner vi til at ligge »uendelig langt borte«, og de har ingen forgænger.
+
+% TODO skal d være a?
+% TODO brug startknude pga s, ikke udgangspunkt u eller kilde k
+
+Den oplagte måde for at forbedre afstandsskønnene er at føre afstansinformation videre gennem enkelte kanter.
+Når der findes en vej fra $s$ til $u$ med omkostning højst $d[u]$, og $e = (u,v)$ er en udgående kant fra $u$, så findes der også en vej fra $s$ til $v$ med omkostning højst $d[u] + c(e)$.
+Hvis dette omkostning er mindre end den bedste hidtidlige afstandsværdi $d[v]$, opdaterer vi $d[v]$ og $\Id{forælder}[v]$ tilsvarende.
+Denne proces kaldes at \emph{slække} kanten $e$.
+\index{korteste veje!slækning af kanter|textbf}
+\index{korteste veje!kantslækning|textbf}
+
+\begin{indentedcode}
+\Procedure \Id{slæk}$(\Declare{e=(u,v)}{\Id{Edge}})$\+\\
+  \If  $d[u] + c(e) < d[v]$ \Then $d[v]\Is d[u] + c(e)$;$\;$ \Id{forælder}$[v]\Is u$
+\end{indentedcode}
+(Regnereglerne for værdien $\infty$ er de oplagte:
+Der gælder $a<\infty$  og  $\infty+a=\infty$ for alle tal $a$, samt $\infty \not< \infty$.)
+
+\begin{lemma}
+\llabel{l:basic lemma} 
+Antag at der efter en vilkårlig følge af kantslækninger gælder $d[v] < \infty$.
+Da findes en vej fra $s$ til $v$ af længde $d[v]$.
+\end{lemma} 
+\begin{proof} 
+Induktion  efter antal slækninger.
+Påstanden gælder klart inden første slækning:
+Den tomme vej fører fra $s$ til $s$ og har længde $0=d[s]$;
+ingen andre knuder er berørte af udsagnet, da de skønnes at være uendeligt langt borte.
+Betragt nu slækningen af kanten $e = (u,v)$. 
+Ifølge induktionsantagelsen findes der en vej $p$ af længde $d[u]$ fra $s$ til $u$ og en vej af længde $d[v]$ fra $s$ til $v$.
+Hvis $d[u] + c(e) \ge d[v]$, er der intet at vise. 
+Ellers er $pe$ en vej fra $s$ til $v$ og har længde $d[u] + c(e)$.         
+\end{proof}
+
+
+\begin{figure}[tb]
+  \[
+  \begin{tikzpicture}[scale = 1.5, >=stealth']
+    \tikzstyle{vertex} = [draw, text depth=.25ex, circle, inner sep = 1pt, minimum height = 13pt];
+    \node (k) at (-2,0) [vertex, label = below:$+\infty$] {$k$};
+    \node (j) at (-1,0) [vertex, fill = myblue, label = below:$-\infty$] {$j$};
+    \node (s) at ( 0,0) [vertex, label = below:$0$] {$s$};
+    \node (i) at ( 1,0) [vertex, label = below:$-1$] {$i$};
+    \node (h) at ( 2,0) [vertex, label = below:$-3$] {$h$};
+    \node (a) at (-2,1) [vertex, fill = myblue, label = above:$-\infty$] {$a$};
+    \node (b) at (-1,1) [vertex, fill = myblue, label = above:$-\infty$] {$b$};
+    \node (d) at ( 0,1) [vertex, fill = myblue, label = above:$-\infty$] {$d$};
+    \node (f) at ( 1,1) [vertex, label = above:$2$] {$f$};
+    \node (g) at ( 2,1) [vertex, label = above:$-3$] {$g$};
+    \draw [->, dashed] (b) -- node [above] {42} (a);
+    \draw [->, dashed] (b) -- node [left] {0} (j);
+    \draw [->, dashed] (d) -- node [above] {0} (b);
+    \draw [->]         (f) -- node [left] {$2$} (i);
+    \draw [->, very thick] (g) -- node [above] {$5$} (f);
+    \draw [->] (k) -- node [below] {$-2$} (j);
+    \draw [->, dashed]     (j) -- node [right] {$-1$} (d);
+    \draw [->, dashed]     (s) -- node [right] {$0$} (d);
+    \draw [->, very thick] (s) -- node [below] {$-1$} (i);
+    \draw [->, very thick] (i) -- node [right] {$-2$} (g);
+    \draw [->, very thick] (i) -- node [below] {$-2$} (h);
+  \end{tikzpicture}
+  \]
+\caption{
+  \llabel{example}
+  En graf med startknude $s$ og korteste-veje-afstande $\mu(v)$ angivet over eller under hver knude.
+  Kantomkostningerne er angivet ved siden af hver kant.
+  De fede kanter hører til korteste veje fra $s$.
+  Stiplede linjer og schatterede knuder hører til en uendelig familje af veje med startknude $s$ og vilkårligt stærkt negative omkostninger.
+  Knude $k$ kan ikke nås fra $s$.  }
+\end{figure}
+
+Algoritmerne i dette kapitel følger alle strategien at gentagne gange slække kanter, indtil enten der for hver knude $v$ er fundet en korteste vej fra $s$ til $v$, eller en negativ kreds er blevet opdaget.
+For eksempel gengiver (omvendingen af) de fede kanter i figur~\lref{example} informationen i  \Id{forælder}-rækken, som er indsamlet efter tilstrækkelig mange kantslækninger:
+knuderne $f$, $g$, $i$ og $h$ kan nås fra $s$ via disse kanter og har de korrekte $\mu(\cdot)$-værdier  $2$, $-3$, $-1$ og $-3$.
+Knuderne $b$, $j$ og $d$ danner en negativ kreds, som kan nås fra $s$, hvilket betyder, at deres korteste-veje-omkostning er $-\infty$.
+% TODO længde, vægt, omkostning, afstand
+Knude $a$ kan nås fra denne kreds og har derfor ligeledes afstand $\mu(a)=-\infty$. 
+Derimod kan knude $k$ ikke nås fra $s$; dens afstand er $+\infty$. 
+
+Men hvad udgør en god følge af kantslækninger?
+Lad $p = \seq{e_1,\ldots,e_k}$ være en vej fra $s$ til $v$. 
+Hvis vi slækker vejens kanter i rækkefølge fra $e_1$ til $e_k$, gælder derefter $d[v] \le c(p)$.
+Dersom $p$ er en korteste vej fra $s$ til $v$, kan ifølge lemmaet foroven værdien $d[v]$ aldrig blive mindre end $c(p)$, og derfor gælder der efter denne følge af kantslækninger, at $d[v] = c(p)$.
+
+
+\begin{lemma}[Korrekthedskriterium]
+  \index{korteste veje!korrekthedskriterium}
+  \llabel{lem:criterion} 
+  Betragt udførelsen af en følge $R$ af slækninger, som indeholder en korteste vej $p = \seq{e_1,e_2,\ldots,e_k}$ fra $s$ til $v$ som delfølge, dvs. at der findes indeks $t_1<t_2<\cdots<t_k$ med $R[t_1]=e_1$, $R[t_2]=e_2$, $\ldots$, $R[t_k]=e_k$.
+  Da gælder $d[v] = \mu(v)$.
+  Desuden beskriver $\Id{forælder}$-informationen for knuderne en vej fra $s$ til $v$ af længde $\mu$.
+\end{lemma}
+
+
+\begin{proof}
+  Vi fremstiller $R$ og $p$ skematisk.
+  Første linje angiver tidspunktet.
+  Til tidspunkt $t_1$ slækkes $e_1$, til tidspunkt $t_2$ slækkes $e_2$, osv.:
+  \[
+    \begin{array}{lccccccc}
+      &1,2,\ldots   &,t_1,         &\ldots\, , &t_2,&\ldots\ldots&,t_k,&\ldots\\
+      R\Is\langle &\ldots       &,e_1,         &\ldots\, , &e_2,&\ldots\ldots&,e_k,&\ldots\rangle\\
+      p\Is        &             &\langle e_1,  &           &e_2,&\ldots&,e_k\rangle&\\
+    \end{array} 
+  \]
+  Idet $p$ er en korteste vej, har vi $\mu(v) = c(e_1)+\cdots + c(e_k)$. 
+  For $i\in\{1,\ldots, k\}$ lad $v_i$ betegne målknuden af $e_i$; desuden definerer vi $t_0=0$ og $v_0=s$. 
+  Lad os først vise, at efter tidspunkt $t_i$ gælder uligheden 
+  \[
+    d[v_i] \le c(e_1)+\cdots+ c(e_i)\,.
+  \]
+  Dette indses ved induktion efter $i$.
+  Efter tidspunkt $t_0$, altså helt i starten, gælder uligheden, fordi vi initielt sætter $d[s]=0$.
+  Betragt nu $i>0$. 
+  Ifølge induktionsantagelsen gælder uligheden 
+  \[ d[v_{i-1}] \le c(e_1)+\cdots + c(e_{i-1})\]
+  efter slækningen til tidspunkt $t_{i-1}$.
+  Yderligere slæknigner i tidsrummet mellem $t_{i-1}$ og $t_i$ ændrer ikke uligheden, idet $d[v_{i-1}]$ ikke kan vokse, når der slækkes en kant.
+  Slækningen til tidspunkt $t_i$ sikrer, at
+  $d[v_i] \le d[v_{i-1}] +c(v_{i-1},v_i)$.
+  Ved addition med den sidste ulighed etablerer man induktionsantatelsen for tidspunktet $t_i$, hvilket beviser uligheden for alle $i\geq 0$.
+  Uligheden for $i=k$ medfører da $d[v] \le \mu(p)$.
+  Yderligere slækninger efter tidspunkt $t_k$ kan kun gørd $d[v]$ endnu mindre.
+  På den anden side medfører~\lref{l:basic lemma}, at der gælder $d[v]\geq \mu(v)$ uanset tidspunkt.
+  Vi konkluderer $d[v] = \mu(v)$.
+
+  Vi mangler at vise, at informationen i \Id{forælder}-rækken beskriver de korteste veje.
+  Vi viser dette under den ekstra antagelse, at korteste veje er entydige; generelle tilfælde er en  øvelse, jf.opgave~\lref{ex: relax general case}.
+  Overvejelserne i første del af beviset medfører, at der efter slækningerne i $R$ gælder $d[v_i] = \mu(v_i)$ for alle $i \in \{1,\ldots, k\}$.
+  På noget tidspunkt udfører altså en operation på formen $\Id{slæk}(u,v_i)$ i $R$ tildelingerne $d[v_i]=\mu(v_i)$ og  $\Id{forælder}[v_i]=u$.
+  (Læg mærke til, at dette sagtens kan ske inden tidspunkt $t_i$, men ikke bagefter.)
+  Ifølge beviset for lemma~\lref{l:basic lemma} findes der en vej af længde $\mu(v_i)$ fra $s$ til $v_i$, dvs. en korteste vej, der ender med kanten $(u,v_i)$.  
+  Ifølge antagelsen er den korteste vej unik, derfor må der gælde $u=v_{i-1}$ og dermed $\Id{forælder}[v_i]=v_{i-1}$.
+  %TODO this is not clear
+  Efter at $d[v_i]$ er blevet sat til den korrekte værdi $\mu(v_i)$, beholder $\Id{forælder}[v_i]$ værdien $v_{i-1}$ i resten af forløbet.
+\qed\end{proof}
+
+
+\begin{exerc}
+  \llabel{ex:relax general case}  
+  Gentag ovenstående bevis, men uden antagelsen om entydighed af korteste veje.
+\end{exerc}
+
+\begin{exerc}
+  Lad $S$ være en følge af kanterne i $G$ i vilkårlig rækkefølge, og betragt følgen $S^{(n-1)}$ af $(n-1)$ gentagelser af $S$.
+  Vis at der efter slækningerne $S^{(n-1)}$ gælder $\mu(v) = d[v]$ for hver knude $v$ med $\mu(v) \not= -\infty$.
+\end{exerc}
+
+Som vi skal se i de følgende afsnit, kan man finde langt mere effektive slækningsrækkefølger, når grafen en acyklisk eller kantvægtene ikke-negative.
+Vi vender tilbage til generelle grafer i afsnit~\lref{s:arbitrary edge costs}.
+
+
+%----------------------------------------------------------------------
+\section{Rettede acykliske grafer}
+\llabel{s:acyclic}
+\index{korteste veje!rettet acyklisk graf}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+I en rettet acyklisk graf forekommer ingen rettede kredse og derfor heller ingen negative kredse.
+Desuden har vi konstateret i afsnit~\ref{ch:gtraverse:ss:numbering}k, at knuderne i en sådan graf tillader en topologisk ordning,
+\index{graf!topologisk ordning}
+dvs. at de kan bringes i rækkefølge $\seq{v_1, \ldots, v_n}$, sommetider kaldet en \emph{topologisk sortering}, sådan at $(v_i,v_j) \in E$ altid medfører $i < j$.
+En topologisk sortering kan findes i tid $O(m + n)$ med dybde-først-søgning.
+Læg mærke til, at knuderne langs hver vej i en rettet acyklisk graf står i voksende rækkefølge i den topologiske ordning.
+Ifølge lemma~\lref{lem:criterion} kan vi altså beregne korteste-veje-afstande ved at slække først alle udgående kanter fra $v_1$, derefter alle udgående kanter fra $v_2$, og så videre.
+I figur~\lref{dag} er vist et eksempel.
+På denne måde bliver hver kant slækket højst enkelt gang.
+% TODO original has exactly once, but that's wrong as observed in picture caption
+Fordi slækning tager konstant tid, er udførelsestiden totalt $O(m+n)$.
+
+\begin{figure}[t]
+  \sidecaption
+\leavevmode\parbox{5cm}{
+  \begin{tikzpicture}[>=stealth', scale =.6]
+    \tikzstyle{every node} = [inner sep = 1.5, circle];
+    \tikzstyle{vertex} = [inner sep = 1.5, fill, draw, circle];
+    \foreach \x in {-1,...,7}
+      \draw [dashed, myblue] (\x,-1.5) -- (\x,2.5) ;
+    \node (s) at (0,0) [vertex, label = below left:$s$] {}; 
+    \node (m1) at (-1,2) [vertex] {}; 
+    \node (1) at (+1,.5) [vertex] {}; 
+    \node (2) at (+2,-1) [vertex] {}; 
+    \node (3) at (+3,+2) [vertex] {}; 
+    \node (4) at (+4,0) [vertex] {}; 
+    \node (5) at (+5,1.5) [vertex] {}; 
+    \node (6) at (+6,-1) [vertex] {}; 
+    \node (7) at (+7,.5) [vertex] {}; 
+    \draw [->] (m1) -- (s);
+    \draw [->] (m1) to [bend left = 10] (3);
+    \draw [->] (s) -- node [above left] {$1$} (1);
+    \draw [->] (s) -- node [below] {$3$} (2);
+    \draw [->] (s) -- node [below] {$2$} (4);
+    \draw [->] (1) -- node [above left] {$4$} (3);
+    \draw [->] (1) -- node [above] {$5$} (5);
+    \draw [->] (2) to [bend right = 10] node [below] {$6$} (6);
+    \draw [->] (4) -- node [above left] {$7$} (7);
+    \draw [->] (4) -- node [above right] {$8$} (6);
+    \draw [->] (5) -- node [above] {$9$} (7);
+  \end{tikzpicture}
+}
+    \caption{\llabel{dag}
+ En mulig rækkefølge for kantslækningerne til beregning af korteste veje i en rettet acyklisk graf fra knude $s$. 
+ Den topologiske sortering af knuderne er vist ved deres placering efter $x$-koordinat; knuderne er sorterede fra venstre til højre.
+  Udgående kanter fra knuder »til venstre« for $s$ behøver slet ikke slækkes.}
+\end{figure}
+
+\begin{thm} 
+  I acykliske grafer kan korteste veje fra en enkelt knude beregnes i tid $O(m + n)$. 
+\end{thm}
+
+
+{\begin{exerc}[Ruteplanlægning ved offentlig transport]
+  \index{korteste veje!offentlig transport}
+  Problemet at komme hurtigt frem med offentlig transport kan modelleleres som korteste-veje-problem i en acyklist graf.
+  Betragt en bus eller et tog, som forlader station $p$ ved tidspunkt $t$ og ankommer til næste station $p'$ ved tidspunkt $t'$.
+  Denne forbindelse opfattes som kant fra knude $(p,t)$ til knude $(p',t')$.
+  Desuden tilføjer vi såkaldte \emph{ventekanter} mellem på hinanden følgende afgangs- og ankomsttider ved hver station $p$; fx for tidspunkter $t$ og $t'$ med $t<t'$ som kant fra $(p,t)$ til $(p,t')$.
+  \begin{enumerate}[(a)]
+    \item Vis, at den resulterende graf er rettet og acyklisk.
+    \item En ekstra knude skal bruge til at fastlægge den rejsendes udgangspunkt som sted og tid.
+      Der skal også bruges en kant, som forbinder denne startknude med transportknetværket.
+      Hvad er målknuden for denne kant?
+    \item Antag, at vi har fundet et træ af korteste veje fra startknuden til alle knuder i transportnetværket.
+      Hvilken er nu den rute, som den rejsende er interesseret i?
+  \end{enumerate}
+\end{exerc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Ikke-negative kantomkostninger (Dijkstras algoritme)}
+\llabel{s:Dijkstra}%
+\index{Dijkstra, E. W.}%
+\index{Dijkstras algoritme|sieheunter{korteste veje}}%
+\index{korteste veje!Dijkstras algoritme|textbf}%
+\index{algoritmekonstruktion!grådig!Dijkstras algoritme}
+
+I dette afsnit går vi ud fra, at der ikke forekommer kanter med negativ omkostning.
+Det medfører direkte, at der ikke forekommer negative kredse, og at der derfor findes en korteste vej til hver knude, som kan nås fra $s$.
+Vi skal vise, at man kan vælge slækningsrækkefølgen på en snedig måde, så hver kant bare slækkes en gang.
+
+Men hvad er den rigtige rækkefølge?
+Langs en korteste vej vokser korteste-veje-afstandene -- eller rettere, de bliver ikke mindre.
+Det leder til idéen at bearbejde knuderne i rækkefølgen af voksende afstande.
+\index{knude!bearbejde}
+(Vi siger, at vi \emph{bearbejder} en knude, når vi slækker alle dens udgående kanter.) 
+Lemma~\lref{lem:criterion} siger os, at denne slækningsrækkefølge medfører, at de korteste veje bliver beregnede, i det mindste, hvis alle kanter har positiv længde.
+I algoritmen kender vi selvfølgeligt ikke korteste-veje-afstandene (endnu), men kun de \emph{skønnede} afstande $d[v]$.
+Heldigvis stemmer for en hidtil ubearbejdede knuder med minimalt afstandsskøn den sande afstand og den skønnede afstand overens.
+Det skal vi vise i sætning~\lref{thm:Dijkstra}.
+Disse overvejelser munder ud i algoritmen i figur.~\lref{a:Dijkstra}, som er kendt som  »Dijkstras algoritme for korteste veje«.
+I figur~\lref{fig:dijkstraex} vises et eksempel på en kørsel.
+
+\begin{buchalgorithmpos}{b}{a:Dijkstra}{Dijkstras algoritme:
+  Korteste veje fra samme udgangspunkt i grafer med ikke-negative kantvægte}%
+{\bf Dijkstras algoritme}\\
+ Alle knuder er  »ubearbejdede«; initialiser $d$ und \Id{forælder}\\
+\While der findes en ubearbejdet knude med afstandsskøn $< +\infty$ \Do\+\\[0.5em]
+  \begin{minipage}[c]{0.6\textwidth}
+  $u \Is \text{ en ubearbejdet knude minimalt afstandsskøn}$ \\
+  slæk alle $u$s udgående kanter $(u,v)$;\\
+  hermed er $u$ »bearbejdet«%
+  \end{minipage}\qquad\qquad\qquad\begin{minipage}[c]{0.2\textwidth}
+       \includegraphics[width=\textwidth]{img/dijkstra2-new.eps}
+                 \end{minipage}%
+\end{buchalgorithmpos}
+
+\newcommand{\myrelax}[3]{\Id{slæk} $#1\stackrel{#3}{\rightarrow}#2$}
+\begin{figure}
+\newcommand{\stentMD}{\rule{0em}{2.6ex}}
+\begin{minipage}{0.5\textwidth}
+\begin{tabular}{ll}
+Operation & Kø\\\midrule
+\Id{tilføj}$(s)$ & $\seq{(s,0)}$\\
+\Id{fjernMindste}$\leadsto (s,0)$ & $\seq{\,}$ \stentMD\\
+\hspace*{0.5em}\myrelax{s}{a}{2}  & $\seq{(a,2)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{s}{d}{10} & $\seq{(a,2),(d,10)}$ \stentMD\\
+\Id{fjernMindste}$\leadsto (a,2)$ & $\seq{(d,10)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{a}{b}{3} & $\seq{(b,5),(d,10)}$ \stentMD\\
+\Id{fjernMindste}$\leadsto (b,5)$ & $\seq{(d,10)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{b}{c}{2} & $\seq{(c,7),(d,10)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{b}{e}{1} & $\seq{(e,6),(c,7),(d,10)}$ \stentMD\\
+\Id{fjernMindste}$\leadsto (e,6)$ & $\seq{(c,7),(d,10)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{e}{b}{9} & $\seq{(c,7),(d,10)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{e}{c}{8} & $\seq{(c,7),(d,10)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{e}{d}{0} & $\seq{(d,6),(c,7)}$ \stentMD\\
+\Id{fjernMindste}$\leadsto (d,6)$ & $\seq{(c,7)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{d}{s}{4} & $\seq{(c,7)}$ \stentMD\\
+\hspace*{0.5em}\myrelax{d}{b}{5} & $\seq{(c,7)}$ \stentMD\\
+\Id{fjernMindste}$\leadsto (c,7)$ & $\seq{\,}$ \stentMD 
+\end{tabular}%
+\end{minipage}
+%\caption{\llabel{fig:dijkstraex}Example run of Dijkstra's algorithm.
+%Fat edges give the shortes path tree. Fat numbers give the shortest path
+%distance.}
+\begin{minipage}{0.5\textwidth}
+  \[
+    \begin{tikzpicture}[xscale = 1.25, >=stealth']
+    \tikzstyle{vertex} = [draw, text depth=.25ex, circle, inner sep = 1pt, minimum height = 13pt];
+      \node (s) at (0,0) [vertex, label =left:$0$] {$s$};
+      \node (a) at (1,1) [vertex, label =above:$2$] {$a$};
+      \node (b) at (2,1) [vertex, label =above:$5$] {$b$};
+      \node (c) at (3,1) [vertex, label =above:$7$] {$c$};
+      \node (d) at (1,-1) [vertex, label = below:$6$] {$d$};
+      \node (e) at (2,-1) [vertex, label = below:$6$] {$e$};
+      \node (f) at (3,-1) [vertex, label = below:$\infty$] {$f$};
+      \draw [->, very thick] (s) -- node [above left] {$2$} (a);
+      \draw [->, very thick] (a) -- node [above] {$3$} (b);
+      \draw [->, very thick] (b) -- node [above] {$2$} (c);
+      \draw [->, very thick] (b) to [bend left = 10] node [right] {$1$} (e);
+      \draw [->, very thick] (e) -- node [below] {$0$} (d);
+      \draw [->] (s) to [bend left = 10] node [above right ] {$10$} (d);
+      \draw [->] (d) to [bend left = 10] node [below left] {$4$} (s);
+      \draw [->] (d) -- node [above left] {$5$} (b);
+      \draw [->] (e) to [bend left = 10] node [left] {$9$} (b);
+      \draw [->] (e) -- node [below right] {$8$} (c);
+      \draw [->] (f) -- node [below] {$7$} (e);
+    \end{tikzpicture}
+  \]
+\caption{\llabel{fig:dijkstraex}
+  Kørsel af Dijkstras algoritme på grafen \emph{til højre}.
+  De fede kanter danner et korteste-veje-træ, tallene ved hver knude angiver deres korteste-veje-afstand.
+  Tabellen \emph{til venstre} viser de udførte skridt.
+  Køen indeholder en tupel $(v,d[v])$ for hver opdagede knude $v$,
+  \index{knude!opdaget}
+  som endnu ikke er bearbejdet.
+  Vi siger at en knude er  \emph{opdaget}, hvis dens afstandsskøn are mindre end $+\infty$.
+  I begyndelsen er $s$ den eneste opdagede knude; den er ikke bearbejdet.
+  Algoritmens skridt står i første spalte, køens indhold efter det pågældende skridt står i  anden spalte.}
+\end{minipage}%
+\end{figure}
+
+I grunden er Dijkstras algoritme ikke andet end tråd-og-knude-algoritmen fra kapitlets indledning, i det mindste for urettede grafer.
+Hvis vi lægger alle tråde på et bord og langsom lyfter startknuden i vejret, slipper de andre knuder bordpladen i samme rækkefølge som deres korteste-veje-afstand.
+
+\begin{thm}\llabel{thm:Dijkstra}
+  Dijkstras algoritme løser korteste-veje-problemet med samme udgangspunkt for grafer med ikke-negative kantomkostninger.
+\end{thm}%
+\begin{proof} 
+  Beviset består af to dele.
+  I første del skal vi vise, at alle knuder, der kan nås fra $s$, bearbejdes før eller senere.
+  I anden del skal vi vise, at en knudes afstandsskøn er lig med dens korteste-veje-avstand på det tidspunkt, hvor den bearbejdes.
+
+  En knude $v$ kaldes \emph{opdaget}, når dens afstandsskøn tildeles en endelig værdi, dvs. $d[v]< +\infty$.
+  Det ses direkte fra den ydre løkke, at algoritmen før eller siden behandler hver knude $v$, der er blevet opdaget.
+
+  Første del:
+  Vi har netop indset, at det er nok at vise, at hver knude $v$, der kan nås fra $s$ bliver opdaget før eller siden.
+  Betragt hertil en vej $p = \seq{v_1,\ldots,v_k}$ med $s=v_1$ og $v=v_k$.
+  Vi skal vise ved induktion efter $i$, at $v_i$ bliver opdaget.
+  Knude $v_1$ bliver opdaget, idet intialiseringen sætter $d[s]=0<+\infty$.
+  Betragt nu $i>1$.
+  Ifølge induktionshypotesen bliver $v_{i-1}$ opdatet, hvilket betyder $d[v_{i-1}]<+\infty$.
+  Før eller siden bliver $v_{i-1}$ bearbejdet, hvilket fører til kaldet $\Id{slæk} (v_{i-1},v_i)$.
+  Herefter (hvis ikke før) gælder $d[v_i] \le d[v_{i-1}]+c(v_{i-1},v_i) < +\infty$, og $v_i$ er opdaget.
+
+  Anden del:
+  Vi viser følgende påstand ved induktion efter antal løkkegennemløb (»runder«):
+  Hvis knude $u$ behandles i runde $t$, så gælder $d[u] \le \mu[u]$.
+  (Læg mærke til, at den modsatte ulighed $d[u]\ge \mu[u]$ altid gælder ifølge lemma~\lref{l:basic lemma}.)
+  Påstanden gælder for $t=1$, fordi runde 1 bearbejder startknuden~$s$, og vi har  $d[s]=0=\mu(s)$.
+  Betragt nu runde $t>1$ og lad $u$ med $u\neq s$ være den knude, som behandles i denne runde. 
+  Vælg en vilkårlig vej $p =\seq{v_1,\ldots,v_k}$  med $s=v_1$ og $u=v_k$.
+  Lad $v_i$ for $i \in\{2,\ldots, k\}$ være den første knuden på vejen, som \emph{ikke} bearbejdes før runde~$t$.
+  Dette er veldefinieret, idet $v_k$ har denne egenskab. %(Mindestens $v_k$ hat diese Eigenschaft.)
+  Da bliver $v_{i-1}$ bearbejdet før runde $t$.
+  I den forbindelse udføres kaldet  $\Id{slæk}(v_{i-1},v_i)$.
+  Derfor gælder, at
+  \[
+d[v_i] \le d[v_{i-1}] + c(v_{i-1},v_{i}) \le \mu(v_{i-1}) + c(v_{i-1},v_{i})\,.
+\]
+  (Første ulighed etableres af operationen $\Id{slæk}(v_{i-1},v_i)$; anden ulighed er netop induktionsantagelsen.)
+  Vejen $\seq{v_1,\ldots,v_{i-1}}$ fra $s$ til $v_{i-1}$ har omkostning mindst $\mu(v_{i-1})$, så der gælder 
+  \[
+\mu(v_{i-1}) + c(v_{i-1},v_{i}) \le 
+           c(\seq{v_1,\ldots,v_{i-1}}) + c(v_{i-1},v_{i}) = c(\seq{v_1,\ldots,v_i})\,.
+	 \]
+  Idet $\seq{v_1,\ldots,v_i}$ udgør en delvej af $p$, og kantomkostningerne ikke er negative, gælder desuden $c(\seq{v_1,\ldots,v_i}) \le c(p)$. 
+  Ved at sammenholde de sidste tre uligheder får vi, at der efter operationen $\Id{slæk}(v_{i-1},v_i)$ gælder $d[v_i] \le c(p)$.
+  Selv hvis $d[v_i]$ herefter skulle aftage, gælder uligheden også i begyndelsen af runde $t$.
+  Nu vælger algoritmen i runde $t$ knuden $u$ som knuden med minimalt afstandsskøn til bearbejdning, så der må gælde $d[u]\le d[v_i]$, hvilket medfører $d[u]\le c(p)$.
+
+  Da $p$ var valgt vilkårlig, gælder $d[u] \le \mu(u)$, og vi har etableret induktionshypotesen for $t$.
+\end{proof}
+
+
+\begin{exerc}
+  \llabel{ex:monotone} 
+  Lad $v_1, v_2, \ldots$ være rækkefølgen, som knuderne bearbejdes i.
+  Vis, at der gælder $\mu(v_1) \le \mu(v_2) \le \ldots$.
+  Med andre ord bearbejdes knuderne i rækkefølge af (svagt) voksende korteste-veje-afstand. 
+\end{exerc}
+
+\begin{exerc}[Kontrol af korteste-veje-afstand]
+  \llabel{e: verification}
+  \index{algoritmekonstruktion!resultatkontrol}%
+  Antag, at alle kantomkostninger er positive, og at alle knuder kan nås fra $s$.
+  Lad $d$ være en knuderække med ikke-negative reelle indgange, som opfylder $d[s] = 0$ og $d[v] = \min_{(u,v) \in E} d[u] + c(u,v)$ for  alle $v \neq s$.
+  Vis, at der for alle $v$ gælder $d[v] = \mu(v)$.
+  Er denne påstand stadig sand, når der der er kanter med omkostning 0?
+\end{exerc}
+
+Vi skal nu se nærmere på, hvordan Dijkstras algoritme kan implementeres.
+Alle ubearbejdede knuder stilles i en addresserbar prioritetskø
+\index{prioritetskø!addresserbar}
+\index{prioritetskø!monoton}
+\index{prioritetskø!anvendelse}
+(se afsnit~\ref{ch:pq:s:addressable}), med afstandsskønnet som nøgle. 
+Operationen \Id{fjernMindste} leverer så altid den knude, som skal bearbejdes hernest.
+Til adressering af indgange for \Id{sænkNøgle}-operation bruger vi her bare knudenummeret i stedet for greb.
+Med udgangspunkt i den sædvanlig prioritetskø kan man implementere sådan en datastruktur, so vi kalder \Id{KnudePK}, med en yderligere knuderække, som oversætter knudenumre til greb.
+Hvis prioritetskøen er implementeret ved hjælp af en træsstruktur, som fx ved fibonaccihobe eller parhobe, kan man gemme indgange af \Id{KnudePK}, dvs. træknuderne, direkte i en knuderække.
+Kaldet  \Id{sænkNøgle}$(v)$ opdaterer \Id{KnudePK}-køen under antagelse af, at nøglen $d[v]$ blev mindsket umiddelbart inden.
+
+\begin{buchalgorithmpos}{t}{alg:dijkstra}{Pseudokode for Dijkstras algoritme}
+\Funct{Dijkstra}{\Declare{s}{\Id{KnudeId}}}{\Id{Knuderække}$\times$\Id{Knuderække}}\+\comment{returnerer $(d,\Id{forælder})$}\\
+  \DeclareInit{$d$}{\Id{Knuderække} \Of $\RR\cup\set{\infty}$}{$\seq{\infty,\ldots,\infty}$}\comment{afstandsskøn}\\
+  \DeclareInit{\Id{forælder}}{\Id{Knuderække} \Of \Id{KnudeId}}{$\seq{\bot,\ldots,\bot}$}\\
+  $\Id{forælder}[s]\Is s$\comment{løkke signaliserer roden}\\
+  \Declare{$Q$}{\Id{KnudePK}} \comment{kø af ubearbejdede opdagede knuder}\\
+  $d[s]\Is 0$;\quad  $Q$.\Id{tilføj}$(s)$\\
+  \While $Q\neq\emptyset$ \Do\+\\
+    $u\Is Q.\Id{fjernMindste}$\comment{der gælder $d[u] = \mu(u)$}\\[-3mm]
+    %\Assert $d[u]=\mu(u)$\\[-2mm]
+    \Foreach kant $e=(u,v)\in E$
+      \Do\+\`\begin{minipage}[c]{37mm}\includegraphics{img/dijkstra2-new.eps}\end{minipage}\hspace*{2cm}\\[-2.5mm]
+      \If $d[u]+c(e)<d[v]$ \Then\+\comment{slæk}\\
+        $d[v]\Is d[u]+c(e)$\\
+        $\Id{forælder}[v]\Is u$\comment{opdater træ}\\
+        \If $v\in Q$ \Then $Q$.\Id{sænkNøgle}$(v)$\\[-2mm]
+        \Else $Q$.\Id{tilføj}$(v)$\`\begin{minipage}[c]{17mm}
+                               \includegraphics{img/dijkstra3-new.eps}\end{minipage}\-\-\-\\[-2mm]
+  \Return $(d,\Id{forælder})$
+\end{buchalgorithmpos}
+%
+%
+\newcommand{\TDijkstra}{T_{\Id{Dijkstra}}}%  MD: die Funktion hat den Namen, schräggestellt.
+\newcommand{\TdeleteMin}{T_{\Id{fjernMindste}}}%
+\newcommand{\Tinsert}{T_{\Id{tilføj}}}%
+\newcommand{\TdecreaseKey}{T_{\Id{sænkNøgle}}}%
+%
+Figur~\lref{alg:dijkstra} viser en detaljeret fremstilling af algoritmen.
+Vi vil nu analysere algoritmens udførelsestid med udgangspunkt i tidsforbruget i det enkelte prioritetskø\-operationer.
+Initialiseringen af rækkerne $d$ og \Id{forælder} samt prioritetskøen $Q=\set{s}$ koster tid $O(n)$.
+Ved hver iteration af den ydre løkke kræver betingelsen $Q=\emptyset$ konstant tid, dvs. total tid  $O(n)$.
+Hver knude $s$, som kan nås fra $s$, bliver fjernet fra prioritetskøen præcis én gang.
+Bortset fra $s$ selv, bliver hver af disse køer også stillet i prioritetskøen præcis én gang.
+Derfor forekommer der totalt højst $n$ kald af  \Id{fjernMindste} og \Id{tilføj} til $Q$.
+Idet hver knude bearbejdes højst én gang, slækkes hver kant højst én gang, og derfor kan der forekomme højst $m$ kald til \Id{sænkMindste}.
+Den samlede udførelsestid for Dijkstras algoritme er altså
+\begin{equation*}\llabel{eq:dijkstra}
+\TDijkstra=O(m\cdot\TdecreaseKey(n) + n\cdot(\TdeleteMin(n)+\Tinsert(n)))\,,
+\end{equation*}
+hvor $\TdeleteMin$, $\Tinsert$ og $\TdecreaseKey$ angiver udførelsestiderne for \Id{fjernMindste}, \Id{tilføj} hhv. \Id{sænkMindste}. 
+Læg mærke til, at disse udførelsestider afhænger af størrelsen $|Q|=O(n)$ af køen.
+
+\begin{exerc} 
+  Givet $n, m$ med $n\le m \le n(n-1)/2$.
+  Konstruer en graf $G$ med $n$ knuder og $m$ kanter og velvalgte kantvægte, sådan at
+  $m - (n-1)$ af kantslækningerne i løbet af Dijkstras algoritme udløser et kald af \Id{sænkNøgle}.
+\index{prioritetskø!sænk nøgle@\Id{sænkNøgle}}
+\end{exerc}
+
+I originalpublikationen fra 1959 foreslog Dijkstra følgende implementation af prioritetskøen:
+Hold rede på antallet af opdagede, ubearbejdede knuder samt to rækker,
+\index{prioritetskø!naiv},
+hver indiceret med knudemængden som indeks -- en række $d$ til afstandsskønnene og en række, som for hver knude angiver, om den er enten uopdaget, opdaget men ubearbejdet eller bearbejdet.
+Så koster \Id{tilføj} og \Id{formindskNøgle} tid $O(1)$. 
+Operationen \Id{fjernMindste} koster $O(n)$, fordi hele rækken skal gennemgås for at finde en opdaget ubearbejdet knude med minimalt afstandsskøn.
+Den samlede tid bliver altså 
+\[T_{\Id{Dijkstra59}}=O(m+n^2)\,.\]
+
+Siden Dijkstras artikel har man fundet på meget bedre prioritetskøer.
+Hvis vi bruger en binær hob
+\index{prioritetskø!binær hob} eller en fibononaccihob
+\index{Prioritätswarteschlange!Fibonacci-Heap}
+som beskrevet i afsnit~\ref{ch:pq:s:addressable}, får vi
+\begin{align*}
+T_{\Id{DijkstraBHeap}}&=O((m + n)\log n)\\
+\intertext{hhv.}
+T_{\Id{DijkstraFibonacci}}&=O(m + n\log n)\,.
+\end{align*}
+Ifølge den asympototiske analyse er implementationen med fibonaccihob bedre, medmindre grafen er tynd, med 
+$m = O(n)$. 
+I praksis giver fibonaccihobe ikke nødvendigvis den hurtigste implementation, både fordi analysen skuler ganske store konstante faktorer og der normalt forekommer langt færre \Id{sænkNøgle}-operationer, end værstefaldsanalysen forudser.
+Vi skal underbygge disse eksperimentelle observationer med en teoretisk analyse i næste afsnit.
+
+\section{Gennemsnitsanalyse af Dijkstras algoritme}
+\llabel{s:average}%
+
+\emph{Udeladt}
+
+\section{Monotone prioritetskøer over heltal}
+\llabel{s:monotone}
+
+\emph{Udeladt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Vilkårlige kantomkostninger (Bellman og Fords algoritme)}
+\llabel{s:arbitrary edge costs}
+\index{korteste veje!Bellman og Fords algoritme}%
+\index{korteste veje!vilkårlige kantomkostninger}%
+\index{algoritmekonstruktion!dynamisk programmering!Bellman og Fords algoritme}
+\index{Bellman og Fords algoritma|sieheunter{korteste veje}}%
+
+For acykliske grafer med ikke-negative kantomkostninger kunne vi nøjes med $m$ kantslækninger.
+For vilkårlige grafer, dvs. grafer som kan indeholde kredse, findes der ikke noget tilsvarende resultat.
+Men man kan hurtigt overbevise sig om, at $O(mn)$ kantslækninger er tilstrækkelige for at etablere korrektheskriteriet i lemma~\lref{lem:criterion}:
+Algoritmen af  Bellman og Ford~\cite{Bel58,Ford56},
+\index{Bellman, R.}
+\index{Ford, L. R., Jr.}
+som er vist i figur~\lref{alg:BellmanFord}, kører i $n-1$ runder.
+I hver runde slækkes hver kant én gang.
+Idet en simpel vej består af højst $n-1$ kanter, er hver korteste vej en delfølge af disse slækninger.
+Ifølge lemma~\lref{l:simple:path} og lemma~\lref{lem:criterion} gælder der efter den sidste runde derfor $d[v] = \mu(v)$ for hver knude $v$ med $-\infty < \mu(v) < \infty$.
+Desuden beskriver rækken $\Id{forælder}$ korteste veje fra $s$ til disse knuder.
+For en knude $v$, som ikke kan nås fra $s$, gælder $d[v]=\infty$, som ønsket.
+
+\begin{buchalgorithmpos}{t}{alg:BellmanFord}{Bellman og Fords algoritme for korteste veje i vilkårlige grafer}%
+  \Funct{BellmanFord}{\Declare{s}{KnudeId}}{$\Id{Knuderække} \times\Id{Knuderække}$}\+\\
+  \DeclareInit{$d$}{\Id{Knuderække} \Of $\RR\cup\set{-\infty,\infty}$}{$\seq{\infty,\ldots,\infty}$}\comment{Afstand fra startknuden}\\
+  \DeclareInit{\Id{forælder}}{\Id{Knuderække} \Of \Id{KnudeId}}{$\seq{\bot,\ldots,\bot}$}\\
+  $d[s]\Is 0$;\quad
+  \Id{forælder}$[s]\Is s$\comment{Løkke angiver roden}\\
+  \ForFromTo{i}{1}{n-1}\+\\ 
+    \Foreach $e\in E$ \Do \Id{slæk}$(e)$\comment{Runde $i$}\-\\[0.2em]
+  \Foreach $e=(u,v)\in E$ \Do\+\comment{Efterbehandling}\\
+%    \Invariant $\Rorall v\in V\gilt d[v]=-\infty\rightarrow
+%             \forall w\text{ reachable from }v\gilt d[w]=-\infty$\\
+    \If $d[u]+c(e)<d[v]$ \Then infect$(v)$\-\\
+  \Return $(d,\Id{forælder})$\-\\[2mm]
+  \Procedure \Id{smit}$(v)$\+\\
+  \If $d[v]>-\infty$ \Then\+\\
+    $d[v]\Is-\infty$\\
+\Foreach $(v,w)\in E$ \Do \Id{smit}$(w)$
+\end{buchalgorithmpos}
+
+% TODO: changed forall to foreach
+
+På den anden side er det mindre klart, hvordan man identificerer de knuder $v$, som opfylder $\mu(v)=-\infty$.
+Ifølge øvelsesopgave~\lref{ex:negative:cycles} er det netop de knuder, som kan nås fra $s$ med en vej, som indholder en kreds med negativ længde.
+Følgende to egenskaber ved negative kredse er centrale:
+\begin{lemma}
+  Lad $C=\seq{v_0,\ldots,v_k}$ med $v_0=v_k$ være en kreds med negativ længde i grafen $G$, som kan nås fra $s$.
+  Da eksisterer $i\in\{1,\ldots,k\}$, således at $d[v_{i-1}] + c((v_{i-1},v_i)) < d[v_i] $.
+\end{lemma}
+\begin{proof}
+  Idet $C$ kan nås fra $s$, gælder $d[v_i] <+\infty$ for alle $i\in\{1,\ldots, k\}$.
+  Antag modsætningsvist, at der for alle disse $i$ gælder $d[v_{i-1}]+c((v_{i-1},v_i)) \ge d[v_i]$.
+  Når man lægger disse $k$ uligheder sammen, går $d[v_i]$-termerne ud mod hinanden, og vi får uligheden $\sum_{i=1}^kc((v_{i-1},v_i)) \ge 0$.
+  Men så er længden af $C$ ikke negativ, i modstrid med antagelsen.
+\end{proof}
+
+\begin{lemma}
+  Lad $v$ være en knude, som kan nås fra $s$.
+  Da gælder $mu(v)=-\infty$ hvis og kun hvis der eksisterer en kant $e=(u,w)$, således at $d[u] + c(e) < d[w] < +\infty$, og $v$ kan nås fra $w$.
+\end{lemma}
+\begin{proof}
+ Antag først $\mu(v)=-\infty$. 
+ Da kan $v$ nås fra $s$ via en kreds $C=\seq{v_0,\ldots,v_k}$ med negativ længde.
+ Ifølge lemmaet foroven indeholder $C$ en kant $e=(v_{i-1},v_i)$, som opfylder $d[v_{i-1}]+c((v_{i-1},v_i)) < d[v_i]$.
+ Desuden kan $v$ nås fra $v_i$.
+ Antag omvendt, at $e=(u,w)$ er en kant med $d[u] + c(e) < d[w] < +\infty$.
+ Vi skal først indse, at 
+  \begin{equation}\label{eq:muw}
+    \mu(w) =-\infty\,.
+  \end{equation}
+  Antag modsætningsvis, at $\mu(w)>-\infty$.
+  Idet $w$ klart kan nås fra $u$, må der også gælde $\mu(u)>-\infty$.
+  Vi har altså $-\infty<\mu(u)<+\infty$, og kan bruge lemma~\lref{lem:criterion} til at indse, at $\mu(u)=d[u]$ og $\mu(w)=d[w]$. 
+  Men uligheden $\mu(u) + c(e) < \mu(w)$ absurd, så \eqref{eq:muw} gælder.
+  Med andre ord kann $w$ nås fra $s$ via en kreds af negativ længde.
+  Via $w$ kan også $v$ nås på samme måde, så $\mu(v)=-\infty$.
+\end{proof}
+
+Disse overvejelser fører til følgende måde at identificere knuder $v$ med $\mu(v)=\infty$ ved at sætte $d[v]=-\infty$.
+I efterbehandlingen prøver for hver kant $e=(u,v)$, om $d[u] + c(e) < d[v]$.
+I så fald kalder vi $v$ for »smittet«, sætter $d[v]\Is -\infty$ og kalder den rekursive procedure $\Id{smit}(v)$, som gennemfører en slags bredde-først-søgning 
+\index{graf!bredde-først-søgning}
+for at sikre, at $d[w]=\infty$ for alle knuder $w$, som kan nås fra $v$.
+
+\begin{exerc}
+  Vis, at de knnuder, for hvilke kaldes $\Id{smit}(v)$ udføres en eller flere gange præcis er de knnuder, for hvilke  $\mu(v)=-\infty$, og at hele efterbehandlingen tager tid $O(m)$.
+  \emph{Vink}: Genbrug argumenterne fra dybde-først-søgning.
+\end{exerc}
+
+%Lösung: Es ist klar, dass für jeden Knoten $v$ und jede Kante  $(u,v)$ der 
+%Aufruf \Id{infect}$(v)$ höchstens einmal erfolgt,
+%und dass der erste dieser Aufrufe Zeit $\Oh{\Id{outdegree}(v)}$ benötigt, die
+%späteren jeweils Zeit $\Oh{1}$. Zusammen also Zeit  $\Oh{\Id{indegree}(v) + \Id{outdegree}(v)}$. 
+%Aus Behauptung 2 folgt, dass \emph{nur} Knoten $v$ mit $\mu(v)= -\infty$ infiziert werden.
+%(Achtung, subtil: Wenn $e=(u,v)$ getestet wird,
+%könnte es sein, dass $v$ schon vorher infiziert worden ist.
+%In diesem Fall gilt $d[u] + c(e) \not< d[v]=-\infty$ und es erfolgt kein Aufruf \Id{infect}$(v)$.)
+%Wieso werden \emph{alle} Knoten $v$ mit $d[v]= -\infty$ infiziert?
+%Sei nach den $n-1$ Runden $d[u] + c(e) < d[w] < +\infty$ und $v$ von $w$ aus erreichbar.
+%Wähle einen (einfachen Weg) $p=\seq{w=v_0,v_1,\ldots,v_k=v}$.
+%Kante $e=(u,w)$ wird auf jeden Fall getestet. Wenn dann $d[u] + c(e) \not< d[w]$ gilt, 
+%kann das nur daran liegen, dass $w$ schon vorher infiziert und $d[w] \Is-\infty$ gesetzt wurde. 
+%Also wird \Id{infect}$(w)$ auf jeden Fall irgendwann einmal aufgerufen.
+%Annahme: \Id{infect}$(v)$ wird nicht aufgerufen. 
+%Betrachte den letzten Knoten $v_i$ auf dem Weg, für den \Id{infect}$(v_i)$ irgendwann aufgerufen wird
+%und betrachte den ersten solchen Aufruf. 
+%In diesem Moment gilt noch $d[v_i]> -\infty$. 
+%Während der Abarbeitung von \Id{infect}$(v_i)$ wird irgendwann Kante $(v_i,v_{i+1})$ betrachtet und es wird \Id{infect}$(v_{i+1})$ aufgerufen,
+%im Widerspruch zur Wahl von $i$. Also ist die Annahme falsch, und \Id{infect}$(v)$ wird aufgerufen. 
+%
+
+
+\begin{exerc}
+  Nogen foreslår en alternativ efterbehandling:
+  Sæt $d[v]$ til $-\infty$ for alle knuder $v$ med $d[v]<+\infty$, for hvilke der ikke findes en vej af forgængerpegere $\Id{forælder}$ tilbage til startknuden  $s$.
+  Vis et eksempel, hvor  denne metode kan overse en knude $v$ med $\mu(v)=-\infty$.
+\end{exerc}
+
+% Lösung: Abbildung 2 http://www.avglab.com/andrew/pub/neci-tr-96-029.ps
+% Goldberg Cherkassky
+
+\begin{exerc}[Arbitrage]
+  \index{Arbitrage}
+  \index{korteste veje!anvendelse}
+  Betrage en mængde $C$ af valutaer med vekselkurs $r_{ij}$ mellem valuta $i$ og $j$, dvs. at man får $r_{ij}$ enheder af valuta $j$ for en enhed af valuta $i$. 
+  En \emph{valutaarbitrage} opstår, når der findes en følge af elementære vekslinger (\emph{transaktioner}), som begynder med en enhed i en valuta og ender med mere end en enhed i samme valuta.
+  \begin{enumerate}[(a)]
+    \item Forklar, hvordan man kan afgøre, om en tabel af valutakurser tillader valutaarbitrage. 
+      \emph{Vink}: $\log(xy)=\log x+\log y$.
+    \item Udvid algoritmen til at beregne en følge af transaktioner, som maksimerer den gennemsnitlige gevinst \emph{per transaktion}!
+  \end{enumerate}
+\end{exerc}
+
+I afsnit~\lref{s:further} beskriver vi yderligere forbedringer af Bellman og Fords algoritme, som gør den mere anvendlig i praksis.
+
+%----------------------------------------------------------------------
+\section{Korteste veje mellem alle par af knuder}
+\llabel{s:potential}
+\llabel{s:all-pairs}
+\index{potentialefunktion|siehe{knudepotentiale}}%
+\index{knudepotentiale|textbf}%
+\index{korteste veje!alle par, negative omkostninger}
+
+\emph{Udeladt}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Korteste-veje-opslag}
+\llabel{s:query}
+\index{kurzeste Wege@korteste veje!Anfrage}
+\index{Algorithm Engineering}
+
+\emph{Udeladt}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementationsaspekter}
+\llabel{s:implementation}
+
+\emph{Udeladt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historiske bemærknigner og videre resultater}
+
+\llabel{s:further}
+
+\emph{Udeladt}
+
+

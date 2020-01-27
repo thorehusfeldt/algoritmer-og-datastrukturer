@@ -1,130 +1,425 @@
 \section{Pseudokode}
+\llabel{s:pseudocode}
+\index{pseudokode|textbf}
 
-Rammodellen, dens abstrakion og forenkling af maskinprogrammer, som skal udføres på en mikroprocessor, skal muliggøre en nøjagtig definition af begrebet »regnetid«.
-Modellen er derimod på grund af sin enkelhed ikke egnet til formuleringen af komplekse algoritmer, fordi de tilsvarende ramprogrammer bliver alt for lange og svære at læse.
-I stedet skal vi formulere vores programmer i \emph{pseudokode}, som fremstiller er abstraktion og forenkling af imperative programmeringssprog som C, C++, Java, C\# og Pascal, kombinered med rundhåndet anvendelse af matematisk notation.
-Vi skal nu beskrive vores konventioner for pseudokodenotation i denne bog, og udlede en tidsmålingsmodel for pseudokodeprogrammer.
+
+Registermaskinen er en abstrakion og forenkling af maskinprogrammer, som skal udføres på en mikroprocessor, der muliggør en præcis definition af begrebet »udførelsestid«.
+Modellen er samtidigt netop på grund af sin enkelhed uegnet til formuleringen af komplekse algoritmer, fordi de tilsvarende registermaskineprogrammer bliver alt for lange og stort set ulæselige for mennesker.
+I stedet vil vi formulere vores programmer i \emph{pseudokode}, som danner en passende abstraktion og forenkling af imperative programmeringssprog som C, C++, Java, C\# og Pascal,
+\index{programmeringssprog}
+\index{imperativ programmering}
+\index{C}
+\index{C++@\CC}
+\index{Java}
+\index{Pascal}
+\index{Csharp@C\#}
+kombineret med rundhåndet brug af matematisk notation.
+Vi skal nu beskrive vores konventioner for pseudokodenotation i denne bog, og præsentere en tidsmålingsmodel for pseudokodeprogrammer.
 Denne er meget enkel: 
 \emph{Grundlæggende pseudokodeinstruktioner behøver konstant tid; procedure- og funktionskald behøver konstant tid plus tiden for at udføre deres krop.}
-Vi skal retfærdiggøre dette ved at skitsere, hvordan man kan oversætte pseudokode til ækvivalent ramkode, som netop har denne tidsopførsel.
+Vi skal retfærdiggøre dette ved at skitsere, hvordan man kan oversætte pseudokode til ækvivalent registermaskinkode, som netop har denne tidsopførsel.
 Vi skal nøjes med at forklare denne oversættelse så langt, at tidsmålingsmodellen bliver forståelig.
-Man skal altså ikke gøre sig overvejelser om compileroptimeringsteknikker, idet kontante faktorer ikke spiller nogen rolle i vores teori.
+Vi bland andet enhver overvejelse om optimeringsteknikker for oversættere,
+\index{oversætter}
+idet konstante faktorer ikke spiller nogen rolle i vores teori.
 Læseren er dog velkommen til at bladre forbi de næste afsnit og acceptere tidsmålingsmodellen for pseudokode som aksiomatisk.
-Den her benyttede syntax ligner Pascal [110], fordi denne notation virker typografisk mere behagelig for bogformen end den velkendte syntax fra C og dette sprogs videreudviklinger som C++ og Java.
+Den her benyttede syntax ligner programmeringssproget Pascal~\cite{JenWir91}, fordi denne notation virker typografisk mere behagelig i bogform end den velkendte syntax fra C og dette sprogs videreudviklinger som C++ og Java.
 
 \subsection{Variabler og elementære datatyper}
 
-En \emph{variabelerklæring} »$v=x\colon T$« stiller en variabel $v$ af typen $T$ til rådighed og initialiserer den med værdien $x$.
-For eksempel skaber »$\Id{svar} = 42:\NN$« en variabel $\Id{svar}$, som kan antage ikkenegative heltalsværdier, og initialiserer den med værdien $42$.
-Muligvis undlader vi at nævne typen af en variabel, hvis den fremgår af sammenhængen.
-Som typer forekommer elementartyper som fx heltal, boolesk værdier og pegere (referencer) og sammensatte typer.
-Hertil findes fordefinerede sammensatte typer som rækker og anvendelsesspecifikke klasser (se nedenfor).
-Når typen af en variabel er irrelevant for fremstillingen, benytter vi den uspecificerede type $\Element$ som pladsholder for en vilkårlig type.
-Sommetider udvides de numeriske typer med værdierne $+\infty$ og $-\infty$, når det er bekvemt.
-Ligeledes udvider vi sommetider typer med den udefinerede værdi (betegnet med symbolet $\bot$), som skal kunne skelnes fra »egentlige« objekter af typen $T$.
+En \emph{variabelerklæring}
+\index{deklaration|textbf}
+\index{variabel|textbf}
+»\DeclareInit{$v$}{$T$}{$x$}« 
+introducerer en variabel $v$ af typen $T$
+\index{type|textbf}
+\index{datatype|sieheunter{type}}
+og initialiserer
+\index{initialiserer|textbf}
+den med værdien $x$.
+For eksempel skaber »\DeclareInit{\Id{svar}}{$\NN$}{$42$}«
+en variabel $\Id{svar}$, som kan antage ikke-negative heltalsværdier, og giver den værdien $42$.
+Sommetider undlader vi at nævne typen af en variabel, hvis den fremgår af sammenhængen.
+Som typer forekommer elementartyper som fx heltal,
+\index{heltal|textbf} 
+booleske værdier,
+\index{boolsk}
+pegere (referencer)
+\index{referencetype!sieheunter{peger}}
+\index{peger}
+og sammensatte typer.
+\index{type!sammensat}
+Vi fordefinerer nogle sammensatte typer, nemlig rækker og visse anvendelsesspecifikke klasser
+\index{klasse}
+(se nedenfor).
+Når typen af en variabel er irrelevant for fremstillingen, benytter vi den uspecificerede type $\Id{Element}$
+\index{element|textbf}
+som pladsholder for en vilkårlig type.
+Sommetider udvides de numeriske typer
+\index{type!numerisk}
+med værdierne $+\infty$ og $-\infty$,
+\index{uendeligt ($\infty$)|textbf}
+når det er bekvemt.
+Ligeledes udvider vi sommetider typer med den udefinerede værdi (betegnet med symbolet $\bot$),
+\index{udefineret værdi ($\bot$)|textbf}
+som skal kunne skelnes fra »egentlige« objekter af typen $T$.
 Især ved pegertyper er en udefineret værdi nyttig.
-Værdier af pegertypen »$\Kw{Peger på} T$« er »håndtag« for objekter af typen $T$.
-I rammodellen er sådan en håndtag bare indeks (»adressen«) af den første celle af et lagersegment, som indeholder et objekt af typen $T$.
+En værdi af pegertypen »\PointerTo $T$« kaldes et \emph{greb}
+\index{greb}
+om et objekt af typen $T$.
+I registermaskinen er sådan et greb bare indeks (kaldt »adressen«)
+\index{adresse}
+af første celle af det lagersegment, som indeholder et objekt af typen $T$.
 
-Den erklæring »$a\colon \Array[i..j]\Of T$« stiller en \emph{række $a$} til rådighed, som består af $j-i+1$ \emph{indgange} af typen $T$, som er gemt i $a[i].a[i+1],\ldots,a[j]$.
-Rækker er realiserede som sammenhængende lagersegmenter.
-For at finde indgangen ved $a[k]$ er det nok kende startadressen af $a$ og størrelsen af objekter af typen $T$.
-Hvis fx registeret $R_a$ indeholder startadressen for objektet $a[0..k]$ og $R_i$ indeholder indeks $42$, og hvis hver indgang er et lagerord, så læser kommandosekvensen »$R_1:= R_a+R_i; R_2:=S[R_1]$« inholdet af $a[42]$ ind i register $R_2$.
-Størrelsen af rækken bliver lagt fast, så snart erklæringen er udført; den slags rækker hedder \emph{statiske}.
-I afsnit 3.2 skal vi se, hvordan man implementerer \emph{dynamiske rækker}, som kan vokse og krympe i løbet af programudførelsen.
+Erklæringen »\Declare{$a$}{\Array$[i..j]$ \Of $T$}« introducerer \emph{rækken}
+\index{række|textbf}
+$a$, som består af $j-i+1$ \emph{indgange} af typen $T$, hvilke er gemt i lagercellerne $a[i]$, $a[i+1]$, $\ldots$, $a[j]$.
+Rækker er registermaskinen realiserede som sammenhængende lagersegmenter.
+For at finde indgangen ved $a[k]$ er det nok at kende startadressen af $a$ og størrelsen af objekter af typen $T$.
+Hvis fx registeret $R_a$ indeholder startadressen for rækken~$a$, registeret $R_i$ indeholder indeks $42$, og hvis hver indgang fylder et lager\-ord, så læser kommandosekvensen »$R_1\Is R_a+R_i; R_2\Is S[R_1]$« inholdet af $a[42]$ ind i register $R_2$.
+Størrelsen af rækken ligger fast, når erklæringen er udført; den slags rækker hedder \emph{statiske}.
+\index{statisk række|textbf}
+I afsnit~\ref{ch:sequence:s:array} viser vi, hvordan man implementerer \emph{dynamiske rækker}, som kan vokse og krympe i løbet af programudførelsen.
 
-En erklæring $c\colon\Class\Id{alder}:\NN, \Id{indkomst}\colon\NN\Kw{ end}$ stiller en variable $c$ til rådighed, hvis værdier er heltalspar.
-Komponenterne angives som $a.\Id{alder}$ og $a.\Id{indkomst}$.
-For en variabel $c$ giver $\Kw{adresse på } c$ et håndtag til $c$ (dvs. $c$s adresse).
-Når $p$ er en variabel af en passende pegertype, så kan vi gemme dette håndtag i $p$ med kommandoen »$p:= \Kw{adress på } c$«; mens utrykket »$*p$« giver objektet $c$ tilbage.
-De to »\emph{felter}« i $c$ kan også betegnes som $p\rightarrow \Id{alder}$ og $p\rightarrow\Id{indkomst}$.
-Den alternative skrivemåde $(*p).\Id{alder}$ og $(*p).\Id{indkomst}$ er mulig, men sjældent brugt.
+Erklæringen »$c \colon \Class \Id{alder} \colon \NN, \Id{indkomst} \colon \NN$«
+stiller en variabel $c$ til rådighed, hvis værdier er heltalspar.
+Komponenterne kaldes sommetider felter og angives som $c.\Id{alder}$ og $c.\Id{indkomst}$.
+Udtrykket »$\Address c$«
+\index{greb}
+\index{afreferering}
+giver et greb om $c$ (dvs.\ adressen på $c$).
+Når $p$ er en variabel af en passende pegertype, så kan vi gemme grebet i $p$ med kommandoen »$p \Is \Address c$«; tilsvarende giver udtrykket »$\Star p$« objektet $c$ tilbage.
+De to felter
+\index{felt (af en variabel)}
+tilhørende $c$ kan også betegnes som $p\Points \Id{alder}$ og $p\Points\Id{indkomst}$.
+Den alternative skrivemåde $(\Star p).\Id{alder}$ og $(\Star p).\Id{indkomst}$ giver mening, men bliver sjældent brugt.
 
-Rækker og objekter, som refereres til af pegere, stilles til rådighed og navngives med kommandoen $\allocate$ og frigøres igen med kommandoen $\dispose$.
-For eksempel stiller kommandoen »$p:=\allocate \Array[1..n] \Of T$« en række med $n$ objekter af typen $T$ til rådighed, dvs. at der reserveres et sammenhængende lagersegment, hvis længe akkurat rækker til $n$ objekter af typen $T$, og variablen $p$s værdi sættes til rækkens håndtag (lagersegmentets startadresse).
-Anvisningen $\dispose$ frigiver lagerområdet, så det kan anvendes til andet brug.
-Med operationerne $\allocate$ og $\dispose$ kan vi opdele rækken $S$ af ram-lagerceller i disjunkte segmenter, som kan tilgår enkeltvis.
-Begge funktioner kan implementeres på en sådan måde, at de kun kræver konstant tid, fx på følgende ekstremt nemme måde:
+Pladsen for rækker og objekter stilles til rådighed med kommandoen $\tAllocate$ og frigøres igen med kommandoen $\tDispose$.
+\index{alloker@{\bf alloker}|textbf}
+\index{afalloker@{\bf afalloker}|textbf} 
+For eksempel stiller kommandoen »$p\Is\Allocate \Array[1..n] \Of T$«
+\index{af@{\bf af} (i typeerklæring)}
+en række med $n$ objekter af typen $T$ til rådighed, dvs.\ at der reserveres et sammenhængende lagersegment med plads til akkurat $n$ objekter af typen $T$, og variablen $p$s værdi sættes til rækkens greb (dvs.\ lagersegmentets startadresse).
+Kommandoen $\Dispose p$
+\index{oversættelse (af pseudokode)}
+frigiver lagerområdet, så det kan anvendes til andet brug.
+Med operationerne $\tAllocate$ og $\tDispose$ kan vi opdele rækken $S$ af registermaksinens lagerceller i disjunkte segmenter, som kan tilgås enkeltvis.
+Begge funktioner kan implementeres på en sådan måde, at de kun kræver konstant tid, 
+\index{lagerforvaltning|textbf}
+fx på følgende ekstremt nemme måde:
 Adressen til den første ledige lagercelle i $S$ holdes i specialvariablen $\Id{fri}$.
-% TODO konsekvensret bestemt ental af variabel
-Et kald til $\allocate$ reserverer et lagerafsnit, som begynder ved $\Id{fri}$, og øger $\Id{fri}$ med omfanget af det reserverede afsnit.
-Et kald til $\dispose$ har ingen effekt.
-Denne implementation er tidseffektiv men ikke lagereffektiv:
-Godtnok kræver både $\allocate$ og $\dispose$ kun konstant tid, men det totale lagerforbrug er summen af længderne af samtlige nogenside reserverede segmenter i stedet for maksimum af den til et bestemt tidspunkt brugte (dvs. reserverede, men endnu ikke frigivne) plads.
-Om det er muligt, at realisere en vilkårlig følge af $\allocate$- og $\dispose$-operationer både lagereffektivt og med konstant tidsforbrug per operation, er et åbent problem.
-For de algoritmer, som præsenteres i denne bog, kan $allocate$ og $\dispose$ dog realiseres både tids- og pladseffektivt på samme tid.
+Et kald til $\tAllocate$ reserverer et lagerafsnit, som begynder ved $\Id{fri}$, og øger derefter $\Id{fri}$ med omfanget af det reserverede afsnit.
+Et kald til $\tDispose$ har ingen effekt.
+Denne implementation er tidsbesparende men ikke pladsbesparende:
+Godtnok kræver både $\tAllocate$ og $\tDispose$ kun konstant tid, men det totale lagerforbrug er summen af længderne af samtlige nogenside reserverede segmenter i stedet for maksimum af den til et bestemt tidspunkt brugte (dvs. reserverede, men endnu ikke frigivne) plads.
+Det er et åbent problem at realisere en vilkårlig følge af $\tAllocate$- og $\tDispose$-operationer både lagereffektivt og med konstant tidsforbrug per operation.
+For de algoritmer, som præsenteres i denne bog, kan $\tAllocate$ og $\tDispose$ dog realiseres både tids- og pladseffektivt på samme tid.
 
-Vi vil overtage nogle sammensatte datatyper fra matematiken.
-Især vil vi bruge tupler, endelige følger og mængder.
-[TODO orig close paren] Ordnede par, tripler og andre tupler skriver vi i parenteser som fx $(3,1)$, $(3,1,4)$ og $(3,1,4,1,5)$.
-Idet de indholder et at typen fastlagt antal komponenter, kan operationer på tupler opdeles i operationer på deres komponenter på en oplagt måde.
-En \emph{følge}, skrevet i spise parenteser, gemmer objeter af samme type i en specifik rækkefølge; herved bestemmer typen ikke antallet af indgange.
-For eksempel erklærer tildelingen »$s=\langle 3,1,4,1\rangle\colon\Id{Følge }\Kw{ af } \ZZ$ en følge $s$ af heltal og initialiserer den med følgen $\langle 3,1,4,1\rangle$ af tallene $3$, $1$, $4$ og $1$ i rækkefølge.
+Vi vil gøre brug af nogle sammensatte datatyper fra matematiken.
+Især vil vi benytte tupler,
+\index{tupel|textbf}
+endelige følger
+\index{følge|textbf}
+og mængder.
+\index{mængde|textbf}
+Ordnede \emph{par},
+\index{par|textbf}
+\emph{tripler}
+\index{tripel|textbf}
+og andre \emph{tupler} skriver vi i parenteser som fx $(3,1)$, $(3,1,4)$ og $(3,1,4,1,5)$.
+Idet antallet af komponenter i en tupel er fastlagt af typen, kan operationer på tupler brydes ned i operationer på de enkelte komponenter på den oplagte måde.
+En \emph{følge},
+\index{fxlge@følge|textbf}
+\index{af@{\bf af} (i typeerklæring)}
+skrevet i spidse parenteser, gemmer objekter af samme type i en bestemt orden; i modsætning til tupler er antallet af indgange ikke fastlagt af typen.
+For eksempel erklærer tildelingen »$\DeclareInit{s}{\Id{Følge} \Of \ZZ}{\seq{3,1,4,1}}$« en følge $s$ af heltal og initialiserer den med følgen $\langle 3,1,4,1\rangle$ af tallene $3$, $1$, $4$ og $1$ i den rækkefølge.
 Den tomme følge skrives som $\langle\,\rangle$.
-Følger er naturlige abstraktioner af mange datastrukturer som fx arikver (eng. \emph{files}), strenge (tegnfølger), lister, stakke, køer og prioritetskøer.
-I kap.~3 skal vi betragte mange forskellige muligheder for at repræsentere følger.
-I senere kapitler vil vi bruge følger som matematisk abstraktion på mange måder, uden at tage videre hensyn til implementationsdetaljer.
+\index{tom følge $\seq{\,}$|textbf} 
+Følgen er en naturlig abstraktion af mange andre datatyper som fx arkivet
+\index{arkiv}
+(eng. \emph{file}), strengen
+\index{streng}
+(eller »tegnfølgen«), listen,
+\index{liste}
+stakken
+\index{stak}
+og køen.
+\index{kø}
+I kap.~\ref{ch:sequence:} skal vi se grundigt på mange forskellige måder at repræsentere følger.
+I de senere kapitler vil vi så bruge følger som matematisk abstraktion uden at tage videre hensyn til implementationsdetaljer.
 
-Mængder spiller en vigtig rolle i matematiske overvejelser; vi vil også benytte dem i vores pseudokode.
-Der vil altså forekomme erklæringer som fx »$M=\{3,1,4\}\colon\Id{ Mængde } \Kw{ af }\NN$«, som skal forstås på samme måde som erklæringer af rækker eller mængder.
-Implementationen af datatypen »mængde« sker for det mest ved hjælp af følger.
+Mængder
+\index{mxngde@mængde|textbf}
+spiller en vigtig rolle i matematiske overvejelser, og vi vil ofte bruge dem i vores pseudokode.
+Der vil altså forekomme erklæringer som fx »$\DeclareInit{M}{\Set \Of \NN}{\set{3,1,4}}$«, som skal forstås på samme måde som erklæringer af rækker eller mængder.
+Implementationen af datatypen »mængde« sker ofte ved hjælp af følger.
 
-\subsection{Anvisninger}
+\subsection{Kommandoer}
+\index{kommando}
 
-Den enkleste anvisning er \emph{tildelningen} »$x:=E$«, hvor $x$ er en variabel og $E$ er et udtryk.
-En tildeling kan transformeres til en følge af ram-operationer af konstant længde.
-For eksempel bliver tildelingen $a:=a+b\cdot c$ oversat til »$R_1:=R_b*R_c;\allowbreak R_a:= R_a+R_1$«, hvor $R_a$, $R_b$ og $R_c$ angiver de registre, som indholder $a$, $b$ hhv. $c$.
-Fra programmeringssproget C låner vi forkortelserne $++$ og $--$ for øgning og mindskning af en variabel med $1$.
-Vi vil også bruge simultan tildeling af flere variabler.
-Hvis fx $a$ og $b$ er variabler af samme type, så bytter »(a,b):=(b,a)« indholdet af $a$ og $b$.
+Den enkleste anvisning er \emph{tildelningen}
+\index{tildeling}
+»$x\Is E$«, hvor $x$ er en variabel og $E$ er et udtryk.
+En tildeling kan transformeres til en følge af operationer i registermaskinen af konstant længde.
+\index{oversættelse!tildeling}
+For eksempel bliver tildelingen $a\Is a+b\cdot c$ oversat til »$R_1\Is R_b*R_c$; $R_a:= R_a+R_1$«, hvor $R_a$, $R_b$ og $R_c$ angiver de registre, som indholder $a$, $b$ og $c$.
+Fra programmeringssproget C låner vi forkortelserne $\Increment$
+\index{zzg@øg ($\Increment$)|textbf}
+og $\Decrement$
+\index{sxnk@mindsk ($\Decrement$)|textbf}
+for øgning og mindskning af en variabel med $1$.
+Vi vil også bruge \emph{simultan tildeling} af flere variable.
+Hvis fx $a$ og $b$ er variabler af samme type, så bytter
+\index{ombyt@\Id{ombyt}}
+kommandoen »$(a,b)$\Is $(b,a)$« indholdet af $a$ og $b$.
 
-Den betingede anvisning $\iif C\tthen I \eelse J$, hvor $C$ er et boolsk udtryk og $I$ og $J$ er anvisninger, oversættes til kommandofølgen
-\[
-\Id{eval}(C); \mathtt{JZ} \Id{sEllers}, R_C; \Id{oversæt}(I); \mathtt{J} \Id{sEnde}; \Id{oversæt}(J)\,.\]
+Den betingede kommando
+\index{betinget kommando|textbf}
+\index{hvis@{\bf hvis}|textbf}
+$\If C\Then I \Else J$, hvor $C$ er et boolsk udtryk og $I$ og $J$ er anvisninger, oversættes til kommandofølgen
+\[ \Id{eval}(C);\ \mathtt{JZ}\ \Id{sElse},\ R_C ;\ \Id{oversæt}(I); 
+\ \mathtt{J}\ \Id{sEnd};\ \Id{oversæt}(J)  \]
 De enkelte dele skal læses som følger:
-$\Id{eval}(C)$ er en følge af anvisninger, som evaluerer udtrykket $C$ og gemmer resultatet i registret $R_C$;
-$\Id{oversæt}(I)$ er en følge af anvisninger, som implementerer anvisningen $I$;
-$\Id{oversæt}(J)$ implementerer anvisningen $J$;
-$\Id{sEllers}$ er nummeret på den første kommando i $\Id{oversæt}(J)$;
-endelig er $\Id{sEnde}$ nummeret på den første kommando som følger efter $\Id{oversæt}(J)$.
-Denne følge beregner først værdien af $C$.
-Hvis denne er $\Id{falsk}$ ($=0$), hopper ram-programmet til den første kommando i oversættelsen af $J$.
-Hvis resultatet derimod er $\Id{sand}$ ($=1$),  udfører programmet oversættelsen af $I$ og hopper derefter videre til den første kommando, som følger efter oversættelsen af $J$.
-Anvisningen $\iif C \tthen I$ er en forkortelse for $\iif C \tthen I\eelse ;$, dvs. en betinget udførelse med tom ellers-gren.
+$\Id{eval}(C)$ er en følge af kommandoer, som evaluerer udtrykket $C$ og gemmer resultatet i registret $R_C$;
+$\Id{oversæt}(I)$ er en følge af anvisninger, som implementerer kommandoen $I$;
+$\Id{oversæt}(J)$ implementerer tilsvarende kommandoen $J$;
+$\Id{sElse}$ er nummeret på den første kommando i $\Id{oversæt}(J)$;
+endelig er $\Id{sEnd}$ nummeret på den første kommando som følger efter $\Id{oversæt}(J)$.
+Instruktionerne beregner først værdien af $C$.
+Hvis denne er $\Id{falsk}$ (dvs.\ lig med $0$), så hopper registermaskinen til den første kommando i oversættelsen af $J$.
+\index{oversættelse}
+Hvis resultatet derimod er $\Id{sandt}$ (dvs.\ lig med $1$), så udfører programmet oversættelsen af $I$ og hopper derefter videre til den første kommando, som følger efter oversættelsen af $J$.
+Vi skriver »$\If C \Then I$« som forkortelse for »$\If C \Then I\Else \,;$«, dvs.\ en betinget udførelse med tom ellers-gren.
 
-Man kan gruppere enkelte anvisninger ved at sætte dem efter hinanden som $I_1;ldots;I_r$, og kan opfatte denne gruppe som (kompleks) anvisning.
+Man kan gruppere enkelte kommandoer ved at sætte dem efter hinanden som $I_1;$ $\ldots;$ $I_r$, og kan opfatte denne gruppe som én (mere kompleks) kommando.
 Ved oversættelsen til et maskinprogram bliver oversættelserne af de enkelte dele sat efter hinanden.
 
-Vores pseudokodenotation for programmer er tiltænkt en menneskelig læser og følger derfor ikke en lige så streng syntaks som programmeringssprog skal gøre.
-Især vil vi bruge indrykninger for at gruppere anvisninger, hvilket sparer os for en masse parenteser sammenlignet fx med C-programmer.
-Højniveausprogrammeringssprog som C er et kompromis mellem læsbarhed for mennesker og maskinel behandling.
+Vores pseudokodenotation for programmer er tiltænkt en menneskelig læser og følger derfor ikke en lige så streng syntaks som programmeringssprog
+\index{programmeringssprog}
+normalt skal gøre.
+Blandt andet vil vi bruge indrykninger
+\index{indrykning} for at gruppere anvisninger, hvilket sparer os for en masse parenteser sammenlignet med fx C eller Pascal.
 Vi vil kun bruge parenteser til gruppering, hvis programmet ellers var flertydigt.
-På samme måde bruger vi linjeskift i stedet for semikolon for at dele to anvisnigner.
+På samme måde bruger vi linjeskift i stedet for semikolon
+\index{semikolon}
+for at dele to anvisnigner.
 
-En løkke $\Kw{ gentag } I \Kw{ indtil } C$ oversættes til $\Id{oversæt}(I); \Id{eval}(C); \texttt{JZ} sI, R_C$, hvor $\Id{sI}$ er nummeret på den første kommando i $\Id{oversæt} (I)$.
-Vi skal bruge mange andre former for løkker, som man kan forstå som forkortelser til $\Kw{gentag}$-løkker.
-I følgende tabel angives til venstre nogle eksempler på den slags forkortelser, og til højre den fulde formulering.
+Løkken
+\index{løkke}
+»\Repeat $I$ \Until $C$« oversættes til $\Id{oversæt}(I);\ \Id{eval}(C);\ \mathtt{JZ}\ \Id{sI},\ R_C$, hvor $\Id{sI}$ er nummeret på den første kommando i $\Id{oversæt} (I)$.
+Vi skal bruge mange andre former for løkker, som man kan opfatte som forkortelser for forskellige $\Repeat$-løkker.
+I følgende tabel angives til venstre nogle eksempler på den slags forkortelser, og til højre den fuldstændige formulering.
 
 \medskip
 \begin{tabular}{ll}
 $\Kw{mens } C \Kw{ udfør } I$ &  $\Kw{hvis } C \Kw{ så gentag } I \Kw{ indtil } \neg C$\\
-$\Kw{for } i:= a \Kw{ til } b \Kw{ udfør } I$ &  $i:=a; \Kw{mens } i\leq b \Kw{ udfør } I; i++ $\\
-$\Kw{for } i:= a \Kw{ to } \infty \Kw{ mens } C \Kw{ udfør } I$ &  $i:=a; \Kw{mens } C\Kw{ udfør } I; i++ $\\
-$\Kw{for hvert } e\in s \Kw{ udfør } I$ &  $\Kw{for} i:=1 \Kw{ til } |s|\Kw{ udfør } e:=s[i]; I$\\
+  $\Kw{for } i:= a \Kw{ til } b \Kw{ udfør } I$ &  $i:=a; \,\Kw{mens } i\leq b \Kw{ udfør } I;\, i\texttt{++} $\\
+  $\Kw{for } i:= a \Kw{ to } \infty \Kw{ mens } C \Kw{ udfør } I\quad$ &  $i:=a;\, \Kw{mens } C\Kw{ udfør } I;\, i\texttt{++} $\\
+$\Kw{for hvert } e\in s \Kw{ udfør } I$ &  $\Kw{for} i:=1 \Kw{ til } |s|\Kw{ udfør } e:=s[i];\, I$\\
 \end{tabular}
+\medskip
 
-Ved oversættelsen af løkker til ram-kode er mange maskinnære forbedringer mulige, som vi dog ikke tager hensyn til her.
-For vores formål er det kun af betydning, at regnetiden for udførelsen af en løkke er summen af de enkelte gennemløb, hvor man naturligvis skal tage hensyn til udførelsestiden for betingelsens evalueringer.
-
+Ved oversættelsen
+\index{oversættelse!løkke}
+af løkker til registermaskinen er mange maskinnære forbedringer mulige, som vi dog ikke tager hensyn til her.
+For vores formål er det kun af betydning, at tiden
+\index{udførelsestid!løkke}
+for udførelsen af en løkke er summen af de enkelte gennemløbstider samt udførelsestiden for at evaluere løkkens iterationsbetingelse.
 
 \subsection{Procedurer og funktioner}
+Et underprogram
+\index{underprogram|textbf}
+\index{procedure|textbf}
+ved navn \Id{foo} erklæres som
+»$\Procedure$ \Id{foo}$(D)$ $I$«.
+Her er $I$ prodedurens krop, og $D$ en liste af variabelerklæringer, som angiver de formelle parametre 
+\index{parameter|textbf}
+\index{parameter!formel}
+af proceduren \Id{foo}.
+Et kald til $\Id{foo}$ har formen $\Id{foo}(P)$, 
+hvor $P$ er en liste af \emph{argumenter} eller \emph{egentlige} parametre
+\footnote{Ovs. anm.:
+Man kan sommetider støde på begrebet »aktuel paremeter«,  som er en misforståelse af det engelske udtryk »\emph{actual parameter}«.}
+\index{argument}
+som har samme længde som listen af variabelerklæringer.
+Argumenterne er enten værdier eller referencer.
+Medmindre andet er sagt, går vi ud fra, at elementære objekter som fx heltal og boolske værdier overføres som værdier, mens komplekse objekter som fx rækker overføres som reference.
+Denne konvention svarer til moderne sprog som C og sikrer, at parameteroverførelsen tager konstant tid.
+Parameteroverførelsens semantik er følgende:
+Når $\Id{x}$ er en værdiparameter af typen $T$, så skal det tilsvarende kaldsargument være et udtryk $E$, som leverer en værdi af typen $T$.
+Parameteroverførelsen bliver derved ækvivalent til erklæringen af en lokal variabel ved navn $\Id{x}$, som initialiseres med værdien af $E$.
+Når derimod $\Id{x}$ er en referenceparameter af typen $T$, så skal det tilsvarende kaldsargument være en variabel af samme type;
+\index{parameter!formel}
+\index{parameter!egentlig} 
+i løbet af udførelsen af procedurekroppen er $\Id{x}$  blot et alterantivt navn til denne variabel.
 
-[TODO]
+Ganske som ved variabelerklæringer undlader vi sommetider at skrive typen i parametererklæringen, når vi finder den uvæsentlig eller åbenlyst ud fra sammenhængen.
+Sommetider vil vi bruge matematisk notation til en implicit erklæring af en parameter.  
+For eksempel erklærer »\Procedure \Id{bar}$(\seq{a_1,\ldots,a_n})$ $I$«
+en procedure, hvis argument er en følge af elementer af ikke nærmere specificeret type.
+
+I procedurekroppen kan den særlige anvisning \Return{}  forekomme, som afslutter udførelsen af procedurekroppen og fortsætter udførelsen ved den første anvisning efter kaldsstedet.
+Det samme sker, når udførelsen når enden af procedurekroppen.
+
+De fleste procedurekald kan oversættes
+\index{oversættelse!procedure} 
+ved blot at erstatte kaldet med procedurekroppen og tage hensyn til parameteroverførelsen.
+Denne fremgangsmåde kaldes »linjeindlejring«.
+\index{linjeindlejring|textbf}
+Overførelsen af argumentet $E$ til den formelle parameter \Declare{$x$}{$T$} realiseres som en følge af kommandoer, som evaluerer udtrykket $E$ og tildeler resultatet til den lokale variabel $x$.
+Overførelsen til en formel referenceparameter \Declare{$x$}{$T$} sker ved, at den lokale variabel $x$ får typen $\PointerTo T$ og alle forekomster af $x$ i procedurekroppen erstattes af  $(\Star x)$. 
+Ved indgangen til procedurekroppen udføres desuden tildelingen $x \Is \Address y$, hvor $y$ er kaldsargumentet.
+Brugen af linjeindlejring giver oversætteren rige muligheder for alskens optimeringer, så denne fremgangsmåde fører til den mest effektive kode, når proceduren er lille eller kun kaldes fra et enkelt sted.
+
+\newcommand{\Rr}{R_{\it res}} %{R_{\Id{result}}}
+
+\begin{figure}[t]
+
+\begin{tabbing}
+  ~~~~~~~~\=\kill
+\Funct{fakultet}{$n$}{$\NN$}\quad\+\\
+  \If $n=0$ \Then \Return $1$ \Else \Return $n\cdot \Id{fakultet}(n-1)$
+\end{tabbing}
+
+  \begin{tikzpicture}
+    \matrix [matrix of nodes,
+	     column 1/.style = {nodes =  {font = \small\ttfamily}},
+	     column 2/.style = {anchor = base west},
+	     column 3/.style = {anchor = base west},
+     ] (m) {
+    34313 & 
+    $R_{\it arg} \Is \Id{RS}[R_r - 1]$ &
+    \comment{indlæs $n$ til register $R_{\it arg}$}\\
+  34314
+  &\texttt{HN\ 34321}, $R_{{\it arg}}$ 
+    &\comment{hop til \Then-grenen, hvis $n=0$}\\
+  34315
+    &$\Id{RS}[R_r] \Is$ \texttt{34319} & 
+  \comment{returadresse for rekursionen}\\
+  34316&
+  $\Id{RS}[R_r + 1] \Is R_{{\it arg}} - 1$  &
+  \comment{parameteren er $n - 1$}\\
+  34317
+    &$R_r \Is R_r + 2$ &\comment{øg stakpegeren}\\
+  34318
+    &$\texttt{H 34313}$ &\comment{rekursivt kald \Id{fakultet}$(n-1)$}\\
+    34319
+  &$\Rr \Is \Id{RS}[R_r - 1]    * \Rr$ &\comment{gem $n \cdot \Id{fakultet}(n-1)$}\\
+    34320
+    &$R_r \Is R_r - 2$          &\comment{frigør aktiveringsposten}\\
+    34321
+&$\texttt{H}$\ \ $\Id{RS}[R_r]$ &\comment{hop retur}\\
+    34322
+    & \texttt{H 34326}  &\\
+   34323
+    &$\Rr \Is 1$ &\comment{gem $1$ i resultatregisteret}\\
+    34324
+    &$R_r \Is R_r - 2$          &\comment{frigør aktiveringsposten}\\
+    34325
+&$\mathtt{H}$\ \ $\Id{RS}[R_r]$ &\comment{hop retur}\\
+    34326
+&\\
+    };
+    \draw [decorate, decoration=brace, callout]
+    (m-9-1.south west)-- node [callout, anchor= east] 
+    {\Else} (m-3-1.north west);
+    \draw [decorate, decoration=brace, callout]
+    (m-13-1.south west)-- node [callout, anchor= east] 
+    {\Then} (m-11-1.north west);
+    \node [left of = m-1-1, callout] {\Id{fakultet} $\rightarrow$};
+  \end{tikzpicture}
+
+  \caption{\llabel{alg:factorial}
+    Rekursiv funktion $\Id{fakultet}$ til beregning af fakultetsfunktionen og den tilsvarende maskinkode.
+  Maskinkoden returnerer resultatet $n!$ i register $\Rr$.
+  Koden svarer nogenlunde til dette kapitels konventioner for \Id{oversæt}.
+  For læselighedens skyld er maskinens repertoire af kommandoer udvidet med et ubetinget indirekte hop til adressen $\Id{RS}[R_r]$ i linje 34322 og 34325.
+  Desuden sammenfatter linje~34319 udregningnen højresiden, som egentlig skulle kræve register\-operationer som fx  $R_0\Is R_r$; $R_1\Is 1$; $R_0\Is R_0-R_1$; $R_0\Is\Id{RS}[R_0]$; $\Rr\Is R_0*\Rr$.
+  På den anden side ville en moderne oversætter fjerne linje 34322, som jo alrig nås, og muligvis slå de to identiske programstumper for \Return{} i linje 34320--34321 og 34324--34325 sammen.}%
+\end{figure}
+%TODO wrongly compiled in original 
+\begin{figure}\sidecaption
+  \begin{tikzpicture} 
+    \matrix [matrix of nodes, minimum width = 1.5cm] (m)
+    {
+      \ \\
+       3\\
+      \texttt{34319}\\
+      4\\
+      \texttt{34319}\\
+      5\\
+      \texttt{34319}\\
+    };
+    \foreach \i in {1,...,7} 
+      \draw (m-\i-1.south east) -- (m-\i-1.south west);
+    \draw (m-1-1.north east) -- (m-7-1.south east);
+    \draw (m-1-1.north west) -- (m-7-1.south west);
+    \node [minimum width = 1pt, left of = m-1-1]  {$R_r\rightarrow$};
+  \end{tikzpicture}
+\caption{\llabel{fig:recursionstack} Rekursionsstakken for kaldet $\Id{factorial}(5)$, når rekursionen er nået til kaldet $\Id{factorial}(3)$.}
+\end{figure}
+
+\emph{Funktioner} minder meget om procedurer, bortset fra at de deres $\Return$-anvisning også skal returnere en værdi. 
+\index{rekursion|textbf},
+\index{returner@{\Return}}
+I figur~\lref{alg:factorial} ses erklæringen af en funktion $\Id{fakultet}$, som på argument $n$ returnerer resultatet $n!$, samt dens oversættelse til registermaskinen.
+Linjeindlejringen virker ikke for \emph{rekursive} funktioner og procedurer som fx $\Id{factorial}$, som kalder sig selv enten direkte eller indirekte  -- kode\-erstatningen ville aldrig blive færdig.
+For at realisere rekursive underprogrammer i registermaskinkode, har man brug for en
+\index{stak}
+\index{rekursionsstak|textbf}
+\emph{rekursionsstak}.
+Udtrykkelige kald og rekursionsstakken bruges også for omfattende underprogrammer, som kaldes fra flere steder i programmet, fordi linjeindlejringen ville føre til for meget kode.
+Rekursionsstakken, betegnet med $\Id{RS}$, placeres i en til formålet reserveret del af lageret.
+Den indeholder en følge af 
+\index{aktivierungspost}
+\emph{aktiveringsposter}, en for hvert aktivt underprogramskald.
+Et særligt register $R_r$ peger altid på den første ledige plads på rekursionsstakken.
+Aktiveringsposten for et underpogram med $k$ parametre og $\ell$ lokale variable har størrelse $1 + k + \ell$.
+Første position indeholder \emph{returadressen}, dvs.\ nummeret på den programlinje, ved hvilken programmets udførelse skal fortsætte efter kaldets afslutning;
+de næste $k$ positioner er reserverede til parametre, og de resterende $\ell$ positioner til de lokale variable.
+Kaldet af et underpogram realiseres på følgende måde som maskinkode:
+Først skriver den kaldende procedure \Id{kalder} returadressen og argumenterne på stakken, øger værdien af $R_r$ med $1+k$ og hopper til den første programlinje underprogrammet \Id{kaldt}.
+Det kaldte underprogram begynder med at reservere plads til sine $\ell$ lokale variabler ved at øge $R_r$ med $\ell$.
+Derefter udføres kroppen af $\Id{kaldt}$.
+I løbet af dennne udførelse findes den $i$te formelle parameter (for $0 \le i < k$) i celle $\Id{RS}[R_r - \ell - k + i]$ og den $j$te lokale variable (for $0 \le j < \ell$) i celle $\Id{RS}[R_r - \ell  + j]$.
+Anvisningen \Return  i \Id{kaldt} oversættes til en følge af maskinkommandoer, som mindsker $R_r$ med $1 + k + \ell$ (\Id{kaldt} kender naturligvis tallene $k$ og $\ell$) og hopper så retur til den adresse, som er gemt i  $\Id{RS}[R_r]$.
+Udførelsen fortsætter nu i proceduren \Id{kalder}.
+Læg mærke til, at rekursion med denne metode ikke længere er et problem, fordi hvert kald (eller »inkarnation«) af underprogrammet har sit eget område på rekursionsstakken for sine parametre og lokale variable.
+Figur~\lref{fig:recursionstack} viser rekursionsstakkens indhold
+\index{rekursionsstak}
+for et kald af $\Id{factorial}(5)$ i det øjeblik, hvor rekursionen er nået til kaldet af $\Id{factorial}(3)$.
+Markeringen $\mathtt{efterKald}$ står for nummeret på den programlinje, som følger efter kaldet $\Id{factorial}(5)$. 
+Adressen $\mathtt{aRecCall}$ er defineret i fig.~\lref{alg:factorial}.
+\index{oversættelse!procedurekald}
+\index{oversættelse!funktionskald}
+\index{oversættelse!rekursion}
+
+
+
+\begin{exerc}[Eratostenes’ si]
+  \index{Eratostenes’ si}
+  \llabel{ex:sieve:Eratosthenes}
+  Oversæt nedenstående pseudokode, som finder og udskriver alle primtal
+  \index{primtal}
+  op til tallet $n$, til maskinkode.
+  (Vi er ligeglade med at oversætte udskriftskommandoen på sidste linje.)
+  Vis først, at algoritmen er korrekt.
+
+\begin{code}\>\+
+\DeclareInit{$a$}{$\Array[2..n]$ \Of $\set{0,1}$}{$\seq{1,\ldots, 1}$}\\
+\comment{referenceparameter; til sidst gælder $a[i]=1$ \ $\Leftrightarrow$ \ $i$ er primsk}\\
+\ForFromTo{i}{2}{\floor{\sqrt{n}}}\+\\
+  \If $a[i]$ \Then \ForFromToStep{j}{2i}{n}{i} $a[j]\Is 0$\\
+\comment{Hvis $a[i]=1$ så er $i$ primsk, men multipler af $i$ er ej}\-\\
+\ForFromTo{i}{2}{n} \If $a[i]$ 
+    \Then {\rm udskriv}$(i, \text{» er primsk«})$
+\end{code}
+\end{exerc}
 
 \subsection{Objektorientering}
 
-Vi vil holde os til en enkel form for objektorientering med formålet at adskille datastrukturers specifikation (eller \emph{grænsefladen}) fra implementationen.
-Vi vil forklare den tilsvarende notation ved hjælp af et eksempel.
+Vi vil holde os til en enkel form for objektorientering med formålet at adskille datastrukturers specifikation (også kaldt \emph{grænseflade}) fra implementationen.
+Vi vil forklare den relevante notation med et eksempel.
 Definitionen
 
 \begin{quote}
@@ -140,13 +435,159 @@ $\Kw{Klasse }\Id{Komplekst}(x,y\colon\Id{tal}) \Kw{ af } \Id{tal}$\\
 \end{tabbing}
 \end{quote}
 
+\noindent
 stiller en (delvis) implementation af en taltype for komplekse tal til rådighed, som kan bruge vilkårlige taltyper som $\ZZ$, $\QQ$ eller $\RR$ til real- og imaginærdelen.
 (»$\Id{Komplekst}$« er også et eksempel på, at vi ofte vil skrive vores klassenavne med stort begyndelsesbogstav.)
-Real- og imaginærdel holdes i \emph{instansvariablerne} $\Id{re}$ hhv. $\Id{im}$.
+Real- og imaginærdel holdes i \emph{instansvariablerne} $\Id{re}$ og $\Id{im}$.
 Deklarationen »$c\colon\Id{Komplekst}(2,3)\Kw{ af }\RR$« skaber et komplekst tal $c$, som initialiseres til $2+3i$, hvor $i$ angiver den imaginære enhed.
-Med $c.\Id{im}$ får man $c$s imaginærdel, og med metodekaldet $c.\Id{abs}$ absolutværdien af $c$ -- et reelt tal.
+Med udtrykket $c.\Id{im}$ tilgår man imaginærdelen af $c$, og metoden $c.\Id{abs}$ bestemmer absolutværdien af $c$ -- et reelt tal.
 
 Angivelsen af en type efter $\Kw{af}$ i variabeldeklarationen gør det muligt at parameterisere klasser på lignende måde som \emph{template}-mekanismen i C++ og de generiske typer i Java.
-Læg mærke til, at de tidligere deklarationer »$\Id{Mænge }\Kw{af }\Id{Element}$« og »$\Id{Følge }\Kw{af }\Id{Element}$« med denne notation definerer helt almindelge parameteriserede klasser.
+Læg mærke til, at de tidligere deklarationer »$\Id{Mængde }\Kw{af }\Id{Element}$« og »$\Id{Følge }\Kw{af }\Id{Element}$« med denne notation definerer helt almindelge parameteriserede klasser.
 Objekter i en klasse intialiseres ved at tildele instansvariablerne de værdier, som er angivet i variabeldeklarationen.
+
+\section{Konstruktion af korrekte algoritmer og programmer}
+\llabel{s:correct}
+
+\section{Eksempel: Binærsøgning}
+\llabel{s:binary search}
+
+\index{binxrsxning@binærsøgning|sieheunter{søgning}}%
+\index{algoritmekonstruktion!del-og-hersk}%
+\index{algoritmekonstruktion!forberedelse}%
+\index{algoritmekonstruktion!sortering!anvendelse}%
+\index{sortering!anvendelse}%
+\index{sxning@søgning!binærsøgning|textbf}%
+\index{sorteret følge}%
+
+Binærsøgning er en yderst nyttig teknik til søgning i en sorteret række af elementer, som vi kommer til at bruge meget i de senere kapitler.
+
+Det enkleste scenario ser ud på følgende måde.
+Givet er en sorteret række $a[1..n]$ af parvist forskellige indgange, dvs.\ at $a[1] < a[2] < \cdots < a[n]$, samt et element $x$.
+Vi skal afgøre, om $x$ forekommer i rækken og finde det indeks $k \in \{1,\ldots, n+1\}$, som opfylder $a[k-1] < x \le a[k]$.
+Her skal man opfatte $a[0]$ og $a[n+1]$ som fiktive indgange med værdierne $-\infty$ hhv.\ $+\infty$. 
+Vi bruger disse fiktive indgange i invarianter og beviser for at forenkle notationen, men de forekommer ikke i programmet.
+
+Binærsøgning er et eksempel på det algoritmisk princip, som hedder »del og hersk«.
+Vi vælger et index $m\in\{1,\ldots,n\}$ og sammenligner $x$ med $a[m]$.
+Hvis $x = a[m]$, så er vi færdige og returnerer $k=m$. 
+Hvis derimod $x < a[m]$, indskrænker vi det fortsatte søgning til delrækken før $a[m]$, og hvis $x > a[m]$ til delrækken efter $a[m]$. 
+Vi skal selvfølgeligt forklare nærmere, hvad vi mener med at indskrænke søgningen til en delrække.
+Vi vedligeholder to indeks $\ell$ og $r$ og sørger for, at invarianten
+\index{invariant!løkkeinvariant}
+{\renewcommand{\theequation}{\textrm{I}}
+\begin{equation}
+	\qquad 0 \le \ell < r \le n+1  \quad \text{og}\quad a[\ell] < x < a[r] \tag*{$\textrm{(I)}$}
+\end{equation}}
+gælder.
+Den gælder klart i begyndelsen, hvor $\ell = 0$ og $r = n + 1$.
+Hvis $\ell$ og  $r$ er på hinanden følgende indeks, dvs.\ $\ell + 1 = r$, så forekommer $x$ ikke i rækken.
+Figur~\lref{alg:binary search} viser det fuldstændige program.
+
+
+\begin{buchalgorithmpos}{b}{alg:binary search}{Binærsøgning efter $x$ i en sorteret række $a[1..n]$.
+  Algoritmen returnerer et indeks $k$, som opfylder $a[k-1] < x \le a[k]$.  
+  }%
+$(\ell,r) \Is(0,n+1)$ \\  
+\While $l+1<r$ \Do \+ \\
+    \Invariant~\emph{$\textrm{(I)}$}\RRem{dvs.\ invariant~$\textrm{(I)}$ gælder her}\\
+    $m \Is \floor{(r + \ell)/2}$ \RRem{$\ell < m < r$}\\
+    $s \Is \Id{sammenlign}(x,a[m])$ \RRem{$-1$ hvis $x < a[m]$, $0$ hvis $x = a[m]$,
+$+1$ hvis $x > a[m]$}\\
+    \If $s = 0$  \Then \Return $m$\RRem{$a[m] = x$} \\ 
+    \If $s < 0$ $r \Is m$ \RRem{$a[\ell] < x < a[m] = a[r]$} \\
+    \If $s > 0$ $l \Is m$ \RRem{$a[\ell] < x < a[m] = a[r]$}\- \\
+    \Return $r$\RRem{$a[\ell] = a[m] < x < a[r]$} 
+\end{buchalgorithmpos}
+%
+% TODO should this not return l+1 in the failure branch?
+
+\index{sammenligning!trevejs-}%
+Kommentarerne i programmet viser, at invariantens anden del altid gælder.
+Med henblik på den første del indser vi, at løkken betrædes med værdierne 
+$\ell < r$. 
+Hvis $\ell + 1 = r$, afsluttes løkken og dermed proceduren. 
+Ellers gælder $\ell + 2 \le r$, hvilket medfører $\ell < m < r$.
+Derfor er $m$ et gyldigt rækkeindeks, og udtrykket $a[m]$ giver mening.
+Hvis nu $x = a[m]$, afsluttes løkken med det korrekte svar. 
+Ellers sættes enten $r = m$ eller $\ell = m$; derfor gælder $\ell < r$ også ved løkkens ende, og invarianten er bevaret.
+
+Vi mangler at argumentere for, at løkken terminerer.
+\index{terminering}
+Vi bemærker først, at  alle løkkegennemløb bortset fra den sidste, enten forøger $\ell$ eller formindsker $r$, dvs. at $r-\ell$ er skarpt aftagende positive heltal.
+Derfor terminerer løkken. 
+Vi vil dog vise noget stærkere, nemlig at løkken terminerer allerede efter et logaritmisk antal gennemløb.
+Hertil betragter vi størrelsen $r-\ell-1$.
+Det er netop antallet af indeks $i$, som opfylder $\ell < i < r$ og derfor et naturligt mål for størrelsen af det aktuelle delproblem.
+Vi vil nu vise, at hvert løkkegennemløb på nær det sidste gør størrelsen af delproblemet halvt så stort eller endnu mindre.
+I hvert af disse gennnemløb minsker $r - \ell - 1$ til en værdi, der er højst
+\begin{align*}
+  &\max\left\{r - \left\lfloor\frac{ r + \ell}{2}\right\rfloor - 1, \left\lfloor\frac{r + \ell}{2}\right\rfloor - \ell - 1\right\}\\
+  &\qquad \le \max\{{r
+  - ((r + \ell)/2 - \tfrac{1}{2}) - 1, (r + \ell)/2 - \ell - 1} \\
+&\qquad = \max\set{(r - \ell - 1)/2, (r - \ell)/2 - 1} = (r - \ell - 1)/2 \,,
+\end{align*}
+hvilket udgør mindst en halvering.
+\index{rekursionsligning}
+Vi begynder med $r - \ell - 1 = n + 1 - 0 - 1 = n$.
+Efter $k\ge0$ gennnemløb gælder derfor uligheden $r - \ell - 1 \le n/2^k$.
+Lad gennemløb nummer $k+1$ være det sidste gennemløb, i hvilket $x$ sammenlignes med indgangen $a[m]$.
+(Hvis søgningen lykkes, viser det sig, at $x=a[m]$, og søgningen afsluttes. 
+Hvis søgningen mislykkes, fører sammenligningen i runde $k+2$ til, at $r = \ell + 1$, og søgningen afsluttes uden yderligere sammenligninger.)
+Da må uligheden $r - \ell - 1 \ge 1$ have været opfyldt i runde $k$.
+Det følger, at $1 \le n/2^k$, og dermed $2^k \le n$, dvs. $k\le \log n$. 
+Idet $k$ er et heltal, kan uligheden skærpes til $k\le \lfloor\log n\rfloor$.
+
+\begin{thm} 
+  Binærsøgning finder et element i en sorteret række af længde $n$ i højst $1 + \lfloor\log n\rfloor$ sammenlignigner mellem indgange. 
+  Udførelsestiden er $O(\log n)$.
+\end{thm}
+
+\begin{exerc}
+  Vis, at denne grænse er skarp, dvs. at der for hvert $n$ findes instanser af størrelse $n$, som leder til $1 + \floor{\log n}$ sammenligninger i algoritmen.
+\end{exerc}
+
+\begin{exerc} 
+  Formuler binærsøgning i termer af tovejssammenligninger,
+  \index{sammenligning!tovejs-}
+  dvs. at sammenligningen kun afgør, om $x \le a[m]$ eller $x > a[m]$.
+\end{exerc}
+
+Vi skal nu betragte to vigtige udvidelser af binærsøgning.
+For det første behøver værdierne $a[i]$ ikke at være gemt i en række. 
+Vi skal bare være i stand til at beregne værdien $a[i]$ for givet $i$. 
+Hvis vi fx får givet en strengt monotont voksende funktion $f$ og argumenter $i$ og $j$ med
+ $f(i) < x \le f(j)$, så kan vi benytte binærsøgning for at bestemme det index $k\in\{i+1,\ldots, j\}$, som opfylder $f(k-1) < x \le f(k)$.
+I denne sammenhæng kaldes binærsøgning ofte »bisektion«.
+\index{bisektion|textbf}
+%TODO bisektion? bisektionsmetode? noget andet?
+
+For det andet kan vi også benytte binærsøgning i situationer, hvor rækken er uendelig lang.
+Antag, at vi har et sorteret række $a[1 .. \infty]$ og vil finde den index $k\in\{1,2,3,\ldots\}$, som opfylder $a[k] < x \le a[k+1]$.
+Hvis $x$ er større end alle indgange i rækken, må proceduren gerne tage uendelig lang tid.
+Fremgangsmåden er at sammenligne $x$ med $a[2^0]$, $a[2^1]$, $a[2^2]$, $a[2^3]$, $\ldots$, indtil vi finder det første $i$, som opfylder $x \le a[2^i]$.
+Denne fremgangsmåde kaldes \emph{eksponentiel søgning}
+\index{eksponentiel søgning}
+\index{søgning!eksponentiel søgning}
+Hvis $i=0$, så returneres $k=1$, ellers afsluttes søgnningen med sædvandlig binærsøgning i den endelige række $a[(2^{i-1}+1) .. 2^i]$.
+
+
+\begin{thm} %\MDcommentout{Position der $\le$ und $<$ verändert!} 
+  Kombinationen af eksponentiel og binærsøgning finder $x$ i en ubegrænset sorteret række med højst $(2 \log k) + 3$ sammenligninger, hvor $k$ er givet ved betingelsen $a[k-1] < x \le a[k]$.
+\end{thm}
+
+\begin{proof}
+  Vi behøver $i+1$ sammenligninger, for at finde det mindste $i$ med $x \le a[2^i]$, og (givet at $i>0$) derefter højst $\log(2^i - 2^{i-1}) + 1=i$ sammenligninger for binærsøgningen. 
+  Sammenlagter er dette $2i + 1$ sammenligninger. 
+  Idet $k \ge 2^{i-1}$, får vi $i \le 1 + \log k$, hvoraf påstanden følger.
+\end{proof}
+
+%\MDcommentout{Position der $\le$ und $<$ verändert!} 
+Binærsøgning er en certificerende algoritme.
+\index{algoritmekonstruktion!certifikat}
+Den returnerer et indeks $k$ som opfylder $a[k-1] < x \le a[k]$. 
+Hvis $x = a[k]$, så bekræfter indeks $k$, at $x$ forekommer i rækken.
+Hvis $a[k-1] < x < a[k]$, og rækken er sorteret, bekræfter indeks $k$, at $x$ ikke forekommer i rækken.
+Læg mærke til, at hvis rækken ikke opfylder sorteringsforudsætningen, så har vi ingen information i dette tilfælde. 
+Det er umuligt at kontrollere sorteringsforudsætningen i logaritmisk tid.
 

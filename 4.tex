@@ -1,0 +1,582 @@
+\chapter{Hakning og associative rækker}
+\index{hakning|textbf}
+\index{række!associativ}
+
+\renewcommand{\labelprefix}{ch:hash}
+\llabel{}
+\vspace*{-3.5cm}
+\begin{flushright}
+\includegraphics[width=7cm]{img/FleischwolfKlein.pdf}
+\end{flushright}
+
+I dette kapitel skal vi betragte en robust og effektiv implementation af en datastruktur til implementation af såkaldte ordbøger eller associative rækker.
+Denne struktur kaldes en \emph{hakketabel}.
+\footnote{Foroven: En kødkværn.}
+\index{ordbog@ordog|textbf}
+\index{associativ række|textbf}
+\index{række associativ|textbf}
+Den anden grundlæggende mulighed er en datastruktur baseret på træer, som vi skal se nærmere på i kap.~\ref{ch:search:}.
+Man skal forestille sig associativ række som en række med potentielt uendelig -- eller i det mindste meget stor -- indeksmængde, hvoraf dog kun nogle få indeks faktisk er i brug.
+For eksempel udgøres de mulige indeks af mængden af strenge, og de faktisk benyttede indeks er alle navne i et konkret C-program.
+Eller de mulige indeks kunne være alle muligheder for at placere skakfigurer på et skakbræt,
+\index{skak}
+og de faktisk benyttede index er de stillinger, som optræder i et konkret parti.
+Associative rækker har mange anvendelser.
+Oversættere
+\index{oversætter}
+benytter dem til deres symboltabeller
+\index{oversætter!symboltabel}
+som knytter navne i det program, der skal oversættes, til deres tilhørende information.
+Programmer, som løser problemer inden for kombinatorisk søging,
+\index{kombinatorisk søgning}
+benytter dem ofte for at afgøre, om en bestem konfiguration allere er blevet undersøgt.
+I skakeksemplet, hvor samme stilling jo kan nås ad forskellige træk, bør programmet jo kun vurdere hver enkelt stilling én gang.
+Løsningen består i at gemme vurderingen i en associativ række, indekseret af stillingerne.
+Inden for relationelle databaser gemmer en af de mest benyttede implementationer af \emph{join}-operationen
+\index{database!join@\emph{join}} 
+ de indgående relationer i en associativ række.
+Skriptsprog som 
+\index{AWK}
+\index{Perl} 
+AWK \cite{AWK88} og Perl \cite{WCO00} bruger associative rækker som deres primære datastruktur.
+I alle de nævnte eksempler er den associative række normalt implementeret som hakketabel.
+I opgaverne til dette afsnit betragtes yderligere anvendelser af associative rækker.
+
+\newcommand{\Key}{\Id{Nøgle}}
+\newcommand{\key}{\Id{nøgle}}
+\newcommand{\find}{\Id{find}}
+\newcommand{\remove}{\Id{fjern}}
+
+Formelt består en associativ række $S$ af en mængde af \emph{indgange}.
+Til hver indgang $e$ knyttes en nøgle
+\index{nzgle@nøgle} 
+$\key(e) \in \Key$, hvor $\Key$ er mængden af mulige nøgler. 
+Vi skal sikre, at nøglerne i $S$ er entydige, dvs. at forskellige indgange i den associative rækker har forskellige nøgler.
+Associative rækker stiller følgende operationer til rådighed:%
+\index{række!associativ!indsæt@\Id{indsæt}|textbf}
+\index{række!associativ!fjern@\Id{fjern}|textbf}
+\index{række!associativ!find@\find|textbf}
+\index{række!associativ!opbyg@\Id{opbyg}|textbf}
+
+\medskip
+\noindent
+\begin{tabular}{lp{8cm}}
+  \toprule
+  $S.\Id{opbyg}(\set{e_1,\ldots,e_n})$ & $S\Is\set{e_1,\ldots,e_n}$.\\
+$S.\Id{indsæt}(e : \Id{Element})$ &
+Hvis der findes $e'\in S$ med $\key(e')=\key(e)$, så $S\Is (S\setminus\set{e'})\cup\set{e}$.
+ Ellers  $S\Is S\cup\set{e}$.\\
+$S.\remove(x : \Key)$ &
+Hvis der findes $e\in S$ med $\key(e)=x$, så $S\Is S\setminus\set{e}$.\\
+$S.\find(x : \Key)$ &
+  Hvis der findes $e\in S$ med $key(e) = x$ så returner $e$. Ellers returner $\bot$.\\\bottomrule
+\end{tabular}
+\medskip
+
+Når kun operationerne \Id{opbyg} og $\find$ er i brug, taler man om en \emph{statisk}, ellers en \emph{dynamisk} datastruktur.
+Ved udførelsen af operationen $\Id{opbyg}(\set{e_1,\ldots,e_n})$ skal man sikre, at indgangene $e_1,\ldots,e_n$  har parvist forskellige nøgler. 
+Operationen $\Id{indsæt}(e)$ opfylder to formål:
+Når $x=\key(e)$ ikke forekommer i  $S$, så tilføjes $e$.
+Ellers erstattes indgangen med nøgle $x$ af $e$.
+Det svarer til at \emph{opdatere} den indgang i den associative række, som er givet af indeks $x$.
+Læg mærke til, at operationerne $\find$ hhv. $\Id{indsæt}$ og $\remove$ i alt væsentligt realiserer læsning og skrivning med »vilkårlig adgang«
+\index{adgang!vilkårlig}
+\index{vilkårlig adgang}
+til en række -- heraf navnet associativ række.
+
+Vi går ud fra, at der ved siden af de nævnte operationer findes en måde at gennemgå samtlige indgange i $S$.
+\index{række!associativ!forAlle@\emph{forAlle}|textbf} 
+Såden en \Id{forAlle}-operation er normalt ganske enkelt at realisere; vi nøjes derfor med at behandle den i øvelsesopgaverne.
+
+Mængden $\Key$ indeholder samtlige potentielle rækkeindeks, hvorimod mængden
+$\{\,\key(e)\colon e\in S\}$ kun indeholder de indeks, som er i brug på et vist tidspunkt.
+I hele kaptitlet skal $n$ betegne størrelsen af $S$ og $N$ betegne størrelsen af $\Key$.
+I typiske anvendelser af associative rækker er $N$ så kæmpestor, at brugen af rækker af størrelse $N$ er udelukket.
+I stedet vil vi kigge på løsninger, hvis pladsbehov er $O(n)$.
+
+\bigskip
+Den grundlæggende idé for at implementere associative rækker som hakketabeller er ganske enkel.
+En \emph{hakkefunktion}\index{hakkefunktion} $h$ afbilder mængden $\Key$ af mulige rækkeindeks til et lille område $\{0,\ldots,m-1\}$ af heltallene.
+Desuden findes en række $t$ indekseret af $\{0,\ldots,m-1\}$, kaldt \emph{hakketabellen}.
+\index{hakketabel|siehe{hakning}}
+For at holde pladsforbruget nede, bør $m$ omtrent svare til antallet af elementer i $S$.
+Um den Platzbedarf niedrig zu halten, sollte $m$ ungefähr der Anzahl der Elemente von $S$ entsprechen.
+
+Hakkefunktionen afbilder hver indgang $e$ til en \emph{hakkeværdi} $h(\key(e))$.
+For at forenkle notationen skriver vi $h(e)$ i stedet for $h(\Id{nøgle}(e))$ for hakkeværdien af $e$.
+I det indledende bibliotekseksempel afbilder $h$ hvert studienummer til sine sidste to cifre.
+Ideelt skulle vi kunne gemme indgangen $e$ på position $t[h(e)]$ i tabllen $t$.
+Når det virker, kan hver af de  tre operationer \Id{indsæt}, \remove{} og \find{} gennemføres i konstant tid.
+\footnote{%
+For at være helt nøjagtige burde vi også tage hensyn til omkostningerne ved at evaluere hakkefunktionen og flytte indgange. 
+For at holde notationen enkel antager vi i dette kapitel, at disse operationer samlet tager konstant tid.} 
+
+Desværre vil det dog ikke altid være muligt, at gemme $e$ i $t[h(e)]$, fordi forskellige indgange kan \emph{kollidere},
+\index{kollision}
+dvs. have samme hakkeværdi.
+Bibliotekseksemplet indeholder allerede en af de mulige udveje:
+der tillades at stille de bestilte bøger til forskellige brugere i samme hylde.
+Det fører selvfølgeligt til, at man skal gennemse hele hylden, for at finde en bestemt bestilling. 
+En mere generel form for denne idé fører til
+\emph{kædehakning}.
+\index{hakning!kæde-}
+På hver plads i  tabellen gemmes en \emph{mængde} af indgange, hvor en mængde implementeres som enkelthægtet liste.
+I afsnit~\lref{s:chaining} analyseres kædehakning, hvor vi gør nogle ret optimistiske (og derfor urealistiske) antagelser om hakkefunktionens opførsel.
+I denne model opnår vi konstant forventet tid for alle tre ordbogsoperationer.
+
+Vi kan holde hakketabellens struktur (men ikke dens analyse!) enkel ved at gå tilbage til den oprindelige idé om at gemme alle indgange i selve tabellen.
+Når en ny indgang $e$ skal tilføjes, men tabelpladsen $t[h(e)]$ allerede er optaget, gennemgår man de følgende tabelpladser, indtil man finder en ledig plads.
+I bibliotekseksemplet skulle det svare til, at der højst kan stå én bog på hver hylde.
+Bibliotekaren ville så benytte de tilstødende hyldepladser for at placere de bøger, som har fået tildelt den samme plads af hakkefunktionen.
+Denne tilgang, som kaldes 
+\emph{hakning med åben adressering og lineær probering},
+\index{hakning!lineær probering}
+er nærmere beskrevet i afsnit~\lref{s:probing}.
+
+Begrebet »hakning« skal minde om at skære, bikse, sønderdele, eller kværne.
+\footnote{O. a.: Det engelske verbum »\emph{to hash}« går ligesom det danske »at hakke« tilbage til det franske  »\emph{hacher}«.
+  Den engelske madret »\emph{hash}« -- biskemad gjort på hakkede kød, gerne gårdagens levninger -- findes i det danske køkken som »hachis«, og serveres her med brun sovs.
+  Læg mærke til at vi på dansk benytter ordet »hash«  for at betegne et udbredt rusmiddel, navngivet efter hampplantens arabiske navn »\emph{hashish}«.
+  Det danske »hash« har altså hverken en etymologisk eller kulinarisk sammenhæng med den primære betydning af det engelske »\emph{hash}«.
+  }
+Det er netop hvad en hakkefunktion gør med nøglerne.
+Når nøglerne fx er strenge, kan hakkefunktionen skære dem i dele af fast længde, fortolke hver del som heltal, og beregne én værdi, \emph{hakkeværdien}, ud fra den resulterende talfølge.
+En god hakkefunktion skaber uorden og undgår derved kollisioner.
+
+\begin{exerc}
+  Givet en mængde $M$ af heltalspar, definieret ved et binær relation $R_M$.
+  Anvend en associativ række for at afgøre, om $R_M$ er symmetrisk.
+\end{exerc}
+
+\begin{exerc}\llabel{ex:count}
+  Skriv et program, som læser et tekstarkiv og udgiver de 100 mest hyppige ord ved brug af den associativ  række.
+\end{exerc}
+
+\begin{exerc}[Et regnskabssystem]\llabel{ex:akamai} 
+  Udvikl en algorithme baseret på en associativ række før følgende problem:
+  Givet et stor database af 3-tupler (transaktion, pris, kundenummer).
+  For hver kunde skal den totale regningssumme udregnes.
+  Algoritmen skal bruge et lineært antal operationer på den associative række.
+\end{exerc}
+
+\begin{exerc}[Gennemløb af hakketabel]
+  Beskriv en implementation af \Id{foralle}-operationen, både for kædehakning og for hakning med åben adressering og lineær probering.
+  Hvad er udførelsestiden for din løsning?
+\end{exerc}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Kædehakning}
+\llabel{s:chaining}
+\index{hakning!kæde-|textbf}
+\index{kædehakning|siehe{hakning}}
+
+Hægtet hakning gør brug af en række (kaldt »tabellen«) $t[0..m-1]$ af følger,  som kan organiseres som enkelthægtede lister \index{liste} (se figur.~\lref{fig:chain}).
+Ideen er, at indgang $e$ befinder sig i følgen $t[h(e)]$.
+Operationerne for den associative række lader sig implementere let:
+For at \emph{finde} en indgang med nøgle $x$
+\index{hakning!kæde-!find@\Id{find}|textbf}
+gennemgår vi følgen $t[h(x)]$; 
+hvis vi herved støder på en indgang $e$ med $\Id{nøgle}(e)=x$, returnerer vi den, i modsat fald returnerer vi værdien $\bot$.
+For at \emph{fjerne} en indgang med nøgle $x$
+\index{hakning!kæde-!fjern@\Id{fjern}|textbf},
+gennemgår vi 
+% TODO gennemse, gennemløbe
+ligeledes følgen $t[h(x)]$;
+hvis vi herved støder på en indgang $e$ med $\Id{nøgle}(e)=x$, fjerner vi den fra følgen.
+For at \emph{indsætte} en indgang $e$
+\index{hakning!kæde-!indsæt@\Id{indsæt}|textbf}
+gennemgår vi ligeledes følgen;
+hvis vi herved støder på en indgang $e'$ med $\Id{nøgle}(e')=\Id{nøgle}(e)=x$,
+erstattes denne med $e$; ellers tilføjes $e$ på en vilkårlig plads i listen.
+Operationen $\Id{opbyg}(\set{e_1,\ldots,e_n})$ realiseres som $n$ indsætninger, hvor vi kan bortse fra at gennemgå den pågældende følge.
+Derfor har hver operation udførelsestid $O(n)$. 
+   
+\begin{figure}
+  \begin{tikzpicture}[scale = .35, yscale = -1]
+    \tikzstyle{list} = [anchor = west];
+    \tikzstyle{index} = [anchor =  east];
+    \node (a) [index] at (1, 0) {a  0};
+    \node (b) [index] at (1, 1) {b  1};
+    \node (c) [index] at (1, 2) {c  2};
+    \node (d) [index] at (1, 3) {d  3};
+    \node (e) [index] at (1, 4) {e  4};
+    \node (f) [index] at (1, 5) {f  5};
+    \node (a) [index] at (1, 6) {g  6};
+    \node (a) [index] at (1, 7) {h  7};
+    \node (a) [index] at (1, 8) {i  8};
+    \node (a) [index] at (1, 9) {j  9};
+    \node (a) [index] at (1,10) {k 10};
+    \node (b) [index] at (1,11) {l 11};
+    \node (c) [index] at (1,12) {m 12};
+    \node (d) [index] at (1,13) {n 13};
+    \node (e) [index] at (1,14) {o 14};
+    \node (f) [index] at (1,15) {p 15};
+    \node (a) [index] at (1,16) {q 16};
+    \node (a) [index] at (1,17) {r 17};
+    \node (a) [index] at (1,18) {s 18};
+    \node (a) [index] at (1,19) {t 19};
+    \node (a) [index] at (1,20) {u 20};
+    \node (a) [index] at (1,21) {v 21};
+    \node (a) [index] at (1,22) {w 22};
+    \node (a) [index] at (1,23) {x 23};
+    \node (a) [index] at (1,24) {y 24};
+    \node (a) [index] at (1,25) {z 25};
+    \draw [callout] (2, -.5) -- (2,25.5);
+    \foreach \y in {0,...,26} \draw[callout] (2,\y) ++(0,-.5) -- +(1,0);
+    \draw [callout] (12,-.5) -- (12,25.5);
+    \foreach \y in {0,...,26} \draw[callout] (12,\y) ++(0,-.5) -- +(1,0);
+    \draw [callout] (22,-.5) -- (22,25.5);
+    \foreach \y in {0,...,26} \draw[callout] (22,\y) ++(0,-.5) -- +(1,0);
+    \node at (2,  4) [list] {$\langle \text{axe}, \text{dice}, \text{cube}\rangle$};
+    \node at (2, 15) [list] {$\langle \text{chop}, \text{clip}, \text{lop}\rangle$};
+    \node at (2,  7) [list] {$\langle \text{hash}\rangle$};
+    \node at (2, 10) [list] {$\langle \text{hack}\rangle$};
+    \node at (2, 11) [list] {$\langle \text{fell}\rangle$};
+    \node at (12,  4) [list] {$\langle \text{axe}, \text{dice}, \text{cube}\rangle$};
+    \node at (12, 15) [list] {$\langle \text{chop}, \text{clip}, \text{lop}\rangle$};
+    \node at (12,  7) [list] {$\langle \text{slash}, \text{hash}\rangle$};
+    \node at (12, 10) [list] {$\langle \text{hack}\rangle$};
+    \node at (12, 11) [list] {$\langle \text{fell}\rangle$};
+    \node at (22,  4) [list] {$\langle \text{axe}, \text{dice}, \text{cube}\rangle$};
+    \node at (22, 15) [list] {$\langle \text{chop}, \text{lop}\rangle$};
+    \node at (22,  7) [list] {$\langle \text{hash}\rangle$};
+    \node at (22, 10) [list] {$\langle \text{hack}\rangle$};
+    \node at (22, 11) [list] {$\langle \text{fell}\rangle$};
+    \node at ( 2.5, -1) {$t$};
+    \node at (12.5, -1) {$t$};
+    \node at (22.5, -1) {$t$};
+    \node at ( 7.5,  -1) {\Id{indsæt}$($slash$)$};
+    \draw [->] (5,0) -- (10,0);
+    \node at (17.5,  -1) {\Id{fjern}$($clip$)$};
+    \draw [->] (15,0) -- (20,0);
+  \end{tikzpicture}
+\caption{
+  \llabel{fig:chain} 
+  Kædehakning.
+  Vi benytter en række $t$ af følger.
+  I eksemplet indeholder datastrukturen en mængde af ord (korte engelske synonymer af »\emph{hash}«), som er gemt med en hakkefunktion, som afbilder et ord til dets sidste bogstavs position i alfabetet, dvs. til en værdi i  $\{0,\ldots, 25\}$.
+  Åbenbart er dette ikke nogen særlig god hakkefunktion.}    
+\end{figure}
+
+Pladsbehovet for hele datastrukturen er $O(n+m)$.
+For at søge efter, indsætte eller fjerne en indang med nøgle $x$ , skal vi gennemsøge følgen $t[h(x)]$.
+I værste fald, fx når \Id{find} søger efter en ikke-eksisterende nøgle, skal hele følgen gennemgås.
+Når det går rigtig galt og hakkefunktionen afbilder samtlige indgange til den samme tabelindgang, er udførelsestiden $\Theta(n)$. 
+I værste fald opfører kædehakning sig altså ikke bedre end lineære lister.
+
+Findes der hakkefunktioner, som leder til, at alle følger er korte?
+Svaret er klart »nej«.
+En hakkefunktion afbilder mængden af nøgler til værdimængden $\{0,\ldots, m-1\}$, hvorfor der for hver hakkefunktion må findes $N/m$ nøgler, der alle havner på samme plads i tabellen.
+I de fleste anvendelser gælder $n < N/m$, og i så fald kan kædehakning degenerere til lineær søgning.
+Vi betragter her tre muligheder for at håndtere denne opførsel.
+Den første tilgang er gennemsnitsanalyse,
+\index{algoritmeanalyse!gennemsnit}, 
+som vi skal beskæftige os med i dette afnit.
+Den anden tilgang består i at benytte randomisering og vælge hakkefunktionen tilfældigt fra en mængde af hakkefunktioner.
+Herom nærmere i dette og næste afsnit.
+Den tredje tilgang består i at ændre algoritmen.
+For eksempel kan vi prøve at tilpasse hakkefunktionen til mængden af nøgler, som skal gemmes i øjeblikket.
+Dette skal vi undersøge i afsnit~\lref{s:perfect} og se, at det leder til god opførsel i værste fald.
+
+Lad $H$ være mængden af alle funktioner fra $\Key$ til $\{0,\ldots, m-1\}$.
+Vi antager, at hakkefuktionen $h$ er valgt tilfældigt fra $H$.
+\footnote{%
+  Denne antagelse er helt urealistisk.
+   Der findes $m^N$ mange funktioner in $H$, derfor skal der bruges
+   $N \log m$ bits alene for at beskrive en funktion i $H$.
+   Det strider mod målet at reducere datastrukturens pladsbehov fra $N$ til $n$.
+   }
+Vi vil nu vise, at der for hver fast mængde $S$ af $n$ indgange gælder, at operationerne \Id{indsæt}, \Id{fjern} og \Id{find} tager forventet tid $O(1+n/m)$.
+\index{algoritmenanalyse!gennemsnit}
+
+\index{hakning!urealistisk analyse}
+\begin{thm}\llabel{thm:chaining}
+Hvis kædehakning bruges til at gemme $n$ indgange i en hakketabel med $m$ tabelpladser, og hakkefunktionen er valgt tilfældigt fra $H$,
+så har operationerne \Id{indsæt}, \Id{fjern} og \Id{find} forventet udførelsestid $O(1+n/m)$. 
+\end{thm}
+% TODO made clear what the expectation is over
+\begin{proof} 
+  I beviset har vi brug for begreberne »stokastisk variabel« og »forventningsværdi« fra sandsynlighedsregningen, samt at forventningsværdien er lineær, 
+\index{linearitet af forventningsværdi}
+som beskrevet i afsnit~\ref{app:notation:s:prob}. 
+Lad $h$ være en tilfældigt valgt funktion fra $H$.
+  Vi betragter udførelsestiden for en operation \Id{indsæt}, \Id{fjern} eller \Id{find} for en fast nøgle $x$. 
+  Hver af disse operationer behøver konstant tid samt tiden for at gennemsøge følgen $t[h(x)]$.
+  De forventede udførelsestid er derfor $O(1+E[X])$, hvor den stokastiske variabel $X$ angiver længden af følgen $t[h(x)]$.
+  Lad $S$ med $|S|=n$ være mængden af indgange, som er gemt i tabellen. 
+  Betragt for hver indgang $e\in S$ den stokastiske \emph{indikatorvariabel} $X_e$, som angiver, om $h$ afbilder $e$ til samme tabelplads som $x$:
+  \[ X_e=\begin{cases}
+    1\,,&\text{hvis } h(e)= h(x)\,;\\
+    0\,,& \text{ellers}\,.
+  \end{cases}\]
+  Der er to tilfælde.
+  Hvis $S$ ikke indeholder nogen indgang med nøglen $x$, så er 
+  $X=\sum_{ e \in S} X_e$.
+ Hvis derimod $\Id{nøgle}(e_0)=x$ for $e_0\in S$, så er $X=1+\sum_{ e \in S\setminus\{e_0\}} X_e$. 
+ I det første tilfælde følger ved linearitet af forventningsværdien, at
+  \[ E[X]=
+  E\left[\sum_{e \in S} X_e\right]=
+       \sum_{e \in S} E[X_e]=
+       \sum_{e \in S} \Pr(X_e=1)\,. \]
+   En tilfældig valgt funktion afbilder $e$ med samme sandsynlighed til hver af de $m$ tabelpladser, uafhængigt af $h(x)$. 
+   Derfor har vi $\Pr(X_e=1)=1/m$, hvilket medfører $E[X] = n/m$.
+  I det andet tilfælde, hvor nøgle $x$ findes ikke i $S$, får vi på samme måde $E[X] = 1 + (n-1)/m < 1 + n/m$.  
+  I begge tilfælde er sætningen bevist.
+\end{proof}  
+
+Vi kan opnå lineært pladsbehov og forventet konstant udførelsestid for alle tre operationer ved at sikre, at der gælder $m=\Theta(n)$. 
+Til dette formål kan vi lade tabellens større tilpasse sig $n$, som beskrevet i afsnit~\ref{ch:sequence:s:array} om ubegrænsede rækker.
+
+\begin{exerc}[Ubegrænsede hakketabeller]\llabel{ex:dynamic}
+  Forklar, hvordan man med kædehakning kan sikre, at der altid gælder $m =  \Theta(n)$.
+  Du kan gå ud fra en hakkefunktion $h'\colon\Id{Nøgle}\rightarrow\NN$.
+  Sæt $h(x)=h'(x)\bmod m$ og tilpas tabelstørrelsen til $n$. 
+\end{exerc}
+
+
+\begin{exerc}[Ubenyttet lagerplads]\llabel{ex:waste}
+  Kædehakning spilder plads i den forstand, at nogle tabelpladser forbliver ubenyttede.
+  Beregn det forventede antal tomme tabelpladser under antagelse af, at hakkefunktionen er tilfældig.
+  \emph{Vink}: 
+  Definer de stokatiske indikatorvariabler $Y_0$, $\ldots$, $Y_{m-1}$,
+med  $Y_i=1$ hvis $t[i]$ er tom.  
+\end{exerc}
+
+
+\begin{exerc}[Gennemsnitstilfælde]
+  \llabel{ex:average}
+  \index{hakning!kæde-!gennemsnitstilfælde} 
+  Antag, at hakkefunktionen afbilder mængden af mulige nøgler uniformt over tabellen, dvs. $\left|\{\, x\in\Key\colon h(x)=i\}\right|\leq \ceil{N/m}$ for alle $i\in\{0,\ldots,m-1\}$.
+  Antag desuden, at at vi har gemt en tilfældig mængde af nøgler i tabellen, dvs. at mængden af nøgler i $S$ er en tilfældig $n$-delmængde af $\Key$.
+  Vis, at der gælder for hver tabelplads $i$, at det forventede antal indgange, der afbildes til $i$, er højst $\ceil{N/m} \cdot n/N\approx n/m$.
+\end{exerc}
+
+\section{Universalhakning}
+\llabel{s:universal}
+\index{hakning!universal-}
+
+\emph{Udeladt}
+
+\section{Hakning med lineær probering}
+\llabel{s:probing}
+\index{hakning!lineær probering}
+
+Kædehakning kaldes også \emph{åben hakning},
+\index{hakning!åben|textbf}
+\index{hakning!lukket|textbf}
+fordi der til kollisionshåndtering bruges lagerplads uden for den egentlige tabel, fx i form af lister.
+Derimod taler man om \emph{lukket} hakning, hvis samtlige ingange gemmes på selve tabelpladserne.
+Ved at slække kravet om at gemme indgang $e$ på plads $t[h(e)]$, opstår fleksibilitet -- også kaldet »åben adressering« --, der gør det muligt helt at undgå at bruge en sekundær datastruktur.
+Der findes mange undersøgelser af metoder for \emph{åben adressering} \cite{Pet57}\index{Peterson, W. W.}, jf.~\cite[kap.~3.3]{GonBY1991}.
+Vi vil nøjes med at se på den enkleste metode, som kaldes \emph{lineær probering}.
+Ubenyttede tabelpladser frå en særlig indgang $\bot$.
+En indgang $e$ findes enten i $t[h(e)]$ eller længere til højre i tabellen, som vi tænker os vandret.
+Vi vil dog kun holde os fra den foretrukne plads $t[h(e)]$, når det er absolut nødvendigt:
+når $e$ er gemt i $t[i]$ med $i>h(e)$, så skal alle plaserne fra  $h(e)$ til og med $i-1$ være optaget af andre indgange.
+(Denne \emph{invariant}
+\index{invariant!datastruktur-} 
+% TOTO: orig: schleifen-, should be datenstruktur-
+opretholdes af operationerne.)
+
+\begin{figure}[t]
+  \begin{tikzpicture}
+    \node at (0,+3.8) {\Id{indsæt} axe, chop, clip, cube, dice, fell, hack, hash, lop, slash};
+    \tikzstyle{e} = [draw = none, font =\upshape]
+    \matrix (1) [matrix of nodes,
+    column sep=-\pgflinewidth,
+    row sep= 3 pt,
+    nodes = { rectangle, draw, font = \footnotesize\itshape,
+    minimum width = .9cm, text height = 1.5ex, text depth=.25ex },
+    ]
+    {
+      \node [e]{an}; & \node [e]{bo}; & \node [e]{cp}; & \node [e]{dq}; & \node [e]{er}; & \node [e]{fs}; & \node [e]{gt}; & \node [e]{hu}; & \node [e]{iv}; & \node [e]{jw}; &\node [e]{kx}; & \node [e]{ly}; & \node [e]{mx}; \\
+      \node [e] {0}; & \node [e] {1}; & \node [e] {2}; & \node [e] {3}; & \node [e] {4}; & \node [e] {5}; & \node [e] {6}; & \node [e] {7}; & \node [e] {8}; & \node [e] {9}; & \node [e] {10}; & \node [e] {11}; & \node [e] {12}; \\
+     $\bot$ & $\bot$ & $\bot$ & $\bot$ &   axe & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & $\bot$ &   axe & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & $\bot$ & $\bot$ & $\bot$ & $\bot$ & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & $\bot$ & $\bot$ & $\bot$ & hack   & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & hash   & $\bot$ & $\bot$ & hack   & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & hash   & lop    & $\bot$ & hack   & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & hash   & lop    & slash  & hack   & fell   & $\bot$ \\
+   };
+ \scoped[on background layer]
+    {
+    \node[fill=myblue, fit=(1-3-5)(1-3-5), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-4-3)(1-4-3), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-5-3)(1-5-4), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-6-5)(1-6-6), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-7-5)(1-7-7), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-8-12)(1-8-12), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-9-11)(1-9-11), inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-10-8)(1-10-8)   , inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-11-3)(1-11-9)   , inner sep = 0pt ]   {};
+    \node[fill=myblue, fit=(1-12-8)(1-12-10), inner sep = 0pt ]   {};
+    }
+    \node at (0,-4.4) {\Id{fjern}(clip)};
+    \matrix (2) at (0,-6) [matrix of nodes,
+    column sep=-\pgflinewidth,
+    row sep= 3 pt,
+    nodes = { rectangle, draw, font = \footnotesize\itshape,
+    minimum width = .9cm, text height = 1.5ex, text depth=.25ex }]
+    {
+     $\bot$ & $\bot$ & chop   & clip   &   axe & cube   & dice   & hash   & lop    & slash  & hack   & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & lop   &   axe & cube   & dice   & hash   & lop    & slash  & hack   & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & lop   &   axe & cube   & dice   & hash   & slash    & slash  & hack   & fell   & $\bot$ \\
+     $\bot$ & $\bot$ & chop   & lop   &   axe & cube   & dice   & hash   & slash   & $\bot$  & hack   & fell   & $\bot$ \\
+   };
+ \scoped[on background layer]
+    {
+    \node[inner sep = 0pt, fill=myblue , fit=(2-1-3)(2-1-4) ]   {};
+    \node[inner sep = 0pt, fill=myblue, fit=(2-2-5)(2-2-9) ]   {};
+    \node[inner sep = 0pt, fill=myblue, fit=(2-3-10)(2-3-10) ]   {};
+    \node[inner sep = 0pt, fill=myblue, fit=(2-4-11)(2-4-13) ]   {};
+  }
+    \node [fit = (2-1-4), draw, callout, thick, inner sep = 0pt, cross out] {};
+    \node [fit = (2-2-9), draw,  callout,thick, inner sep = 0pt, cross out] {};
+    \node [fit = (2-3-10), draw,  callout,thick, inner sep = 0pt, cross out] {};
+  \end{tikzpicture} 
+  % TODO orig: hack in upper part 
+  \caption{% 
+  \llabel{fig:probing}
+  Hakning med lineær probering.
+  Tabellen med 13 pladser er tegnet vandret og indeholder engelske synomymer for »(at) hakke«. 
+  Hakkefunktion afbilder hvert ords sidste bogstav til tallene $\{0,\ldots,12\}$ som antydet i figuren: 
+  »a« og  »n« sendes til $0$, 
+  »b« og »o« $1$ osv.
+  Ordene indsættes et at gangen i alfabetisk rækkefølge.
+  Til sidst fjernes ordet »\emph{clip}«. 
+  I figuren er vist, hvordan tilstanden i tabellen forandrer sig efter hver operation.
+  De pladser, som inspiceres under udførelsen af den aktuelle operation, er fremhævede.
+  }
+\end{figure}
+
+Implementationerne af \Id{indsæt}
+\index{hakning!lineær probering!indsæt@\Id{indsæt}|textbf}
+og \Id{find} er ligetil.
+For at udføre $\Id{indsæt}(e)$ gennemsøger vi tabellen sekventielt, begyndende i tabelplads $[h(e)]$, intil vi enten møder en indgang $e'$ med  $\Id{nøgle}(e')=\Id{nøgle}(e)=x$ eller en ledig plads i tabellen.
+I det første tilfælde erstattes $e'$ med $e$, i det andet bliver $e$ gemt på den ledige plads, se fx figur~\lref{fig:probing}.
+Fremgangsmåden for at søge efter nøgle $x$ med operationen $\Id{find}$)
+\index{hakning!lineær probering!find@\Id{find}|textbf}
+er lignende:
+vi gennemsøger tabellen sekventielt fra plads $t[h(x)]$, indtil vi finder en indgang med nøgle $x$.
+Søgningen afbrydes som mislykket, så snart vi når en tabelplads indeholdende $\bot$.
+Det lyder jo meget enkelt, men der optræder en lille komplikation.
+Hvad sker der, hvis vi under en indsættelse eller søgning når til slutningen af tabel $t$?
+En enkel reparation består i at altid afsætte yderligere $m'$ tabelpladser uden for  de $m$ pladser, der omfattes af hakkefunktionen $h$.
+For »velartede« hakkefunktioner burde det række med en værdi  for $m'$, som er langt mindre end $m$, for at tage hånd om overløb.
+En anden mulighed, som betragtes i opgave~\lref{ex:cyclic} 
+(jf. afsnit~\ref{ch:sequence:s:stack}),
+består  i at behandle tabllen som en cyklisk række.
+Denne variant er mere robust, men også langsommere.
+
+Implementationen af sletteoperationen
+\Id{fjern}\index{hakning!lineær probering!fjern@\Id{fjern}|textbf} 
+er ikke lig så enkel.
+Det er ikke nok at overskive den slettede ingang med $\bot$, fordi dette ville gøre invarianten ugyldig.
+(Antag fx, at $h(x) = h(z)$ og $h(y) = h(x) + 1$, og at nøglerne $x$, $y$ og $z$ insættes i den rækkefølge.
+Så står $z$ på plads $h(x) + 2$. 
+Når ny $y$ bliver fjernet ved at overskrive plads $h(x)+1$ med $\bot$, kan $z$ ikke længere nås i en søgning.)
+Der er tre løsninger på dette problem.
+Den første mulighed er at forbyde fjernelse.
+Den anden er at markere fjernede indgange, men ikke overskrive dem med $\bot$.
+Søgninger afbrydes som før, når vi møder $\bot$, men ikke når vi møder en indgang, som er markeret som slettet.
+Problemet med denne fremgangsmåde er, at antallet af ikke-tomme tabelpladser (optaget eller markeret) vokser, så søgninger bliver efterhånden langsommere end nødvendigt.
+Dette problem kan afhjælpes ved regelmæssigt at genopbygge tabellen og faktisk fjerne de markerede indgange.
+Den tredje mulighed er at opretholde invarianten. 
+Hvordan skal det ske?
+Antag, at vi vil fjerne indgangen på tabelplads $i$.
+Vi overskriver pladsen med $\bot$; 
+dette kan skabe et »hul«, som forstyrrer søgningen efter indgange med mindre hakkeværdier.
+Nu gennemsøger vi tabelpladserne til højre for $i$ sekventielt og leder efter indgagne, som ødelægger invarianten:
+Sæt $j$ til $i+1$. Hvis $t[j]=\bot$, er vi færdige.
+Ellers lad $f$ være den indgang, som står på plads $t[j]$.
+Hvis $h(f)>i$, kan vi øge $j$ med $1$ og gentage.
+Hvis $h(f) \le i$, så ville »hullet« på plads $i$ ødeløgge invarianten for indgang $f$, og søgningen efter 
+$\Id{nøgle}(f)$ skulle slå fejl.
+Vi flytter derfor $f$ til $t[i]$, flytter $\bot$ til $t[j]$, og sætter $i\Is j$.
+(Mao. lader vi $f$ og »hullet« bytte plads og gemmer »hullets« nye position på plads $i$.)
+Ny begynder vi en ny gennemgang fra $j\Is j+1$.
+Figur~\lref{fig:probing} viser et eksempel.
+
+
+\begin{exerc}[Cyklisk lineær probering]
+  \llabel{ex:cyclic}
+  \index{hakning!lineær probering!cyklisk}
+  Implementer varianten af lineær probering, hvor tabelstørrelsen ikke er $m+m'$, men $m$.
+  For forhindre overløb i tabellens højre ende, organiseres gennemsøgningen cyklisk.
+(1) Tilpas operationerne \Id{indsæt} og \Id{fjern} ved at erstatte inkrementationen $i \Is i+1$ med  $i \Is (i+1)\bmod m$.
+  % TODO inkrementere -> øge? øgningen?
+  (2) Specificer udsagnet $\Id{mellem}(i,j,k)$ om tabelpositioner i $\{0,\ldots, m-1\}$, som er  \emph{sand} hvis og kun hvis $i$ befinder sig skarpt mellem $j$ og $k$ ifølge den cykliske opfattelse.
+% i<k and i<j<k or i>k and (j>i or j<k)
+(3) Omformuler invarianten, så den bruger \Id{mellem}.
+(4) Tilpas operationen \Id{remove}.
+\end{exerc}
+
+
+\begin{exerc}[Hakketabel med lineær probering]
+  \index{hakning!lineær probering!ubegrænset}
+  Implementer en \emph{ubegrænset} hakketabel, altså en hakketabel, hvis størrelse ikke er kendt i forvejen, med lineær probering og universelle hakkefunktioner.
+  Vælg en ny hakkefunktion, hver gang tabellen bliver mindre eller større.
+  Lad $\alpha$, $\beta$ og $\gamma$ være konstanter med $1<\gamma<\beta<\alpha$, som vi kan vælge.
+  Opret en tæller til antallet $n$ af gemte indgange.
+  Udvid tabellen til en ny størrelse $m=\beta n$, så snart $n>m/\gamma$.
+  Formindsk tabellen til en ny størrelse $m=\beta n$, så snart $n<m/\alpha$.
+  Medmindre du vil bruge cyklisk lineær probering som beskrevet i opgave~\lref{ex:cyclic}, sæt tabelstørrelsen til $m'=m/\delta$ for noget $\delta<1$ og vælg en ny hakkefunktion (uden at ændre $m$ eller $m'$), når tabellen er ved at løbe over i højre side.
+  (Bemærkning: Der kan opstå problemer, når man forsøger at kombinere enkle universelle hakkeklasser med lineær probering, jf. afsnit~\lref{s:further}.)
+\end{exerc}
+
+\section{Sammenligning af kædehakning og lineær probering}
+\llabel{s:versus}
+\index{ingeniørssaspekter}%
+% TODO algorihtm engineering?
+Vi har nu set to forskellige fremgangsmåder for realisering af hakketabeller.
+Hvilken er bedre?
+Det spørgsmål kan vi ikke besvare på baggrund af en teoretisk analyse, fordi svaret afhænger af anvendelsessituationen og af mange tekniske parametre.
+Vi skal her nævne nogle kvalitative askpekter og skitsere nogle eksperimentelle resultater.
+
+En af fordelene ved kædehakning er »referenceintegritet«,
+\index{referenceintegritet}
+\index{integritet!reference-|siehe{referenceintegritet}}
+hvilket betyder, at en indangs lagerposition ikke ændrer sig, efter den er blevet indrettet.
+Senere søgninger kommer altid til at finde indgangen på præcis samme plads i lageret.
+Derfor kan man arbejde med pegere på listeknuder.
+I modsætning hertil vil fjernelser ved lineær probering flytte indgange; absolutte referencer eller pegere på flyttede indgange bliver herved ugyldige.
+
+Fordelen ved lineær probering er, at hver adgang til tabellen arbejder med et sammenhængende lagersegment.
+Moderne processorers lagerarkitektur er optimeret for dette adgangsmønster, mens de er langsomme til at følge pegere ved gennemløb af en lineær liste, som ikke får plads i gemmelageret.
+Et problem ved lineær probering er, at søgetiderne vokser hurtigt, når antal indgange nærmer sig tabelstørrelsen, og at tabellen kan flyde over.
+Ved kædehakning forekommer ingen sådanne abrupte overgange -- de forventede søgetider forbliver små, selv når nøgleantallet overstiger tabelstørrelsen.
+På den anden side skal kædehakning bruge lagerplads til pegerne, som man ved lineær probering ville kunne have brugt til en større tabel.
+En retfærdig sammenligning må derfor tage hensyn til hele lagerforbruget og ikke bare tabelstørrelsen.
+
+Vi har implementeret begge metoder og gennemført udførlige eksperimenter.
+Resultatet var, at begge metoder opfører sig nogenlunde lige godt, hvis de har samme lagerplads til rådighed.
+Forskellene er så små, at konklusionerne afhænger af implementationsdetaljer, specielle egenskaber ved oversætteren, operativsystemet og den benyttede regner.
+Derfor nævner vi her ingen eksakte resultater.
+
+Vi fandt dog implementationen af kædehakning vanskeligere.
+For at kunne konkurrere med lineær probering, skal alle forbedringer i afsnit~\lref{s:implementation} gennemføres.
+Kædehakning bliver meget langsommere, hvis man sløser med implementationen eller organiserer lagerstyringen dårligt.
+
+Med hensyn til matematiske argumenter skal man nævne, at udsagn i stil med sætning~\lref{thm:universal} \emph{kun} gælder for kombinationen af kædehakning og $c$-universelle klasser og ikke for lineær probering med $c$-universelle klasser.
+For at opnå lineær søgetid har lineær probering brug for hakkefunktioner med stærkere sandsynlighedsegenskaber, eller antage fuld tilfældighed.
+(Se hertil afsnit~\lref{s:further}.) 
+
+\section{Perfekt hakning}
+\llabel{s:perfect}
+\index{hakning!perfekt}  
+
+\emph{Udeladt}
+
+\section{Implementationsaspekter}
+\llabel{s:implementation}
+
+\emph{Udeladt}
+
+\section{Historiske anmærkninger og yderligere resultater}
+\llabel{s:further}
+
+\emph{Udeladt}

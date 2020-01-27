@@ -1,0 +1,34 @@
+% Pseudocode Unterst\"utzung
+\newcommand{\labelcommand}{}
+\newcommand{\captiontext}{}
+\newsavebox{\buchalgorithmparam}
+\newcounter{lineNumber}
+\newenvironment{buchalgorithmpos}[3]{%
+\renewcommand{\labelcommand}{#2}%
+\renewcommand{\captiontext}{#3}%
+\sbox{\buchalgorithmparam}{\parbox{\textwidth}{#3}}%
+\begin{figure}[#1]\begin{code}\setcounter{lineNumber}{1}}
+{\end{code}%
+\caption{\llabel{\labelcommand}\captiontext}\end{figure}}
+
+
+\newenvironment{buchalgorithm}[2]{\begin{buchalgorithmpos}{htbp}{#1}{#2}}%
+{\end{buchalgorithmpos}}
+
+\newenvironment{code}{\noindent%
+\begin{tabbing}%
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
+\kill}{\end{tabbing}}
+
+\newenvironment{indentedcode}{\noindent%
+\begin{tabbing}%
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
+\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
+\kill\+\kill}{\end{tabbing}}
+
+
+\newcommand{\aufmacher}[1]{{\it #1\par\noindent\vspace*{1mm}}}
+
+\newcommand{\intint}[2]{{#1}..{#2}}
+\newcommand{\RRem}[1]{\qquad\comment{#1}}

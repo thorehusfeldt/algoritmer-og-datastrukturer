@@ -1,9 +1,22 @@
 \section{Grafer}
+\llabel{s:graphnot}
 
+
+\index{graf|textbf}%
+\index{knude|textbf}%
+\index{hjørne|siehe{knude}}%
+\index{punkt|siehe{knude}}%
+\index{kant|textbf}%
+\index{bue|siehe{kant}}%
 Grafer er et overordentligt nyttigt koncept i algoritmikken.
 Vi bruger dem altid, når vi skal modelle objekter og deres indbyrdes relationer; i grafterminologien hedder objekterne \emph{knuder}, og relationerne mellem par af knuder hedder \emph{kanter}.
-Temmelig åbenlyse anvendelser af grafer er vejkort og kommunikationsnetværk, men der findes også mere abstrakte anvendelser.
-For exempel kan knuder fremstille delopgaver, som skal udføres når man bygger et hus, som »byg mure« eller »sæt vinduer i«, og kanter kan beskrive præcedens- eller forrangsrelationer som »murene skal bygges inden vinduerne kan sættes i«.
+Temmelig åbenlyse anvendelser af grafer er vejkort og kommunikationsnetværk,
+\index{vejkort}
+\index{kommunikationsnetværk}
+men der findes også mere abstrakte anvendelser.
+For eksempel kan knuderne repræsentere de delopgaver, som skal udføres, når man bygger et hus, fx »byg murene« eller »sæt vinduerne i«, og kanterne kan beskrive præcedens- eller forrangsrelationer, fx »murene skal bygges, inden vinduerne kan sættes i«.
+\index{præcedensrelation}
+\index{relation!præcedens-}
 Vi kommer også til at lære mange datastukturer at kende, i hvilke vi på en naturlig måde kan opfatte hvert objekte som en knude og hver peger som en rettet kant fra det objekt, den går ud fra, til det objekt, den peger på.
 
 \begin{figure}
@@ -123,35 +136,75 @@ Vi kommer også til at lære mange datastukturer at kende, i hvilke vi på en n
 Når mennesker gør sig overvejelser om grafer, finder de det normalt bekvemt at arbejde med billeder, som fremstiller knuder som små cirkler og kanter som lige eller bøjede linjer eller pile.
 For at bearbejde grafer algoritmisk har vi dog brug for en mere matematisk orienteret notation:
 en \emph{rettet graf} $G=(V,E)$ er et par bestående af en mængde $V$ af \emph{knuder} (også kaldt \emph{hjørner} eller \emph{punkter}) og en mængde $E\subseteq V\times V$ af \emph{kanter} (også kaldt \emph{buer}).
-Sommetider skrives kort »\emph{digraf}« for »rettet graf« (fra eng. \emph{directed graph}).\footnote{%
-  Ovs. anm.: I nogle danske fremstillinger kan man desuden støde på begrebet »orienteret graf« for »rettet graf«.
-  Desværre betyder \emph{oriented graph} på engelsk noget andet, så vi vil her undgå denne terminologi.}
+\index{graf!rettet|textbf}
+Sommetider støder man på ordet »\emph{digraf}« for »rettet graf« (fra eng. \emph{directed graph}).\footnote{%
+  Ovs. anm.: Man kan desuden støde på »orienteret graf« brugt i betydningen »rettet graf«.
+  Desværre er »orienteret graf« dog et veletableret begreb i grafteori og betyder noget andet: 
+  En rettet graf er \emph{orienteret}, hvis den ikke indeholder et par af knuder, som er forbundet af to kanter i hver sin retning.
+  Orienterede grafer er altså rettede, men rettede grafer er ikke nødvendigvis orienterede, idet de kan indeholde modsatrettede kanter.
+  }
 Fig.~2.7 viser den rettede graf $G=(\{s,t,u,v,w,x,y,z\},\{(s,t), (t,u), (u,v), (v,w), \allowbreak (w,x), \allowbreak (x,y),\allowbreak  (y,z), (z,s),  (s,v), (z,w), (y,t), (x, u)\})$.
 I hele bogen gælder $n=|V|$ og $m=|E|$, medmindre $n$ og $m$ er tildelt en anden betydning.
 En kant $e=(u,v)\in E$ repræsenterer en forbindelse fra $u$ til $v$.
-Knuderne $u$ og $v$ kaldes for $e$s endeknuder, $u$ kaldes $e$s \emph{startknude} og $v$ for $e$s \emph{målknude}.
-Vi siger at $e$ er \emph{incident med} $u$ og $v$, at $u$ og $v$ \emph{ligger på} $e$ og at $u$ og $v$ er \emph{naboer}.
-Envidere er $e$ \emph{udgående fra} $v$ og \emph{indkommende til} $v$.
+Knuderne $u$ og $v$ kaldes for $e$s endeknuder eller endepunkter, $u$ kaldes $e$s \emph{startknude} og $v$ for $e$s \emph{målknude}.
+\index{startknude|textbf}
+\index{endepunkt|textbf}
+\index{kant!endepunkt|textbf}
+\index{målknude|textbf}
+Vi siger at $e$ er \emph{incident med} eller \emph{hosliggende til} $u$ og $v$, at $u$ og $v$ \emph{ligger på} $e$ og at $u$ og $v$ er \emph{naboer}.
+\index{incidens|textbf}
+\index{kant!hosliggende|textbf}
+\index{nabo|textbf}
+Envidere er $e$ \emph{udgående fra} $v$ og \emph{indkommende til} $u$.
+Sommetider siger vi at $e$ er \emph{udkant} til $v$ hhv. \emph{indkant} til $u$.
+\index{udgående kant|textbf}
+\index{udkant|textbf}
+\index{indkommende kant|textbf}
+\index{indkant|textbf}
+\index{kant!indkommende|textbf}
+\index{kant!udgående|textbf}
 Ofte kalder vi også $u$ for en (umiddelbar) \emph{forgænger} til $v$ og $v$ for en (umiddelbar) \emph{efterfølger} for $u$.
+\index{forgænger|textbf}
+\index{efterfølger|textbf}
 Vi udelukker for det meste specialtilfældet hvor $(v,v)$ er en \emph{løkke}, medmindre andet er sagt.
 
 En knudes \emph{udgrad} $v$ er antallet af kanter, som udgår fra $v$, dens \emph{indgrad} er antallet af kanter, der indgår til $v$. 
+\index{udgrad|textbf}
+\index{indgrad|textbf}
 Formelt har vi 
 $\Id{udgrad}(v)=|\{\,u\in V\colon (v,u)\in E\,\}|$ og
 $\Id{indgrad}(v)=|\{\,u\in V\colon (u,v)\in E\,\}|$.
 Fx har knuden $w$ i grafen $G$ i fig.~2.7 indgrad $2$ og udgrad $1$.
 
-En \emph{dobbeltrettet graf} er en rettet graf, som for hver rettede kant $(u,v)$ indeholder modkanten $(v,u)$.
-En \emph{urettet graf} kan man opfatte som en strømlinet udgave af en dobbeltrettet graf, hvor vi skriver kantparret $(u,v)$, $(v,u)$ som parmængden $\{u,v\}$.
-Figur~2.7 viser en urettet graf med tre kunder og dens dobbeltrettede modpart.
+En 
+\emph{dobbeltrettet graf}
+\index{dobbeltrettet graf|textbf}
+\index{graf!dobbeltrettet|textbf}
+er en rettet graf, som for hver rettede kant $(u,v)$ indeholder modkanten $(v,u)$.
+En 
+\emph{urettet graf}
+\index{urettet graf|textbf}
+\index{graf!urettet|textbf}
+kan man opfatte som en strømlinet udgave af en dobbeltrettet graf, hvor vi skriver kantparret $(u,v)$, $(v,u)$ som parmængden $\{u,v\}$.
+Figur~\lref{fig:graphexample} viser en urettet graf med tre kunder og dens dobbeltrettede modpart.
 De fleste grafteoretiske begreber defineres for urettede grafer præcis som for rettede grafer; derfor koncentrerer vi os i dette afsnit om rettede grafer og nævner urettede grafer kun, når der findes en afvigelse.
 Fx har en urettet graf kun halvt så mange kanter som sin dobbeltrettede modpart.
 Når $\{u,v\}$ er en kant, kalder vi $u$ for $v$s \emph{nabo}; i den dobbeltrettede udgave er $u$ både forgænger og efterfølger til $v$.
+\index{nabo}
 En knudes udgrad og indgrad i en urettet graf er altid ens, så den kaldes bare knudens \emph{grad} (eller \emph{valens}).
+\index{grad}
+\index{valens|siehe{grad}}
 Urette grafer er vigtige, fordi retninger ofte ikke spiller nogen rolle, og mange problemer i urettede grafer kan løses enklere end i almene rettede grafer; visse problemer giver overhovedet kun mening i urettede grafer.
 
-En graf $G'= (V', E')$ er en \emph{delgraf} af grafen $G=(V,E)$, hvis $V'\subseteq V$ og $E'\subseteq E$.
-Givet $G=(V,E)$ og en knudedelmængde $V'\subseteq V$ defineres den \emph{inducerede delgraf} $G'$ 
+En graf $G'= (V', E')$ er en 
+\emph{delgraf}
+\index{delgraf|textbf}
+af grafen $G=(V,E)$, hvis $V'\subseteq V$ og $E'\subseteq E$.
+Givet $G=(V,E)$ og en knudedelmængde $V'\subseteq V$ defineres den 
+\emph{inducerede delgraf}
+\index{induceret delgraf|textbf}
+\index{delgraf|induceret|textbf}
+$G'$ 
 som $G' = (V', E\cap (V'\times V'))$.
 I fig.~2.7 inducerer knudemængden $\{u,v\}$ i $G$ delgrafen $H = (\{v,w\}, \{(v,w)\})$.
 Grafen $G'$ kaldes \emph{knudeinduceret}.
@@ -159,48 +212,77 @@ Grafen $G'$ kaldes \emph{knudeinduceret}.
 En kantdelmængde $E'\subseteq E$ inducerer delgrafen $(V,E')$.
 
 Ofte knyttes yderligere information til knuder og kanter.
-Især har vi ofte behov for \emph{kantvægte} eller \emph{kantomkostninger} $c\colon E\rightarrow \RR$, som tildeler en talværdi til hver kant.
+Især har vi ofte behov for 
+\emph{kantvægte}
+\index{kantvægt|textbf}
+\index{vægt!kant-|textbf}
+eller \emph{kantomkostninger} $c\colon E\rightarrow \RR$, som tildeler en talværdi til hver kant.
 Fx har kanten $(z,w)$ i grafen $G$ i fig.~2.7 vægten $c(\{z,w\}) = 2$.
 %TODO error in original
 Læg mærke til, at en kant $\{u,v\}$ i en urettet graf kun kan have én vægt, mens der i en dobbeltrettet graf kan gælde $c((u,v)) \neq c((v,u))$.
 
 De sidste par afsnit indeholdt mange tørre definitioner på i stram form.
-Hvis man efterlyser definitionerne »i aktion«, kan finde algoritmer på grafer i kapitel 8.
+Hvis man efterlyser definitionerne »i aktion«, kan finde algoritmer på grafer i kapitel~\ref{ch:grepresent:}.
 Men selv her skal materialet straks blive lidt mere interessant.
 
-Et vigtigt højere begreb i grafteorien er \emph{stien} eller \emph{vejen}.
+Et vigtigt højere begreb i grafteorien er \emph{vejen}.
+\index{vej|textbf}
+\index{sti|siehe{vej}}
 En \emph{vej} (eller \emph{sti}) $p=\langle v_0,\ldots, v_k\rangle$ i en rettet graf $G=(V,E)$ er en følge af knuder, således at på hinanden følgende knuder er forbundet med kanter i $E$, dvs. at der gælder 
 $(v_0,v_1)\in E$, 
 $(v_1,v_2)\in E$, $\cdots$,
 $(v_{k-1},v_k)\in E$.
-Tallet $k\geq 0$ kaldes for \emph{længden} af $p$; vi siger at vejen \emph{går} (eller \emph{leder}) fra $v_0$ til $v_k$.
+Tallet $k\geq 0$ kaldes for 
+\emph{længden}
+\index{længde!vej-|textbf}
+af $p$; vi siger at vejen \emph{går} (eller \emph{leder}) fra $v_0$ til $v_k$.
 Sommetider angiver vi vejen som en følge af dens kanter.
 Fx er $\langle u,v,w\rangle= \langle (u,v), (v,w)\rangle$ i fig.~2.7 en vej af længde $2$.
 I en urettet graf er $p=\langle v_0,\ldots, v_k\rangle$ en vej, hvis $p$ er en vej i den tilsvarende dobbeltrettede graf.
 I grafen $U$ i fig.~2.7 er $\langle u,w,v,u, w,v\rangle$ en vej af længde $5$.
 En vej er simpel%
+\index{vej!simpel|textbf}
 \footnote{I mange fremstillinger bruges »vej« for »simpel vej« og »vandring« for »vej«.},
 hvis dens knuder bortset måske fra $v_0$ og $v_k$ er parvist forskellige.
 I grafen $G$ i fig.~2.7 er $\langle z,w,x,u,v,w,x,y\rangle$ en vej, som ikke er simpel.
 Det ses nemt, at hvis der findes en vej fra $u$ til $v$, så findes der også en simpel vej fra $u$ til $v$.
 
-En \emph{kreds} (eller \emph{cykel}) er en vej af længde mindst $1$, hvis første og sidste knude er den samme.
+En \emph{kreds}
+\index{kreds|textbf}
+\index{kreds!hamiltonsk}
+\index{Hamilton, W.\,R.}
+\index{cykel|siehe{kreds}}
+(eller \emph{cykel}) er en vej af længde mindst $1$, hvis første og sidste knude er den samme.
 I urettede grafer kræves yderligere, at den første og sidste kant er forskellige, hvorved en kreds har længde mindst $3$.
 (I fig.~2.7 indeholder $G$ kredsen $\langle u,v,w,x,y,z,w,x,u\rangle$ og $U$ kredsen $\langle u, w, v, u, w, v, u\rangle$.)
 En \emph{simpel} kreds er en kreds, hvis interne knuder er forskellige.
+\index{kreds!simpel|textbf}
 Det ses let, at hvis $G$ har en kreds, så har den også en simpel kreds.
 En simpel kreds, som besøger alle knuder i grafen, kaldes en hamiltonkreds.
 (I fig.~2.7 har $G$ hamiltonkredsen $\langle s,t,u,v,w,x,y,z,s\rangle$ og $U$ hamiltonkredsen $\langle w,u,v,w\rangle$.)
 
 Begreberne »vej« og »kreds« tillader os at definere endnu mere komplekse begreber.
-En rettet graf er \emph{stærkt sammenhængende}, hvis der fra hver knude $u$ og til hver knude $v$ findes en vej.
+En rettet graf er 
+\emph{stærkt sammenhængende},
+\index{graf!stærkt sammenhængende|textbf}
+hvis der fra hver knude $u$ og til hver knude $v$ findes en vej.
 Grafen $G$ i fig.~2.7 er stærkt sammenhængende.
-En \emph{stærk sammenhængskomponent} er en maksimal, knudeinduceret, stærkt sammenhængende delgraf af $G$.
+En \emph{stærk sammenhængskomponent} 
+\index{stærk sammenhængskomponent|textbf}
+\index{graf!stærk sammenhængskomponent|textbf}
+er en maksimal, knudeinduceret, stærkt sammenhængende delgraf af $G$.
 Hvis vi i fig.~2.7 fjerner kanten $(w,x)$ i $G$, opstår en graf uden kredse.
 En graf uden kredse hedder \emph{kredsfri} eller \emph{acyklisk}.
+\index{acyklisk|textbf}
+\index{graf!acyklisk|textbf}
 En rettet, acyklisk graf betegnes kort \emph{rag}.
-Hver stærk sammenhængskomponent i en rag består af præcis en knude.
-En urettet graf kaldes \emph{sammenhængende}, hvis der for hvert par $u$, $v$ af nuder findes en (urettet) vej fra $u$ til $v$.
+\index{rag|siehe{graf, rettet, acyklisk}}
+\index{graf!rettet, acyklisk|textbf}
+Hver stærke sammenhængskomponent i en rag består af præcis en knude.
+En urettet graf kaldes 
+\emph{sammenhængende},
+\index{graf!sammenhængende|textbf},
+hvis der for hvert par $u$, $v$ af knuder findes en (urettet) vej fra $u$ til $v$.
 Sammenhængskomponenterne er de maksimale, sammenhængdende delgrafer.
 Inden for en sammenhængskomponent er hvert par af knuder forbundet af en vej, mens der ikke fører nogen vej fra nogen sammenhængskomponent til en anden.
 I fig.~2.7 har graphen $G$ sammenhængskomponenterne $\{u,v,w\}$, $\{s,t\}$ og $\{x\}$.
@@ -213,15 +295,21 @@ Mindst fem anvendelse bør ikke forekommme i bogen.
 \end{exerc}
 
 \begin{exerc}
-En graf er \emph{planær}, hvis den kan tegnes på et stykke papir på sådan måde, at ingen kanter krydser hinanden.
+En graf er \emph{planær},
+  \index{graf!planær|textbf}
+  hvis den kan tegnes på et stykke papir på sådan måde, at ingen kanter krydser hinanden.
 Forklar, hvorfor vejnet ikke nødvendigvis er planære.
+  \index{graf!vejnet}
 Vis at $K_5$ og $K_{3,3}$ fra fig.~2.7 ikke er planære.
 \end{exerc}
 
 \subsection{En første grafalgoritme}
 
+\index{algoritmekonstruktion!grådig!fravær af kredse}
+
 Det er tid til en eksempelalgoritme.
 Vi skal betragte en algoritme, som afgør, om en rettet graf $G$ er acyklisk eller ej.
+\index{kredsfrihed|textbf}
 Udgangspunktet er den enkle observation, at en knude $v$ med udgrad $0$ ikke kan ligge på en kreds.
 Hvis vi altså stryger $v$ (og dets indgående kanter), opnår vi en graf $G'$, som er acyklisk, hvis og kun hvis $G$ er acyklisk.
 Denne transformation gentages nu, indtil en af to siutationer opstår:
@@ -236,9 +324,10 @@ For at finde en kreds, kunne vi begynde i knude $z$ og følge turen $\langle z,w
 Herved har vi fundet kredsen $\langle w,x,u,v,w\rangle$.
 Anderledes forløber det, når vi betragter grafen $G$ uden kanten $(w,x)$.
 Da findes ingen kreds, og algoritmen stryger samtlige knuder i rækkefølgen $w$, $v$, $u$ , $t$, $s$, $z$, $y$, $x$.
-I kapitel 8 skal vi se, hvordan man kan repræsentere grafen på en måde, så den foroven skitserede algoritme kører i lineær tid, dvs. i tid $O(|V|+|E|)$.
-(Se hertil opgave 8.3.)
+I kapitel~\ref{ch:grepresent:} skal vi se, hvordan man kan repræsentere grafen på en måde, så den foroven skitserede algoritme kører i lineær tid, dvs. i tid $O(|V|+|E|)$.
+(Se hertil opgave~\ref{ch:grepresent:ex:dagtest}.)
 Algoritmen kan let udvides til at være certificerende:
+\index{algoritmekonstruktion!certifikat}
 Når algoritmen finder en kreds, er grafen sikkert cyklisk, så det er let at afgøre, om den fundne knudefølge udgør en kreds i $G$.
 Når algoritmen fjerner samtlige knuder i $G$, nummererer vi knuderne i den rækkefølge, de blev strøget.
 Når vi fjerner en knude $v$ med udgrad $0$, må alle kanter i $G$, som har $v$ som startknude, gå til knuder, som blev fjernet tidligere, og som derfor har et lavere nummer end $v$. 
@@ -247,13 +336,18 @@ Langs hver kant er knudenummeret faldende, hvilket igen er nemt at certificere.
 
 \begin{exerc}
 For vilkårligt $n$, find en rag med $\frac{1}{2}n(n-1)$ kanter.
+\index{graf!rettet!acyklisk} 
 Vis, at der ikke findes en rag med flere end $\frac{1}{2}n(n-1)$ kanter.
 \end{exerc}
 
 \subsection{Træer}
 
-En urettet graf er et \emph{træ}, hvis der mellem hvert par af knuder findes netop én vej; fx som i fig.~2.8.
-En urettet graf er en \emph{skov}, hvis der mellem hvert par af knuder findes højst én vej.
+En urettet graf er et \emph{træ},
+\index{træ|textbf}
+hvis der mellem hvert par af knuder findes netop én vej; fx som i fig.~2.8.
+En urettet graf er en \emph{skov},
+\index{skov|textbf}
+hvis der mellem hvert par af knuder findes højst én vej.
 Det ses let, at hver sammenhængskomponent i en skov er et træ.
 
 \begin{figure}
@@ -371,22 +465,46 @@ Derfor følger (3) af (2).
 \end{proof}
 
 Lemma 2.8 gælder ikke for rettede grafer.
+\index{graf!rettet!acyklisk} 
 Især kan en rag have meget mere end $n-1$ kanter.
-En rettet graf kaldes \emph{udtræ} med rod $r$, hvis der fra $r$ findes netop én vej til hver knude.
-Den kaldes \emph{indtræ}, hvis der findes netop én vej fra hver knude til $r$.
+En rettet graf kaldes \emph{udtræ}
+\index{udtræ}
+\index{træ!ud-}
+med rod $r$,
+\index{rod}
+\index{træ!rod|textbf}
+hvis der fra $r$ findes netop én vej til hver knude.
+Den kaldes \emph{indtræ},
+\index{indtræ}
+\index{træ!ind-}
+hvis der findes netop én vej fra hver knude til $r$.
 Figur~2.8 viser nogle eksempler.
-\emph{Dybden} af $v$ i et træ med rod er længden af vejen mellem $v$ og roden.
-\emph{Højden} (også kaldt \emph{dybden}) af et træ med rod er den maksimale dybde av nogen knude.
+\emph{Dybden}
+\index{knude!dybde i træ|textbf}
+af en knude $v$ i et træ med rod er længden af vejen mellem $v$ og roden.
+\emph{Højden}
+\index{træ!højde|textbf}
+(også kaldt \emph{dybden}) af et træ med rod er den maksimale dybde av nogen knude.
 
 Man kan rodfæste et urettet træ ved at erklære en vilkårlig knude til rod.
 Dataloger har den spøjse vane, at tegne træer så roden er foroven  og alle kanter forløber oppefra og ned.
 For rodfæstede træer er det almindeligt, at betegne forholdet mellem knuder med ord, som er taget fra familjerelationer.
-Kanter forløber mellem en \emph{forælder} og dets \emph{børn}.
-Knuder med samme forælder hedder \emph{søskende}.
-En knude uden børn kaldes et \emph{blad}.
-En knude, om ikke er et blad, kaldes en \emph{indre} knude.
-Når $u$ ligger på vejen fra roden til en knude $v$, og $u$ er forskellig fra $v$, kaldes $u$ en \emph{ane} til $v$, tilsvarende kaldes $v$ en \emph{efterkommer} til $u$.
-En knude $u$ og alle dens efterkommere danner et \emph{undertræ} med rod $u$.
+Kanter forløber mellem en 
+\emph{forælder} og dets 
+\emph{børn}.
+Knuder med samme forælder hedder 
+\emph{søskende}.
+En knude uden børn kaldes et 
+\emph{blad}.
+En knude, om ikke er et blad, kaldes en 
+\emph{indre} knude.
+Når $u$ ligger på vejen fra roden til en knude $v$, og $u$ er forskellig fra $v$, kaldes $u$ en \emph{ane}
+til $v$, tilsvarende kaldes $v$ en 
+\emph{efterkommer}
+til $u$.
+En knude $u$ og alle dens efterkommere danner et 
+\emph{undertræ}
+med rod $u$.
 Vi betragter et eksempel:
 I de rettede træer i fig.~2.8 er $r$ roden; $s$, $t$ og $v$ er blade; $s$, $t$ og $u$ er søskende, fordi de er børn til samme forælder $r$; $u$ er en indre knude; $r$ og $u$ er ane til $v$; $s$, $t$, $u$ og $v$ er efterkommmerne til $r$; $v$ og $u$ danner et deltræ med rod $u$.
 

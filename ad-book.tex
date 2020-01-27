@@ -1,8 +1,8 @@
 \documentclass[envcountsame,envcountchap]{svmono}
-
 \usepackage[T1]{fontenc} 
 \usepackage[utf8]{inputenc}
 \usepackage[danish]{babel}
+\usepackage[decimalsymbol=comma]{siunitx}
 \usepackage{mathpazo}
 \usepackage{inconsolata}
 %\usepackage{times}
@@ -12,14 +12,19 @@
 \usepackage{microtype}
 \usepackage{makeidx}
 \makeindex
-\newcommand{\sieheunter}[1]{\textit{se under}\linebreak[3] #1}
+\newcommand{\siehe}[2]{\textit{se}\linebreak[3] #1}
+\newcommand{\sieheauch}[2]{\textit{se også}\linebreak[3] #1}
+\newcommand{\sieheunter}[2]{\textit{se under}\linebreak[3] #1}
+\newcommand{\sieheauchunter}[2]{\textit{se også under}\linebreak[3] #1}
 \usepackage{booktabs}
 \usepackage{multicol}
 
 \usepackage{ifthen}
+\usepackage{psfrag}
+\usepackage{wrapfig}
 
 \title{Algoritmer og datastrukturer}
-\subtitle{Grundværktøjerne}
+\subtitle{Grundværktøjerne (i uddrag)}
 \author{Martin Dietzfelbinger \and Kurt Mehlhorn \and Peter Sanders}
 
 \newcommand{\NN}{\mathbf N}
@@ -31,14 +36,21 @@
 \newcommand{\set}[1]{\{ #1\}}
 \newcommand{\ceil}[1]{\lceil #1\rceil }
 \newcommand{\floor}[1]{\lfloor #1\rfloor }
+\newcommand{\abs}[1]{\left| #1\right|}
+\newcommand{\setGilt}[2]{\left\{\, #1\colon #2\,\right\}}
+\newcommand{\classP}{\mathrm P}
+\newcommand{\NP}{\text{NP}}
+\newcommand{\Input}{I}
+\newcommand{\Inputs}{\mathcal{I}}
+\newcommand{\CC}{C++}
 
 \newcommand{\Id}[1]{\protect\ensuremath{\operatorname{\emph{#1}}}}
 \newcommand{\Kw}[1]{\protect\ensuremath{\operatorname{\textbf{\upshape #1}}}}
 \newcommand{\Declare}[2]{#1{\ensuremath{\colon}} #2}   
 \newcommand{\DeclareInit}[3]{#1\ensuremath{{}={}}#3\mbox{ \rm : }#2} 
 \newcommand{\Is}{{\ensuremath{\mathbin{:=}}}}
-\newcommand{\Increment}{\mathrel{{+}{+}}}
-\newcommand{\Decrement}{\mathrel{{-}{-}}}
+\newcommand{\Increment}{{\texttt{++}}}
+\newcommand{\Decrement}{{\texttt{--}}}
 
 \newcommand{\Procedure}{\Kw{Procedure~}}
 \newcommand{\Function}{\Kw{Funktion~}}
@@ -55,38 +67,46 @@
 \newcommand{\Else}{\Kw{ellers~}}
 \newcommand{\return}{\Kw{returner~}}
 \newcommand{\Return}{\Kw{returner~}}
-\newcommand{\while}{\Kw{mens~}}
-\newcommand{\ddo}{\Kw{udfør}}
-\newcommand{\allocate}{\Kw{alloker~}}
-\newcommand{\dispose}{\Kw{afalloker~}}
+\newcommand{\While}{\Kw{så længe~}}
+
+\newcommand{\Repeat}   {{\bf gentag\ }}
+\newcommand{\Until}    {{\bf indtil\ }}
+\newcommand{\Loop}     {{\bf løkke\ }}
+\newcommand{\Exit}     {{\bf afbryd\ }}
+\newcommand{\Goto}     {{\bf gå til\ }}
+\newcommand{\For}      {{\bf for\ }}
+\newcommand{\Foreach}      {{\bf for hvert\ }}
+\newcommand{\Forall}      {{\bf for alle\ }}
+\newcommand{\Step}       {{\bf skridt\ }}
+\newcommand{\To}       {{\bf til\ }}
+\newcommand{\Do}       {{\bf udfør\ }}
+\newcommand{\Downto}       {{\bf ned til\ }}
+\newcommand{\ForFromTo}[3]{{\For $#1 \Is #2$ \To $#3$ \Do}}
+\newcommand{\ForFromDownto}[3]{{\For $#1 \Is #2$ \Downto $#3$ \Do}}
+\newcommand{\ForFromWhile}[3]{{\For $#1 \Is #2$ \To $\infty$ \While $#3$ \Do}}
+\newcommand{\ForFromdownWhile}[3]{{\For $#1 \Is #2$ \Downto $-\infty$ \While $#3$ \Do}}
+\newcommand{\ForFromToStep}[4]{{\For $#1 \Is #2$ \To $#3$ \Step $#4$  \Do}}
+
+
+
+\newcommand{\Allocate}{\Kw{alloker~}}
+\newcommand{\Dispose}{\Kw{afalloker~}}
+\newcommand{\tAllocate}{{\bf alloker}}
+\newcommand{\tDispose}{{\bf afalloker}}
 \newcommand{\PointerTo}{\Kw{Peger på~}}
+\newcommand{\Pointer}{\Kw{Peger~}}
+\newlength{\mysmallspace}
+\setlength{\mysmallspace}{0.05em}
+\newcommand{\Points}{\ensuremath{\hspace{\mysmallspace}{\rightarrow}\hspace{\mysmallspace}}}
 \newcommand{\adressof}{\Kw{adressen på~}}
+\newcommand{\Address}{\Kw{adressen på~}}
+\newcommand{\Star}{*}
 \newcommand{\Invariant}{\Kw{invariant~}}
 \newcommand{\Assert}{\Kw{antag~}}
 \newcommand{\this}{\Kw{dette}}
 
-\newcommand{\Do}       {{\bf udfør\ }}
-\newcommand{\Loop}       {{\bf løkke\ }}
-\newcommand{\Repeat}       {{\bf gentag\ }}
-\newcommand{\Until}       {{\bf indtil\ }}
-\newcommand{\For}      {{\bf for\ }}
-\newcommand{\To}      {{\bf til\ }}
-\newcommand{\While}      {{\bf mens\ }}
-\newcommand{\Downto}       {{\bf ned til\ }}
-\newcommand{\ForFromTo}[3]{{\For $#1 \Is #2$ \To $#3$ \Do}}
-\newcommand{\ForFromToWhile}[4]{{\For $#1 \Is #2$ \To $#3$ \While $#4$ \Do}}
-\newcommand{\ForFromDowntoWhile}[4]{{\For $#1 \Is #2$ \Downto $#3$ \While $#4$ \Do}}
-\newcommand{\ForFromDownto}[3]{{\For $#1 \Is #2$ \Downto $#3$ \Do}}
-\newcommand{\ForFromUpto}[3]{{\For $#1 \Is #2$ \Upto $#3$ \Do}}
-\newcommand{\ForFromWhile}[3]{{\For $#1 \Is #2$ \To $\infty$ \While $#3$ \Do}}
-\newcommand{\ForFromdownWhile}[3]{{\For $#1 \Is #2$ \Downto $-\infty$ \While $#3$ \Do}}
-\newcommand{\ForFromToStep}[4]{{\For $#1 \Is #2$ \To $#3$ \Step $#4$  \Do}}
-\newcommand{\ForFromDowntoStep}[4]{{\For $#1 \Is #2$ \Downto $#3$  \Step $#4$ \Do}}
-\newcommand{\ForFromStepWhile}[4]{{\For $#1 \Is #2$ \To $\infty$ \Step $#3$  \While $#4$
-    \Do}}    
-
-
 \newcommand{\Array}{\Id{Række}}
+\newcommand{\Set}{\Id{Mængde}}
 
 \newcommand{\List}{\operatorname{\emph{Liste}}}
 \newcommand{\Handle}{\operatorname{\emph{Greb}}}
@@ -97,6 +117,8 @@
 \newcommand{\moveAfter}{\operatorname{\emph{flytEfter}}}
 \newcommand{\nnext}{\Id{næste}}
 \newcommand{\prev}{\Id{forrige}}
+
+\input{orig-macros}
 
 \usepackage{amssymb}
 \usepackage{amsthm}
@@ -118,10 +140,17 @@
 \definecolor{callout}{RGB}{150, 35, 31}
 \definecolor{myblue}{RGB}{200, 200, 255}
 \usepackage{tikz}
+\usepackage{pgfplots}
 \usetikzlibrary{arrows}  
+\usetikzlibrary{matrix}  
 \usetikzlibrary{positioning}  
 \usetikzlibrary{backgrounds}  
+\usetikzlibrary{fit}  
 \usetikzlibrary{shapes.multipart}  
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{shapes.misc}  
+\usetikzlibrary{decorations.pathmorphing}  
+\usetikzlibrary{decorations.pathreplacing}  
 
 \usepackage{multirow}
 \usepackage{enumerate}
@@ -132,36 +161,34 @@
 \input{vc.tex}
 \begin{document}
 \maketitle
-\let\thefootnote\relax
 \footnotetext{Udgave~\GITAbrHash, \GITAuthorDate, \GITAuthorName.}
 
-\setcounter{chapter}{1}
-\chapter{Inledning}
-%\setcounter{section}{1}
-%\input{2-2.tex}
-%\input{2-3.tex}
-\setcounter{section}{5}
+\setcounter{tocdepth}{1}
+\tableofcontents
+
+\input{1.tex}
+\input{2.tex}
+\input{2-2.tex}
+\input{2-3.tex}
 \input{2-6.tex}
-\setcounter{section}{8}
 \input{2-9.tex}
+\input{2-10.tex}
 
-\chapter{Fremstilling af følger med rækker og hægtede lister}
-\input{3-0.tex}
-
-\setcounter{chapter}{4}
+\input{3.tex}
+\input{4.tex}
 \input{5.tex}
 \input{6.tex}
-
-\setcounter{chapter}{10}
-\chapter{Minimale spændetræer}
-\setcounter{section}{3}
-\input{11-4.tex}
+\input{7.tex}
+\input{8.tex}
+\input{9.tex}
+\input{10.tex}
+\input{11.tex}
+\input{12.tex}
 
 \appendix
-\chapter{Appendiks}
 \input{appendix.tex}
 
-\bibliography{ref}{}
+\bibliography{ref,diss}{}
 \bibliographystyle{abbrv}
 
 \printindex

@@ -1,0 +1,1186 @@
+\chapter{Repræsentation af følger med rækker og hægtede lister}
+\renewcommand{\labelprefix}{ch:sequence}
+\llabel{}
+
+\vspace*{-2.5cm}
+\begin{minipage}{0.5\textwidth}
+\begin{flushleft}
+  \includegraphics[height=4cm]{img/cuneiform.eps}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+\begin{flushright}
+\includegraphics[height=4cm]{img/Quipu.eps} 
+\end{flushright}
+\end{minipage}
+\vspace*{0.5cm}
+
+\noindent
+\emph{De måske ældste datastrukturer i verden var kileskriftstavlerne%
+\footnote{%
+Den 4600 år gamle tavle oppe til venstre indeholder en liste af gaver til ypperstepræstinden af Adab (se \texttt{commons.wikimedia.org/wiki/Image: Sumerian\_26th\_c\_Adab.jpg}).
+},
+som for mere end 5000 år siden blev brugt af embedsmænd i sumeriske templer.
+\index{Sumer}
+\index{kileskrift|textbf}
+Embedsmændene førte lister over varer -- deres mængder, ejere og købere.
+\index{liste}
+Billedet til venstre viser sådan en tavle, muligvis det ældste eksempel på skriftsprog.
+Operationerne, som dengang skulle udføres på disse lister, er de samme som i dag:
+Indgange bliver tilføjet, informationen gemmes til senere brug, man vil lede efter en indgang og  måske ændre dem, hele listen skal gennemgås for at skabe en sammenfatning, osv.
+Det peruanske quipu~\cite{cuipi} tjente i inkariget lignende formål;
+\index{Peru}
+\index{quipu|textbf}
+hertil brugte man knuder på farvede snore, som en efter en var anbragt på en hovedsnor.
+\index{knude}
+\index{snor}
+Det var sandsynligvis lettere at gemme, pleje og organisere data på tavler end med knudesnore, men på den anden side er det ubekvemt slæbe stentavler over stejle stier i Andesbjergene.
+\index{tavle}
+Åbenbart giver det mening at bruge forskellige repræsentationer af samme slags data alt efter behov.
+}
+
+\bigskip\noindent
+Det abstrakte begreb \emph{følge} er meget enkelt og har i første omgang ikke noget med dens digitale repræsentation at gøre.
+\index{følge}
+\index{liste}
+\index{tabel}
+Matematisk set er den eneste væsentlige egenskab ved følgen $s = \langle e_1,\ldots, e_n\rangle$, at en række af værdier (kaldt \emph{indgange}) er anbragt i en lineær ordning -- i modsætning graferne og træerne, som vi skal betragte i kapitel 7 og 8, som ikke er \emph{lineært} ordnede, og hakketabellerne i kapitel~4, som slet ikke er ordnede.
+
+Grundlæggende kan man tilgå indgangene i en følge på to måder.
+Den første mulighed består af at angive indgangens indeks.
+\index{indeks}
+Det svarer til vores konvention for rækkeadgang,
+\index{række}
+\index{statisk række}
+\index{række!statisk}
+dvs.\ at vi med udtrykket $s[i]$ angiver den $i$te indgang i følgen $s$.
+Hertil stiller vore pseudokode i afsnit~\lref{s:array} allerede \emph{statiske rækker} til rådighed.
+En datastruktur kaldes sommetider \emph{statisk}, 
+når dens størrelse er givet på forhånd og ikke kan ændres ved tilføjelser og fjernelser.%
+\footnote{Ovs.\ anm.: Værdierne de enkelte indgange kan derimod ændres.}
+Vi kalder datastrukturen \emph{begrænset},
+\index{begrænset række|textbf}
+\index{række!begrænset|textbf}
+  når en øvre grænse på dens størrelse er givet på forhånd.
+I afsnit~\llabel{s:array} skal vi betragte \emph{dynamiske} eller \emph{ubegrænsede} rækker,
+\index{ubegrænset række}
+\index{række!ubegrænset}
+som kan vokse og krympe, når indgange bliver tilføjet eller fjernet i enden af følgen.
+Tidsanalysen for ubegrænsede rækker er baseret på begrebet \emph{amortiseret analyse} af algoritmer.
+\index{amortiseret analyse}
+\index{algoritmeanalyse, amortiseret}
+
+Den anden mulighed for at tilgå indgangene i en følge er at tage udgangspunkt i en anden indgang.
+For eksempel kunne man spørge om efterfølgeren til indgang $e$,
+\index{efterfølger|textbf}
+forgængeren til indgang $e'$ 
+\index{forgænger|textbf}
+eller delfølgen $\langle e,\ldots, e'\rangle$ af indgange mellen $e$ og $e'$.
+Selvom den slags relativ adgang kan simuleres med indekserede rækker, skal vi i afsnit~\lref{s:list} introducere en mere fleksibel repræsentation i form af hægtede lister.
+Især gør denne repræsentation det lettere at indføje
+\index{indføje i følge}
+og fjerne
+\index{fjerne fra følge}
+vilkårlige afsnit i en følge.
+
+Mange algoritmer nøjes med at benytte følger på en meget indskrænket måde.
+Ofte bliver der kun læst og ændret i enden af følgen, forrest eller bagest.
+Følger, som benyttes på denne indskrænkede måde, kaldes \emph{stakke}, \emph{køer} og \emph{dobbeltkøer}.
+Disse datastrukturer betragtes i afsnit~\lref{s:stack}.
+Afsnit~\lref{s:o} sammenfatter kapitlets resultater.
+
+\section{Hægtede lister}
+\llabel{s:list}
+
+\newcommand{\friListe}{\Id{friListe}}
+
+I dette afsnit betragter vi repræsentationen af følger ved hjælp af hægtede lister.
+\index{liste!hægtet}
+\index{liste!dobbelthægtet|textbf}
+Hægtede lister er opbygget af elementer kaldt \emph{knuder};
+\index{knude!liste-}
+hver knude består af en indgang fra følgen og en eller flere pegere.
+Man kan forestille sig en hægtet liste som en kæde, hvor der på hvert led står en af følgens indgange.
+Når vi har greb om et kædeled, kan vi derfra nå andre led i kæden.
+I en dobbelthægtet liste peger hver knude på sin forgænger og sin efterfølger.
+\index{forgænger}
+\index{efterfølger}
+I en enkelthægtet liste peger hver knude på sin efterfølger.
+Vi skal se, hvor let det er at foretage foretage forskellige ændringer i hægtede lister:
+vi kan indføje og slette knuder og dellister, og vi kan hægte lister efter hinanden.
+\index{liste!sammenføjning}
+Ulempen ved hægtede lister er, at de ikke understøtter vilkårligt indiceret adgang i form at operatoren $[\cdot]$ effektivt.
+Vi betragter dobbelthægtede lister i afsnit~\lref{ss:dlist} og enkelthægtede lister i afsnit~\lref{s:slist}.
+Enkelthægtede lister behøver mindre plads og er en smule hurtigere.
+Derfør er de at  foretrække, medmindre men har brug for hele den dobbelthægtede listes funktionalitet.
+
+\subsection{Dobbelthægtede lister}
+\llabel{ss:dlist}
+
+Den grundlæggende byggesten for en hægtet liste er vist i figur \lref{alg:ditem}.
+En \emph{knude}%
+\index{knude!liste-} 
+gemmer en indgang med to pegere til henholdsvis efterfølger og forgænger.
+En peger til en knude kaldes også et \emph{greb}
+\index{greb|textbf}
+om denne knude, som i afsnit~\ref{ch:intro:s:pseudocode}.
+Konstruktionen virker måske ganske overskuelig, men pegere er så kraftfulde, at vi vil behandle dem med største omhu.
+Hvilke konventioner (dvs.\ hvilken datastruktur\-invariant) garanterer listestrukturens konsistens, dvs.\ dens linearitet?
+\index{invariant!for listestruktur}
+\index{liste!invariant}
+For det første skal man kræve, at forgængeren til efterfølgeren til knuden $k$ er $k$ selv, og at efterfølgeren til forgængeren til $k$ ligeledes er $k$ selv.
+Ved siden af den lokale linearitet skal vi desuden sikre, at der findes et indgangspunkt til listen, hvorfra alle indgange kan nås ved at følge efterfølgerpegere.
+
+\begin{figure}
+  \begin{tabbing}
+    ~~~~\=\hspace{4cm}\=\kill
+    $\Class \Handle = \PointerTo \Node$\\
+    \\
+    $\Class \Node \Of \Element$ \qquad\textcolor{callout}{/\!\!/ En knude i en dobbelthægtet liste}\\
+    \> $e\colon \Element$\\
+    \> $\nnext\colon\Handle$\> \tikz[remember picture] \node (lnode) {};\\
+    \> $\prev\colon\Handle$\\
+    \> $\Invariant \nnext{\rightarrow}\prev = \prev{\rightarrow}\nnext = \this$
+  \end{tabbing}
+  \tikzset{ 
+    lnode/.style={rectangle split, rectangle split parts=3, draw}, 
+    >=stealth'}
+  \begin{tikzpicture}[callout, remember picture, overlay, anchor = west, shift = (lnode)]
+    \node (this) [lnode, minimum width = 1cm] at (2,0) { $e$ \nodepart{two} $\bullet$ \nodepart{three} $\bullet$};
+    \node (prev) [dashed,lnode, minimum width = 1cm] at (0,0) {};
+    \node (next) [dashed,lnode, minimum width = 1cm] at (4,0) {};
+    \draw [->] (this.north|-this.two east) -- (next);
+    \draw [->] (this.north|-this.three west) -- (prev.three east);
+  \end{tikzpicture}
+  \caption{\llabel{alg:ditem}
+  En knude i en dobbelthægtet liste.}
+\end{figure}
+
+En følge $\langle e_1,\ldots, e_n\rangle$ med $n$ indgange repræsenteres som en ring af $n+1$ knuder.
+I ringen findes en særlig \emph{attrapknude}~$h$,
+\index{liste!attrapknude|textbf}
+som ikke indholder nogen følgeindgang.
+Attrapknudens efterfølger $h_1$ indeholder følgens første indgang $e_1$, i $h_1$s efterfølger gemmes følgens anden indgang $e_2$, osv. Forgængeren til $h$ indeholder følgens sidste indgang $e_n$, se figur~\lref{alg:ditem}.
+Den tomme følge repræsenteres af en ring, som kun indeholder attrapknuden $h$.
+I denne situation er altså $h$ sin egen efterfølger og forgænger.
+Figur~\lref{alg:dlist1} viser en implementation af dobbelthægtede lister.
+Et objekt af klassen $\List$ indeholder en enkelt knude $h$ som instansvariabel.
+Denne »hovedknude« $h$ initialiseres ved at sætte indgangen til attrapværdien $\bot$ og lade knuden pege på sig selv som både forgænger og efterfølger.
+Dette repræsenterer en tom liste som begyndelsestilstand.
+
+\begin{figure}
+  \[
+  \tikzset{ 
+    lnode/.style={rectangle split, rectangle split parts=3, draw}, 
+    >=stealth'}
+  \begin{tikzpicture}[remember picture, shift = (lnode), scale = .8]
+    \node (1) [lnode, minimum width = 1cm] at (0,0) 
+    { $e_1$ \nodepart{two} $\bullet$ \nodepart{three} $\bullet$};
+    \node (dummy) [dashed,lnode, minimum width = 1cm] at (-2,0) 
+    { $\bot$ \nodepart{two} $\bullet$ \nodepart{three} $\bullet$};
+    \node (n) [lnode, minimum width = 1cm] at (4,0)
+    { $e_n$ \nodepart{two} $\bullet$ \nodepart{three} $\bullet$};
+    \draw [->] (1.north|-1.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+    \draw [->] (1.north|-1.three west) -- (dummy.three east);
+    \draw [->] (dummy.north|-dummy.two east) -- (1);
+    \draw [->, rounded corners] (dummy.north|-dummy.three west) -- ++(-1,0) -- ++(0,-.5) -- ++ (8,0) -- ++(0,.5) -- (n.three east);
+    \draw [->, rounded corners] (n.north|-n.two east) -- ++(1,0) -- ++(0,1) -- ++(-8,0) -- ++(0,-1) -- (dummy.two west);
+    \draw [->] (n.north|-n.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+  \end{tikzpicture}
+\]
+  \caption{
+    \llabel{fig: representation of a sequence by a dlist}
+    Repræsentation af følgen $\langle e_1,\ldots, e_n\rangle$ som dobbelthægtet liste. 
+  Repræsentationen består af $n+1$ knuder anbragt i en ring:
+  En attrapknude $h$, som ikke indeholder nogen indgang, og en knude for hver af følgens $n$ indgange.
+  Knuden med indgang $e_i$ er efterfølger til knuden med indgang $e_{i-1}$ og forgænger til  knuden med indgang $e_{i+1}$.
+  Attrapknuden sidder mellem de to knuder med indgang $e_n$ og $e_1$.}
+\end{figure}
+
+\begin{figure}
+  \begin{tabbing}
+    ~~~~\=~~~~\=\kill
+    $\Class \Id{Liste} \Of \Id{Element}$\\
+    \> \textcolor{callout}{/\!\!/ Knude $h$ er forgænger til den første og efterfølger til den sidste knude.}\\
+    \> $h=\begin{pmatrix}\bot\\\this\\\this\end{pmatrix}\colon\Id{Knude} $\\
+    \\
+    \> \comment{Funktioner for enkel adgang.}\\
+    \> $\Function\Id{hoved}\colon\Handle\quad \return \adressof h$
+    \qquad \comment{Position før alle indgange}\\
+    \\
+    \> $\Function\Id{tom}\colon\{0,1\} \quad\return h.next = \this$\\
+    \> $\Function\Id{første}\colon\Handle \quad\Assert \neg\Id{tom}; \return h.\Id{næste} $\\
+    \> $\Function\Id{sidste}\colon\Handle \quad\Assert \neg\Id{tom}; \return h.\Id{forrige} $\\
+    % TODO removed semicolons after function head
+    \\
+    \>\comment{Flytning af enkelte indgange inden for samme følge.}\\
+    % TODO added "enkelte", removed brackets
+    \>\comment{$\langle \ldots, a,b,c,\ldots,a',c',\ldots\rangle \mapsto
+   \langle \ldots, a,c,\ldots,a',b,c',\ldots\rangle$.}\\
+    \>$\Procedure \Id{flytEfter}(b,a'\colon\Handle) \quad\Id{splejs}(b,b,a')$\\
+    \>$\Procedure \Id{flytForrest}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{hoved})$\\
+    \>$\Procedure \Id{flytBagest}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{sidste})$
+  \end{tabbing}
+  \caption{\llabel{alg:dlist1}
+  Nogle konstanttidsoperationer på dobbelthægtede lister.}
+\end{figure}
+
+\begin{figure}
+\begin{tabbing}
+  \textcolor{callout}{/\!/ Fjern $ \langle a,\ldots,b\rangle$ fra sin liste og indføj den efter $t$}\\
+  \textcolor{callout}{
+    /\!/ $\ldots, a',a,\ldots,b,b',\ldots + \ldots, t,t',\ldots\mapsto\ldots,
+    a',b',\ldots + \ldots,t,a,\ldots,b,t',\ldots$
+  }\\
+  ~~~~\=\kill
+  $\Procedure \splice(a,b,t \colon \Handle)$\\
+  \>$\Assert$ $a$ og $b$ tilhører samme liste, $b$ står ikke før $a$, og $t\notin\langle a,\ldots ,b\rangle$\\
+  \\
+  \>   \textcolor{callout}{/\!\!/ klip $\langle a,\ldots,b\rangle$ ud}\\
+  \> $a' :=a{\rightarrow}\prev$\qquad\qquad\qquad\tikz[remember picture] \node (splice1) {};\\
+  \> $b' :=b{\rightarrow}\nnext$\\
+  \> $a'{\rightarrow}\nnext:=b'$\tikz[remember picture] \node (splice2) {};\\
+  \> $  b'{\rightarrow}\prev:=a' $  \\
+\>   \\
+  \>  \textcolor{callout}{/\!\!/ indføj $\langle a,...,b\rangle$ efter $t$} \tikz[remember picture] \node (splice3) {}; \\
+  \>   $t' :=t{\rightarrow}\nnext$\\
+  \> $  b{\rightarrow}\nnext:=t' $  \\
+  \> $   a{\rightarrow}\prev:=t$\tikz[remember picture] \node (splice4) {};\\
+  \> $ t{\rightarrow}\nnext:=a $\\
+  \> $   t'{\rightarrow}\prev:=b$ \tikz[remember picture] \node (splice5)  {};
+\end{tabbing}
+ \tikzset{ 
+    lnode/.style={minimum width =.4cm, inner sep = 1pt, rectangle split, rectangle split parts=3, draw, 
+    node contents = { \nodepart{two} $\scriptstyle\bullet$ \nodepart{three} $\scriptstyle\bullet$}
+    },
+    >=stealth',
+    illustration/.style = { remember picture, overlay, callout, scale = .5 }
+    }
+  \begin{tikzpicture}[illustration, shift = (splice1)]
+    \node (a_) at (0,0) [label = above:$a'$, lnode];
+    \node (a) at (2,0) [label = above:$a$, lnode];
+    \node (b) at (6,0) [label = above:$b$, lnode];
+    \node (b_) at (8,0) [label = above:$b'$, lnode];
+    \draw [->] (a_.north|-a_.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->] (a_.north|-a_.two east) -- (a.two west);
+    \draw [->] (a.north|-a.three west) -- (a_.three east);
+    \draw [->] (a.north|-a.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+    \draw [->] (b.north|-b.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->] (b.north|-b.two east) -- (b_.two west);
+    \draw [->] (b_.north|-b_.three west) -- (b.three east);
+    \draw [->] (b_.north|-b_.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+  \end{tikzpicture}
+  \begin{tikzpicture}[illustration, shift = (splice1|-splice2)]
+    \node (a_) at (0,0) [lnode];
+    \node (a) at (2,0) [lnode];
+    \node (b) at (6,0) [lnode];
+    \node (b_) at (8,0) [lnode];
+    \draw [->] (a_.north|-a_.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->, rounded corners] (a_.north|-a_.two east) -- ++(1,1) -- ++(6,0) -- (b_);
+    \draw [->] (a.north|-a.three west) -- (a_.three east);
+    \draw [->] (a.north|-a.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+    \draw [->] (b.north|-b.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->] (b.north|-b.two east) -- (b_.two west);
+    \draw [->, rounded corners] (b_.north|-b_.three west) -- ++(-1,-.5) -- ++(-6,0) -- (a_);
+    \draw [->] (b_.north|-b_.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+  \end{tikzpicture}
+  \begin{tikzpicture}[illustration, shift = (splice1|-splice3)]
+    \node (t) at (0,0) [lnode, label = above: $t$];
+    \node (a)  at (2,0) [lnode, label = above: $a$];
+    \node (b)  at (6,0) [lnode, label = above: $b$];
+    \node (t_) at (8,0) [lnode, label = above: $t'$];
+    \draw [->] (t.north|-t.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->, rounded corners] (t.north|-t.two east) -- ++(1,1) -- ++(6,0) -- (t_);
+%    \draw [->] (a.north|-a.three west) -- (t.three east);
+    \draw [->] (a.north|-a.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+    \draw [->] (b.north|-b.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+%    \draw [->] (b.north|-b.two east) -- (t_.two west);
+    \draw [->, rounded corners] (t_.north|-t_.three west) -- ++(-1,-.5) -- ++(-6,0) -- (t);
+    \draw [->] (t_.north|-t_.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+  \end{tikzpicture}
+  \begin{tikzpicture}[illustration, shift = (splice1|-splice4)]
+    \node (t)  at (0,0) [lnode];
+    \node (a)  at (2,0) [lnode];
+    \node (b)  at (6,0) [lnode];
+    \node (t_) at (8,0) [lnode];
+    \draw [->] (t.north|-t.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->, rounded corners] (t.north|-t.two east) -- ++(1,1) -- ++(6,0) -- (t_);
+    \draw [->] (a.north|-a.three west) -- (t.three east);
+    \draw [->] (a.north|-a.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+    \draw [->] (b.north|-b.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->] (b.north|-b.two east) -- (t_.two west);
+    \draw [->, rounded corners] (t_.north|-t_.three west) -- ++(-1,-.5) -- ++(-6,0) -- (t);
+    \draw [->] (t_.north|-t_.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+  \end{tikzpicture}
+  \begin{tikzpicture}[illustration, shift = (splice1|-splice5)]
+    \node (t)  at (0,0) [lnode];
+    \node (a)  at (2,0) [lnode];
+    \node (b)  at (6,0) [lnode];
+    \node (t_) at (8,0) [lnode];
+    \draw [->] (t.north|-t.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->] (a.north|-a.three west) -- (t.three east);
+    \draw [->] (a.north|-a.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+    \draw [->] (b.north|-b.three west) -- +(-1,0) node [anchor = east] {$\cdots$};
+    \draw [->] (b.north|-b.two east) -- (t_.two west);
+    \draw [->] (t_.north|-t_.two east) -- +(1,0) node [anchor = west] {$\cdots$};
+  \end{tikzpicture}
+\caption{\llabel{alg:splice}Operationen \Id{splejs} på lister.}
+\end{figure}
+
+Alle grundlæggende listeoperationer bruger basisoperationen \emph{splejs},
+\index{splejs@\Id{splejs}|textbf}
+\index{liste!splejs@\Id{splejs}|textbf}
+som er vist i figur~\lref{alg:splice}.
+Splejsning klipper en delliste ud af listen og indføjer den bagved en given målknude.
+Dellisten er hertil givet ved greb $a$ og $b$ om sin første og sidste knude.
+For den korrekte udførelse af operationen er det væsentligt, at knuden med greb $b$ kan nås fra knuden med greb $a$ gennem at følge efterfølgerpegere uden undervejs møde attrapknuden.
+Målknuden $t$, som ligeledes er givet som et greb, kan sidde enten i den samme eller i en anden liste.
+I første fald må $t$ selvfølgeligt ikke optræde i dellisten fra $a$ til $b$.
+
+Operationen \emph{splejs} ændrer ikke på det totale antal knuder i systemet.
+Vi går ud fra, at der findes en speciel liste $\friListe$, som stiller et forråd af ubenyttede knuder til rådighed.
+\index{liste!lagerforvaltning}
+Når nye indgange skal optages i en følge, tages de nødvendige knuder fra listen \emph{friListe}; når indgange fjernes fra listen, bliver det frigjorte knuder givet tilbage til \emph{friListe}.
+\index{liste|fjern@\Id{fjern}}
+Funktionen $\Id{sikrFriListe}$ reserverer lagerplads til nye knuder, når dette bliver nødvendigt.
+I opgave 3.3 spørges og i afsnit 3.6 diskuteres hvordan denne funktion kan implementeres.
+
+\begin{figure}
+  \begin{tabbing}
+    \=~~~~\=\kill
+    \>\comment{Indsættelse og fjernelse af enkelte indgange.}\\
+    \>\comment{$\langle \ldots, a,b,c,\ldots\rangle \mapsto
+   \langle \ldots, a,c,\ldots\ldots\rangle$.}\\
+    \>$\Procedure \Id{fjern}(b\colon\Handle) \quad\Id{flytEfter}(b,\Id{friListe}.\Id{hoved})$\\
+    \>$\Procedure \Id{fjernForrest} \quad\Id{fjern}(\Id{første})$\\
+    \>$\Procedure \Id{fjernBagest} \quad\Id{fjern}(\Id{sidste})$\\
+    \\
+    \>\comment{$\langle \ldots, a,b,\ldots\rangle \mapsto
+   \langle \ldots, a,e,b,\ldots\ldots\rangle$.}\\
+    \>$\Function \Id{indsætEfter}(x\colon\Element, a\colon\Handle)\colon \Handle$ \\
+    \>\>$\Id{sikrFriListe}$\hspace{2cm}\=\comment{Sikr at $\Id{friListe}$ er ikketom. Se opg. 3.3.}\\
+    \>\>$a':=\Id{friListe}.\Id{første}$\>\comment{Skaf ny knude $a'$ til at indeholde $x$,}\\
+    \>\>$\Id{flytEfter}(a',a)$\>\comment{indsæt den på rette plads,}\\
+    \>\>$a'{\rightarrow} e:= x$\>\comment{og fyld den med det rette indhold.}\\
+    \>\>$\return a'$\\
+    \\
+    \>$\Function\Id{indsætFør}(x\colon\Element; b\colon\Handle)\colon\Handle$\\
+    \>\>$\return\Id{indsætEfter}(e, b{\rightarrow}\Id{forrige})$\\
+    % TODO wft er pred(b)
+    \>$\Procedure\Id{tilføjForrest}(x\colon\Element) \quad \Id{indsætEfter}(x, \Id{hoved})$\\
+    \>$\Procedure\Id{tilføjBagest}(x\colon\Element) \quad \Id{indsætEfter}(x, \Id{sidste})$\\
+    \\
+    \>\comment{Behandling af hele lister.}\\
+    \>\comment{$(\langle a, \ldots, b\rangle, \langle c,\ldots,d\rangle) \mapsto
+		(\langle a, \ldots, b, c,\ldots,d\rangle, \langle \,\rangle)$}\\
+    \>$\Procedure\Id{sammenføj}(L'\colon\Id{Liste})\quad 
+    \Id{splejs}(L'.\Id{første}, L'.\Id{sidste},\Id{sidste})$\\
+    \\
+    \>\comment{$\langle a, \ldots, b\rangle \mapsto \langle \,\rangle$}\\
+    \>$\Procedure\Id{tøm}\quad \Id{friListe}.\Id{sammenføj}(\this)$
+  \end{tabbing}
+  \caption{\llabel{alg:dlist2}
+  Nogle flere konstanttidsoperationer på dobbelthægtede lister til klassen fra figur~\lref{alg:dlist1}.}
+\end{figure}
+
+Baseret på disse konventioner kan vi nu implementere mange nyttige listeoperationer som funktioner bestående af en enkelt linje, som alle kræver konstant tid.
+Idet \emph{splejs} er så magtfuld, kan vi sågar behandle dellister af vilkårlig længde i konstant tid.
+Figur\lref{alg:dlist2} viser mange eksempler på den slags operationer.
+For at afgøre, om en liste er tom, behøver vi blot at undersøge, om $h$ er sin egen efterfølger.
+\index{liste!tom@\Id{tom}}
+Når en liste ikke er tom, finder vi dens første og sidste indgang som efterfølger hhv.\ forgænger til $h$.
+\index{liste!fzrste@\Id{første}}
+\index{liste!sidste@\Id{sidste}}
+For at flytte knude~$b$ til positionen efter knude~$a'$ klipper man bare den delliste, som begynder og ender ved $b$, ud og indføjer den efter $a'$.
+\index{liste!flytning af enkelt knude|textbf}
+Dette gøres med kaldet \emph{splejs}$(b, b, a')$.
+For at placere en indgang forrest eller bagest i listen flyttes den tilsvarende knude bag ved hovedknuden~$h$ eller bag ved den sidste indgang.
+En indgang slettes ved at flyttes den tilsvarende knude til \emph{friListe}.
+For at indsætte en ny indgang~$e$ 
+\index{liste!indsæt@\Id{indsæt}}
+udtages en ny knude fra \emph{friListe}, indgangen $e$ gemmes i knuden, og knuden anbringes på den ønskede plads.
+
+\begin{exerc}[Alternativ listeimplementation]
+  Diskutér en alternativ implementation af klassen $\List$, som undgår brugen af en attrapknude.
+  I stedet gemmer man i listeobjektet pegere på den første og den sidste knude i listen.
+  Forgængeren til den første knude og efterfølgeren til den sidste knude er nulpegere.
+  Grænsefladen og de asymptotiske udførelsestider bør forblive uændrede.
+  Nævn mindst en fordel og en ulempe ved denne implementation i sammenligning med den i teksten beskrevne implementation.
+\end{exerc}
+
+Attrapknuden kan også være nyttig for andre operationer. 
+Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet knude \emph{fra}.
+\index{liste!find@\Id{find}}
+  Hvis $x$ ikke forekommer, skal attrapknudens greb \emph{hoved} returneres.
+  Attrapknuden bruges her som en såkaldt \emph{vogterknude}.
+\index{vogterknude|textbf}
+  En vogterknude i en datastruktur er en knude, der sørger for, at en vis løkke terminerer.
+  Ved søgning i en liste gemmer vi den søgte nøgle $x$ i attrapknuden.
+  Herved opnår vi, at $x$ findes i listestrukturen, så søgningen garanteret terminerer.
+  Søgningen ender enten i en egentlig knude eller i attrapknuden, alt efter om $x$ fandtes i den oprindelige liste eller ej.
+  Dette trick gør, at man ikke i hvert skridt behøver at undersøge, om søgningen har nået enden af listen.
+  Dette kan øge effektiviteten af søgningen betragteligt:
+
+ \begin{quote}
+  \begin{tabbing}
+    ~~~~\=~~~~\=\kill
+    $\Function\Id{findNæste}(x:\Element; \Id{fra}\colon\Handle)\colon \Handle$\\
+    \>$h.e:= x\qquad\comment{Vogterknude}$\\
+    %TODO = in orig, not :=
+    \>$\While\Id{fra}{\rightarrow}e\neq x$ \Do\\
+    \>\>$\Id{fra} :=\Id{fra}{\rightarrow}\Id{næste}$\\
+    \>$h.e:=\bot$\\
+    $\return\Id{fra}$
+  \end{tabbing}
+ \end{quote}
+ 
+  \begin{exerc}
+    \index{liste!ombytning af delfølger|textbf}
+    Implementer en procedure \emph{ombyt}, som i konstant tid ombytter to delfølger, dvs. transformerer følgerne
+    \[(\langle \ldots, a',a,\ldots, b,b',\ldots\rangle,
+    \langle \ldots, c',c,\ldots, d,d',\ldots\rangle)\]
+    til følgerne
+    \[(\langle \ldots, a',c,\ldots, d,b',\ldots\rangle,
+    \langle \ldots, c',a,\ldots, b,d',\ldots\rangle)\,.\]
+    Er \emph{splejs} et specialtilfælde af \emph{ombyt}?
+  \end{exerc}
+
+  \begin{exerc}[Lagerhåndtering.]
+    \llabel{ex:memory}
+    \index{liste!lagerhåndtering|textbf}
+    Angiv en implementation af funktionen $\Id{sikrFriListe}$, som kaldes fra $\Id{indsætEfter}$, som angivet i figur~\llabel{alg:dlist2}.
+    Funktionen skal sikre, at $\Id{friListe}$ ikke er tom, og i modsat fald tilføje nye knuder.
+    Fordi den kan have en negativ indvirkning på udførelsestiden at kalde den af programmeringssproget til rådighed stillede grundoperation $\Allocate$ for hver knude separat, bør funktionen stille knuder til rådighed i større »portioner«.
+    Udførelsestiden for $\Id{sikrFriListe}$ i værste fald bør være uafhængig af portionernes størrelse.
+    \emph{Vink:} 
+    Benyt ved siden af $\Id{friListe}$ en lille række af ubenyttede (og endnu ikke initialiserede) knuder.
+  \end{exerc}
+
+  \begin{exerc}
+    \index{liste!rotation|textbf}
+    Beskriv en algoritme, som i konstant tid udfører en højrerotation
+    $\langle a, \ldots, b,c\rangle \mapsto \langle c, a,\ldots, b\rangle$
+    af en position i en følge.
+    Beskriv en mere generel algoritme for rotationen
+    $\langle a, \ldots, b,c,\ldots, d\rangle \mapsto \langle c,\ldots, d, a,\ldots, b\rangle$,
+    givet et greb om $b$. 
+    Udførelsestiden bør igen være konstant.
+  \end{exerc}
+
+  \begin{exerc}
+    Funktionen $\Id{findNæste}$ kører på grund af anvendelsen af en vogterknude hurtigere, end hvis vi i hvert  løkkegennemløb skulle teste, om vi er nået til den sidste knude i listen.
+    Men hvor stor er gevinsten i udførelsestid?
+    Hvilken relativ forskel i udførelsestid ville du forvente i følgende situationer? 
+    (a) I en kort liste med $100$ indgange gennemføres mange søgninger;
+    (b) i en lang liste med fx $10\,000\,000$ indgange gennemføres en enkelt søgning.
+    Hvorfor afhænger den relative hastighedsforskel af listelængden?
+  \end{exerc}
+  
+  \subsection*{Vedligeholdelse af listestørrelsen}
+  \index{liste!størrelse@\Id{størrelse}|textbf}
+
+  I vores enkle listedatastruktur i figur~\lref{alg:dlist1} kan vi ikke bestemme listens størrelse (dvs.\ dens længde) i konstant tid.
+  Til det formål kan man udvide klassen med en instansvariabel $\size$, som aktualiseres, når antallet af listeelementer bliver ændret.
+  Hermed får nu alle operationer, som kan ændre flere lister, brug for at kende længderne af de berørte lister, i modsætning til vores konvention for basisfunktionen $\splice$, som kunne nøjes med at kende til de berørte knuders greb.
+  Betragt fx følgende kodestump, som fjerner en enkelt knude~$a$ fra liste $L$ og flytter den bag ved knude $a'$ i liste $L'$ og aktualiserer de pågældende instansvariabler for størrelserne.
+
+  \begin{tabbing}
+~~~~\=\kill
+    $\Procedure \moveAfter (a, a'\colon \Handle ; L,L'\colon \List)$\\
+    \> $\splice(a,a,a'); \quad L.\size\texttt{--}; \quad L.\size\texttt{++}$
+ \end{tabbing}
+ 
+ Vedligeholdelsen af listelængden
+\index{liste!længde}
+ kræver tilsvarende ændringer i implementationen af de andre listeoperationer.
+ Et større problem end de udvidede grænseflader er dog, at vi ikke længere kan garantere konstante udførelsestider.
+ Hertil skulle operationer som fx splejsning, der flytter hele listeafsnit, jo også have bruge for at kende til listeafsnittets størrelse.
+ Den næste opgave beskriver et muligt kompromis.
+
+ \begin{exerc}
+   \llabel{ex:smartsize}
+   Konstruer på grundlag af en dobbelthægtet liste en listedatatype, som både tillader konstant-tids forskydning af dellister fra en liste og bestemmelse af listens størrelse, forudsat at listen ikke har været involveret i dellisteoperationer med andre lister siden det sidste kald til $\size$.
+   Efter at den slags dellisteoperationer er blevet udført, skal værdien af $\size$ kun genberegnes, når den bliver brugt næste gange.
+ \end{exerc}
+ 
+ \begin{exerc}
+   \index{liste!sammenføjning} 
+   Forklar, hvordan operationerne $\Id{fjern}$, $\Id{indsætEfter}$ og $\Id{sammenføj}$ skal modificeres for at vedligeholde listestørrelsen.
+ \end{exerc}
+
+\subsection{Enkelthægtede lister}
+\llabel{s:slist}
+\index{liste!enkelthægtet|textbf}
+
+At hver knude har både forlæns- og baglænsreferencer gør det ganske nemt at implementere operationer på dobbelthægtede lister.
+Vi skal nu se på deres lidt slankere søskende, de enkelthægtede lister.
+Knudetypen i enkelthægtede lister kalder vi $\Id{EElement}$.
+Typen $\Id{EElement}$ har ingen forgængerpeger og nøjes med at gemme en peger på efterfølgeren.
+Det gør, at enkelthægtede lister kræver mindre plads og ofte også er hurtigere end dobbelthægtede.
+Ulempen er, at mange operationer ikke længere udføres i konstant tid eller ikke længere virker med samme almengyldighed.
+For eksempel bliver vi nødt til at kende en $\Id{EElement}$-knudes forgænger for at fjerne den.
+
+Vi følger den grundlæggende tilgangsmåde for implementationen af dobbelthægtede lister.
+En enkelthægtet list skabes som en ring af knuder.
+Hvert objekt af typen $\Id{EListe}$ har en attrapknude $h$ af typen $\Id{EElement}$, som er forgænger til den første egentlige knude og efterfølger til den sidste egentlige knude.
+Mange listeoperationer lader sig stadig gennemføre med små ændringer  af grænsefladen.
+For eksempel har $\Id{splejs}$-operationen nu brug for at kende \emph{forgængeren} til den første knude af den delliste, som skal flyttes:
+\index{liste!splejs@\Id{splejs}} 
+
+\begin{quote}
+  \begin{tabbing}
+    ~~~~\=\kill
+    \comment{$(\langle \ldots,a',a,\ldots,b,b',\ldots\rangle,
+    \langle\ldots, t,t',\ldots,\rangle) \mapsto
+    (\langle \ldots,a',b',\ldots\rangle,
+    \langle\ldots, t,a,\ldots,b,t',\ldots,\rangle)$}\\
+    $\Procedure\Id{splejs}(a',b,t\colon \Id{EGreb})$\\
+    \>$\begin{pmatrix}
+      a'{\rightarrow}\Id{næste}\\
+      t{\rightarrow}\Id{næste}\\
+      b{\rightarrow}\Id{næste}
+    \end{pmatrix} := 
+    \begin{pmatrix}
+      b{\rightarrow}\Id{næste}\\
+      a'{\rightarrow}\Id{næste}\\
+      t{\rightarrow}\Id{næste}
+    \end{pmatrix} 
+    $
+  \end{tabbing}
+\end{quote}
+
+På en lignende måde skal operationen $\Id{findNæste}$ ændres til at returnere et greb om \emph{forgængeren} til søgenøglen, hvis den fundne indgang skal kunne fjernes.
+\index{liste!findNæste@\Id{findNæste}} 
+Tilsvarende må funktionen $\Id{findNæste}$ begynde sin søgning ikke ved den angivne knude, men først ved dennes efterfølger.
+En nyttig tilføjelse til enkelthægtede lister er en peger på den sidste listeknude, hvilken gør det muligt at udføre operationen $\Id{indsætBagest}$ i konstant tid.
+\index{liste!indsætBagest@\Id{indsætBagest}} 
+
+\begin{exerc}
+  \llabel{ex:slist}
+  %TODO shitload of index
+  Implementer klasserne $\Id{EGreb}$, $\Id{EElement}$, $\Id{EListe}$ på basis af enkelthægtede lister svarende til
+  $\Id{Greb}$, $\Id{Element}$ og $\Id{Liste}$.
+  Vis, at alle de følgende operationer kan implementeres, så de tager konstant tid.
+  Hertil skal operationerne $\Id{hoved}$, $\Id{første}$, $\Id{sidste}$, $\Id{tom}$, $\Id{fjernForrest}$, $\Id{indsætForrest}$, $\Id{indsætForrest}$, $\Id{indsætEfter}$, $\Id{sammenføj}$ og $\Id{gørTom}$ have den samme grænseflade som for dobbelthægtede lister;
+  hvorimod operationerne $\Id{flytEfter}$, $\Id{flytTilForrest}$, $\Id{flytTilBagest}$, $\Id{fjern}$, $\Id{fjernForrest}$ og $\Id{findNæste}$ har brug for ændringer i grænsefladen.
+\end{exerc}
+
+Vis skal i det videre forløb se nogle eksempler på brugen af enkelthægtede lister, fx hakketabeller i afsnit~\ref{ch:hash:s:chaining} og flettesortering i afsnit \ref{ch:sort:s:merge}.
+Enkelthægtede lister egner sig også til at vedligeholde af lister af frie knuder til lagerhåndtering -- inklusive for knuder i dobbelthægtede lister.
+
+\section{Ubegrænsede rækker}
+\llabel{s:array}
+\index{række!ubegrænset|textbf}
+\index{ubegrænset række|textbf}
+
+Vi betragter nu en datastruktur for følger, som ved siden af den indeksbaseret adgangsoperation $[\cdot]$ tillader operationerne $\Id{indsætBagest}$, $\Id{fjernBagest}$ og $\Id{størrelse}$ som følger:
+\index{række!fjernBagest@\Id{fjernBagest}|textbf}
+\index{række!indsætForrest@\Id{indsætForrest}|textbf}
+\index{række!størrelse@\Id{størrelse}|textbf}
+\index{række!adgang@adgang med $[{}\cdot{}]$|textbf}
+\begin{align*}
+  \langle e_1,\ldots, e_n\rangle.\Id{indsætBagest}(e) &=
+\langle e_1,\ldots, e_n, e\rangle\,,\\
+  \langle e_1,\ldots, e_n\rangle.\Id{fjernBagest}(e) &=
+  \langle e_1,\ldots, e_{n-1}\rangle\,, \qquad (\text{for } n\geq 1)\,,\\
+  \Id{størrelse}(\langle e_1,\ldots, e_n\rangle) &= n\,.
+\end{align*}
+
+Hvorfor en den slags ubegrænsede rækkestrukturer vigtige?
+I mange situationer ved man ikke i forvejen, hvor stor en række skal blive.
+Et typisk eksempel er følgende:
+Lad os implementere unixkommandoen $\Id{sort}$, som sorterer de enkelte linjer i et arkiv.
+Vi begynder med at læse arkivets enkelte linjer ind i en række av linjer, sorterer rækker in hovedlageret og udskriver til sidst den sorterede række af linjer.
+Med ubegrænsede rækker er dette ligetil, men med begrænsede rækker skulle vi derimod behøve at læse hele arkivet to gange:
+En første gang bare for at bestemme antallet af linjer, og en anden gang for at læse linjerne ind i den nu parate række af den rette størrelse.
+
+Vi skal nu beskrive, hvordan man implementerer ubegrænsede rækker.
+Vi simulerer en ubegrænset række $u$ af $n$ indgange ved at dynamisk vedligeholde en begrænset række $b$ med $w$ pladser, hvor $w\geq n$.
+De første $n$ pladser i $b$ bruges til at gemme indgangene fra $u$.
+De sidste $w-n$ pladser i $b$ er ubenyttede.
+Så længe $w>n$, kan operationen $\Id{indsætBagest}$ nøjes med at øge pejlvariablen $n$ og placere den nye indgang på den første ubenyttede plads i $b$.
+Når $w=n$, fører det næste kald af $\Id{indsætBagest}$ til, at der stilles en ny begrænset række $b'$ til rådighed, som er en konstant faktor (fx to gange) større end $b$.
+For at genetablere invarianten at $u$ er gemt i $b$, bliver $b$s indhold kopieret til de første $n$ pladser af $b'$. Hermed den gamle række $b$ frigøres.
+Endelig flyttes pegeren på $b$ til at pege på $b'$.
+Det er endnu nemmere at fjerne den sidste indgang (ved $\Id{fjernBagest}$), fordi der aldrig er fare for, at $b$ bliver for lille.
+Det kan dog tænkes, at vi spilder alt for meget lagerplads ved at tillade, at $b$ er meget større end nødvendig.
+Den overskydende lagerplads kan holdes lille ved krympe $b$, når $n$ bliver for lille i forhold til $w$.
+I figur~\lref{fig: UArray pseudocode} vises pseudokoden for en klasse, der realiserer ubegrænsede rækker.
+Den underliggende række vokser og krymper ved hjælp af proceduren $\Id{realloker}$.
+\index{række!vokse}
+\index{række!krympe}
+\index{række!realloker@\Id{realloker}|textbf}
+I vores implementation har vi benyttet konstanterne $\alpha$ og $\beta$ med $\beta= 2$ og $\alpha=4$.
+Når den aktuelle begrænsede række bliver for lille, erstatter vi den af en ny række, som er $\beta$ gange større;
+når den udnyttede del af rækken bliver $\alpha$ gange mindre end rækkens størrelse, erstatter vi den med en ny række af størrelse $n/\beta$.
+Vi gør rede for vores valg af værdierne for $\alpha$ og $\beta$ forneden.
+
+\begin{figure}
+  \begin{tabbing}
+    ~~~~\=~~~~\=~~~~\=\kill
+    $\Class \Id{URække} \Of \Id{Element}$\\
+    \>$\Constant \beta := 2\colon \RR_{>0}$\\
+    \>$\Constant \alpha := 4\colon \RR_{>0}$\\
+    \>$w:=1\colon\NN$\\
+    \>$n:=0\colon\NN$\\
+    \>$\Invariant n\leq w\leq \alpha n\text{ eller }n=0\text{ og }w\leq\beta$\\
+    \>$b\colon\Id{Række} [1..w] \Of \Id{Element}$\\
+    \\
+    \>$\mathbf{Operator} [i\colon\NN]\colon\Id{Element}$\\
+    \>\>$\Assert 1\leq i\leq n$\\
+    \>\>$\return b[i]$\\
+    \\
+    \>$\Function \Id{størrelse}\colon\NN\quad\return n$\\
+    \\
+    \>$\Procedure\Id{tilføjBagest}(e\colon\Id{Element})$\\
+    \>\>$\iif n=w\tthen$\\
+    \>\>\>$\Id{realloker}(\beta n)$\\
+    \>\>$b[n+1]:=e$\\
+    \>\>$n\texttt{++}$\\
+    \\
+    \>$\Procedure\Id{fjernBagest}$\\
+    \>\>$\Assert n> 0$\\
+    \>\>$n\texttt{--}$\\
+    \>\>$\iif \alpha n\leq w\wedge n> 0\tthen$\\
+    \>\>\>$\Id{realloker}(\beta n)$\\
+    \\
+    \>$\Procedure\Id{realloker}(w'\colon\NN)$\\
+    \>\>$w:=w'$\\
+    \>\>$b':= \Allocate\Id{Række}[1..w']\Of\Id{Element}$\\
+    \>\>$(b'[1],\ldots,b'[n]):=(b[1],\ldots,b[n])$\\
+    \>\>$\Dispose b$\\
+    \>\>$b:=b'$
+  \end{tabbing}
+  \caption{\llabel{fig: UArray pseudocode}%
+  Pseudokode for ubegrænsede rækker.}
+\end{figure}
+
+\subsection{Amortiseret analyse af ubegrænsede rækker: det globale perspektiv}
+\index{algoritmeanalyse!amortiseret!ubegrænset række}
+
+Vores implementation af ubegrænsede rækker følger princippet om at være »sædvanligvist hurtig«.
+\index{algoritmekonstruktion!szdvandlig@»sædvanligvist hurtig«}
+Adgangen til en indgang ved brug af $[\cdot]$ er lige så hurtig som for en begrænset række.
+Intuitivt betragtet vil $\Id{indsætBagest}$ og $\Id{fjernBagest}$ ligeledes være hurtige »sædvanligvist« -- datastrukturen skal jo bare aktualisere pejlevariablen $n$.
+Alligevel vil visse indsættelser og fjernelser kræve tid $\Theta(n)$.
+Vi skal nu vise, at disse dyre operationer er sjældne, og at hver følge af $m$ operationer begyndende fra en tom række kan udføres i tid $O(m)$.
+
+\begin{lem}
+  \llabel{lem:amortize}
+  Betragt en ubegrænset række $u$, som er tom i begyndelsen.
+  En vilkårlig følge $\sigma=\langle \sigma_1,\ldots,\sigma_m\rangle$ af $m$ $\Id{indsætBagest}$- og $\Id{fjernBagest}$-operationer på $u$ bliver udført i tid $O(m)$.
+\end{lem}
+
+Lemma~\lref{lem:amortize} er alt andet end trivielt.
+En lille og uskyldigt udseende ændring i implementationen gør påstanden falsk, som næste opgave viser.
+
+\begin{exerc}
+  Din afdelingsleder opfordrer dig til at ændre forvalget af $\alpha$ til $\alpha=2$.
+  Hans argumentet er, at det skulle være spild af plads at vente med at erstatte rækken med en mindre, til den er kvartfuld.
+  Han foreslår derfor at formindske rækken, så snart $n\leq \frac{1}{2}w$.
+  Overbevis ham om, at det er en dårlig ide.
+  Angiv hertil in følge af $m$ $\Id{indsætBagest}$- og $\Id{fjernBagest}$-operationer, som skulle kræve tid $\Theta(m^2)$, hvis I fulgte hans råd.
+\end{exerc}
+
+Lemma~\lref{lem:amortize} er et udsagn om de såkaldt »amortiserede« omkostninger ved en følge af $\Id{indsætBagest}$- og $\Id{fjernBagest}$-operationer.
+Enkelte operationer kan være dyre, men hele følgen af $m$ operationer koster $O(m)$.
+Hvis vi dividerer den samlede omkostning for alle operationer i følgen $\sigma$ med antallet af operationer, får vi en konstant.
+Det udtrykker vi på følgende måde:
+Den \emph{amortiserede omkostning} af hver enkel operation er konstant.
+Betydningen, som vi her tildeler ordet »amortiseret«, ligner den hverdagssproglige brug, men undgår en fælde, som ofte optræder i forbindelse med forestillinger om amortisering.
+Måske virker følgende ræsonnement bekendt?
+Bjarne siger: »Fra og med i dag cykler jeg på arbejde hver dag, så derfor har jeg råd til en luksuscykel.
+I det lange løb er udgiften per køretur meget lille -- investeringen amortiserer sig altså.«
+Hvad kommer til at ske i virkeligheden?
+Bjarne køber den dyre cykel, vejret slår om i regnvejr, og alle gode forsæt er glemt; den dyre cykel står i et hjørne, og ingenting er blevet amortiseret.
+I modsætning hertil planlægger vi vores datastrukturer sådan, at alle store udgifter altid retfærdiggøres af opsparinger i fortiden i stedet for af håbet om fremtidig nøjsomhed.
+I vores eksempel om transport til og fra arbejde kunne det se sådan ud:
+Astrids mål er egentlig at køre på arbejde i en luksuslimousine
+Hun køber den dog ikke på den første dag, men går derimod til fods og lægger hver dag et fast beløb til side.
+Efter et stykke tid har hun nu råd til at købe en cykel.
+Hun fortsætter med at spare og har snart råd til en lille bil, og efter endnu længere tid til den ønskede luksusbil.
+Hver udgift er dækket af tidligere opsparing og er amortiseret i samme øjeblik, den sker.
+Med dette amortiserede udgiftsbegreb kan vi formulere lemma~\lref{lem:amortize} endnu mere elegant.
+Den elegante formulering tillader også en mere præcis sammenligning af forskellige datastrukturer.
+
+\begin{cor}
+  Ubegrænsede rækker understøtter operationen $[\cdot]$ i konstant værstefaldstid og operationerne $\Id{indsætBagest}$ og $\Id{fjernBagest}$ i amortiseret konstant tid.
+\end{cor}
+
+\begin{proof}[Bevis for lemma~\lref{lem:amortize}]
+  For at etablere lemmaet benytter vi den såkaldte \emph{bankkonto\-metode}.
+  Denne er ækvivalent til \emph{potentialemetoden}, som er nærmere forklaret forneden.
+  \index{algoritmeanalyse!amortiseret!bankkontometode|textbf}%
+  \index{algoritmeanalyse!amortiseret!potentialemetode}
+  \index{potentialemetode|sieheunter{algoritmeanalyse, amortiseret}} 
+  Ved siden af vores datastruktur tænker vi os en bankkonto, som til hver tid indeholder et vist beløb, der aldrig må være negativt.
+  For hver $\Id{tilføjBagest}$- og $\Id{indsætBagest}$-operation indbetaler vi et fast beløb på kontoen.
+  Vi kalder vores valuta for \emph{mønter}.
+  \index{algoritmeanalyse!amortiseret!mønt|textbf}
+  Åbenbart er kopieringen af indgange i proceduren $\Id{realloker}$ den eneste aktion i programmet i figur~\lref{fig: UArray pseudocode}, som medfører mere end en konstant omkostning.
+  Ved nærmere betragtning indser vi, at proceduren altid kaldes med parameterværdien $w'=2n$ og så skal flytte $n$ indgange.
+  Grundideen i analysen er nu at lade opsparingen på bankkontoen finansiere omkostningen ved denne dyre operation $\Id{realloker}$.
+  Lad os vedtage, at en enkelt mønt kan finansiere omkostningen ved at flytte en enkelt indgang fra $b$ til $b'$.
+  Det betyder, at vi kan nøjes med at hæve $n$ mønter fra kontoen for et kald af $\Id{realloker}$.
+  Vi bestemmer os med forsyn for at indbetale 2~mønter for hvert kald af $\Id{indsætBagest}$ og 1~mønt for hvert kald af $\Id{fjernBagest}$.
+  Vi skal nu vise, at disse indbetalinger er nok til at dække udgifterne ved kaldene til $\Id{realloker}$.
+
+  Det første kald til $\Id{realloker}$ sker, når rækken indeholder én indgang, og den næste indgang bliver tilføjet.
+  For den allerede eksisterende indgang havde vi indbetalt to mønter, og det er rigeligt til at dække den ene mønt, som $\Id{realloker}$-kaldet koster.
+
+  Efter hvert kald $\Id{realloker}$ i det videre forløb indeholder rækken $w$ pladser, hvoraf $n=\frac{1}{2}w$ er benyttede og $\frac{1}{2}w$ står tomme.
+  Ved det næste kald af $\Id{realloker}$ gælder enten $n=w$ eller $4n\leq w$.
+  I det første tilfælde må der være tilkommet mindst $\frac{1}{2}w$ indgange i mellemtiden; for hver af disse havde vi indbetalt 2~mønter.
+  Derfor må der være mindst $w$ mønter på kontoen, hvilket er nok til at finansiere flytningen af $n$ indgange, idet $n=w$.
+  I det andet tilfælde er der blevet fjernet mindst $\frac{1}{2}w-\frac{1}{4}w=\frac{1}{4}w$ indgange fra rækken; for hver af disse operationer havde vi indbetalt 1~mønt.
+  Derfor er der mindst $\frac{1}{4}w$ mønter på kontoen, hvilket er nok til at finansiere flytningen af $n$ indgange, idet $n\leq \frac14w$.
+  Hermed er lemma~\lref{lem:amortize} bevist.
+\end{proof}
+
+\begin{exerc}\llabel{exerc: alpha beta costs}
+  Ændr beviset for lemma~\lref{lem:amortize} således, at det gælder for generelle værdier af $\alpha$ og $\beta$.
+  Hertil kræves, at et kald af $\Id{indsætBagest}$ koster $\beta/(\beta-1)$ mønter, og et kald af $\Id{fjernBagest}$ koster $\beta/(\alpha-\beta)$ mønter.
+  Når $n'$ opfylder ligningen $w=\beta n'$, ender hvert kald af $\Id{realloker}$ med netop $n'$ optagede pladser og $(\beta-1)n' = ((\beta-1)/\beta)w$ ledige pladser.
+  Når næste kald af $\Id{realloker}$ sker, gælder enten $n=w$ eller $\alpha n\leq w$.
+  Vis, at der i begge tilfælde er tilstrækkeligt mange mønter.
+\end{exerc}
+
+Amortiseret analyse er et kraftfuldt redskab med mange anvendelser.
+Derfor kan det betale sig at lære yderligere metoder til at bevise den slags udsagn.
+\footnote{Situationen minder om induktionsbeviser, som sommetider kan formuleres i termer af mindste modeksempler.
+Det er nyttigt at beherske begge metoder.}
+Vi skal se nærmere på to variationer over beviset for lemma~\lref{lem:amortize}.
+
+Foroven bestemte vi at anslå $2$~mønter for hvert $\Id{indsætBagest}$- og $1$~mønt for hvert $\Id{fjernBagest}$-kald.
+Alternativt kunne vi have regnet med $3$~mønter for $\Id{indsætBagest}$ og $0$~mønter for $\Id{fjernBagest}$.
+Bogholderiet er ligetil:
+Af de $3$~mønter bruges de to til at finansiere tilføjelsen af en indgang og den tredje til indgangens (eventuelle og fremtidige) fjernelse, som altså er blevet betalt lang tid i forvejen.
+
+\begin{exerc}[Fortsættelse af opgave~\lref{exerc: alpha beta costs}]
+  Vis, at det er nok med en afgift på $\beta(\beta-1)+\beta)(\alpha-\beta)$ mønter for hver $\Id{indsætBagest}$-operation.
+  Bestem (afhængigt af $\beta$) en værdi for $\alpha$, som sikrer $\beta/(\alpha-\beta)\leq 1/(\beta-1)$ hhv. $\beta/(\alpha-\beta)\leq \beta/(\beta-1)$.
+\end{exerc}
+
+
+\subsection{Amortiseret analyse af ubegrænsede rækker: det lokale perspektiv}
+
+\llabel{ss:local:view}
+Vi skal nu betragte den anden variant af beviset for lemma~\lref{lem:amortize}.
+I overvejelserne foroven har vi anlagt et globalt perspektiv for at overbevise os om, at der altid fandtes tilstrækkeligt mange mønter på kontoen for hvert kald af $\Id{realloker}$. 
+Nu vil vi i stedet indtage et lokalt standpunkt.
+Vi husker, at rækken umiddelbart efter kaldet til $\Id{reallocate}$ består af $w$  pladser, af hvilke $\frac{1}{2}w$ er optagede og $\frac{1}{2}w$ er ledige.
+Vi skal nu vise, at der for hvert tidspunkt efter første kald til $\Id{reallocate}$ gælder følgende invariant for antallet af mønter:
+\[
+  \text{Der er mindst $\max\{ 2 (n -\tfrac{1}{2} w) , \tfrac{1}{2}w - n\}$
+  mønter på kontoen.}
+\]
+Det ses let, at denne værdi aldrig er negativ.
+Vi skal vise invarians ved induktion i antal udførte operationer.
+Umiddelbart efter første udførelse af \Id{realloker} er kontostanden 1~mønt, hvilket opfylder invarianten, som jo kræver mindst 0~mønter i dette fald, hvor $n=w/2=1$.
+Hver udførelse af \Id{indsætBagest} (uden hensyntagen til det muligvis udløste kald til \Id{realloker}) øger $n$ med 1 og indbetaler 2~mønter. 
+Invarianten gælder altså stadig
+Hver udførelse af \Id{fjernBagest} (uden hensyntagen til det muligvis udløste kald til \Id{realloker}) formindsker $n$ med 1 og indbetaler 2~mønter.
+Invarianten gælder altså også i dette tilfælde stadig.
+Nu betrager vi et kald til \Id{realloker}, som jo skal bruge $n$ mønter.
+Der er to tilfælde, svarende til $n=w$  og $4n\leq n$ med $n\geq 0$.
+I det første tilfælde er kontostanden  ifølge invarianten mindst $2(n-\frac{1}{2}w)=n$, hvilket dækker behovet. 
+I det andet tilælde er kontostanden ifølge invarianten mindst $\frac{1}{2}w-n\ge n$, hvilket ligeledes dækker behovet.
+I begge tilfælde gælder ligheden $n=\frac{1}{2}w$ efter udførelsen af \Id{reallocate}; 
+invarianten er altså stadig gyldig.
+
+\begin{exerc}
+  \llabel{ex:three and zero} 
+  Lad os vedtage, at \Id{tilføjBagest} koster 3~mønter, og \Id{fjernBagest} ingen.
+  Vis, at kontoen altid har en saldo på mindst 
+$n + \max \set{ 2 (n - w/2) , w/2 - n} = \max\set{3n - w,w/2}$ mønter.
+\end{exerc}
+
+
+\begin{exerc}[Samtidig fjernelse af flere indgange]
+  Implementer operationen $\Id{fjernBagest}(k)$ for $0< k\leq n$, som fjerner de sidste $k$ elementer i rækken, i amortiseret konstant tid. 
+  Læg mærke til, at værdien $k$ er en kaldsparameter, ikke en konstant. 
+\end{exerc}
+
+
+\begin{exerc}[Konstant værstefaldstid]
+  Antag, at vi har brug for ubegrænsede rækker med konstant \emph{værstefalds}-tid per operation.
+  Konstruér sådan en datastruktur.
+  \emph{Vink:} 
+  Begynd med at understøtte $[\cdot]$ og $\Id{indsætBagest}$.
+  Gem værdierne i op til to rækker.
+  Påbegynd flytningen til en større række inden den mindre række er helt udnyttet.
+  Hvordan kan man generalisere denne idé til også at understøtte $\Id{fjernBagest}$?
+\end{exerc}
+
+\begin{exerc}[Implicitte voksende rækker]\llabel{ex:implicit}
+[TODO]
+\end{exerc}
+
+\begin{exerc}[Tyndt besatte rækker]
+  Implementer en begrænset række $b$ med konstant allokeringstid og konstant tid for $[\cdot]$.
+  Alle rækkeindgange skal være (implicit) initialiserede til $\bot$.
+  Du må ikke gøre nogen antagelser om indholdet i en nyallokeret række.
+  \emph{Vink:} 
+  Brug en ekstra række $b'$ af samme størrelse og husk antallet $t$ af indgange i $b$, som har fået tildelt en værdi.
+  I begyndelsen er $t=0$.
+  Når indgangen $i$ tildeles en værdi, gemmes denne værdi sammen med et indeks $j$ med $1\leq j\leq t$, og $b'[j]$ sættes til $i$.
+\end{exerc}
+
+\subsection{Amortiseret analyse af binær tæller}
+
+[TODO]
+
+
+\section{Amortiseret analyse *}
+
+[TODO]
+
+\section{Stakke og køer}
+\llabel{s:stack}
+
+Følger bliver ofte brugt på en temmelig begrænset måde.
+Lad os begynde med to eksemper fra den førdigitale tidsalder.
+En sagsbehandler kan arbejde på følgende måde:
+Hun har en \emph{stak} af ubehandlede sagsmapper på sit skrivebord.
+\index{stak}
+Nye sagsmapper bliver lagt på toppen af stakken.
+Når sagsbehandleren vil behandle næste sag, vælger hun den mappe, der ligger øverst på stakken.
+Denne »datastruktur« af sagsmapper er nem at bruge; selvom den kan ske, at visse mapper længere nede i stakken ender med at forblive ubehandlede i lang tid.
+I terminologien for klassen $\Id{Liste}$ fra afsnit~\lref{s:list} er en stak en følge, som kun bruger operationerne $\Id{tilføjBagest}$, $\Id{fjernBagest}$, $\Id{sidste}$ og $\Id{tom}$.
+Vi kalder gerne de tre første operationer for $\Id{stak}$,
+$\Id{afstak}$%
+\footnote{O.a.: Vær opmærksom på, at mange lærebøger og programbiblioteker bruger $\Id{afstak}$ til at betegne en kombination af $\Id{sidste}$ og $\Id{fjernBagest}$, som returnerer det sidste element (dvs.\ staktoppen) og samtidigt fjerner det fra stakken, svarende til operationerne $\Id{tmp} \Is L.\Id{sidste}$; $L.\Id{fjernBagest}$; $\Return \Id{tmp}$.}
+og $\Id{top}$.
+\index{stak!stak@\Id{stak}|textbf}
+\index{stak!afstak@\Id{afstak}|textbf}
+\index{stak!top@\Id{top}|textbf}
+Andre betegnelser for stak er \emph{sifu-liste} eller \emph{sifu-kø} (»sidst ind, først ud«) og \emph{kælderlager}.
+
+En anden opførsel kan man observere, når folk står pænt i kø hos bageren:
+Kunder stiller sig bagest i køen og forlader den forrest, når de når frem til disken.
+Sådan en følge kaldes \emph{kø}, \emph{fifu-liste} eller \emph{fifu-kø} (»først ind, først ud«).
+\index{kø|textbf}
+I terminologien for klassen $\Id{Liste}$ fra afsnit~\lref{s:list} er en kø en følge, som kun bruger operationerne $\Id{tilføjBagest}$, $\Id{fjernForrest}$, $\Id{første}$ og $\Id{tom}$, hvoraf de første kan omdøbes til $\Id{kø}$ og $\Id{afkø}$%
+\index{kø!kø@\Id{kø}|textbf}
+\index{kø!afkø@\Id{afkø}|textbf}
+\index{kø!første@\Id{første}|textbf}
+\footnote{O.a.: I mange fremstillinger og programbiblioteker dækker funktionen $\Id{afkø}$ over en kombination af $\Id{første}$ og $\Id{fjernForrest}$, som både returnerer det første element i køen og fjerner det fra køen.}.
+
+En mere generel \emph{dobbeltkø} 
+\index{dobbeltkø|textbf}
+stiller operationerne
+$\Id{første}$,
+$\Id{sidste}$,
+$\Id{tilføjForrest}$, 
+$\Id{tilføjBagest}$, 
+$\Id{fjernForrest}$,
+$\Id{fjernBagest}$,
+og $\Id{tom}$ til rådighed.
+Dobbeltkøen kan observeres hos bageren, når en ubehagelig person stiller sig forrest i køen, eller den person, der står bagest i køen, bliver træt af at vente og forlader butikken.
+Figur~\lref{fig:queues} sammenfatter funktionaliteten af datastrukturerne stak, kø og dobbeltkø.
+
+
+\begin{figure}
+  \[
+  \begin{tikzpicture}[scale = .5]
+    \node (0) at (0,0) [draw, fill=myblue, rectangle, inner sep = 4pt] {};
+    \node (0) at (1,0) [draw, fill=myblue, rectangle, inner sep = 4pt] {};
+    \node (0) at (2,0)  {$\cdots$};
+    \node (0) at (3,0) [draw, fill = myblue, rectangle, inner sep = 4pt] {};
+    \draw (3.5, .5) -- (-.5, .5) -- (-.5,-.5) -- (3.5, -.5);
+    \node at (1.5,1) [callout] {\emph{stak}};
+    \draw [->, thick] (7,0)--(5,0) node[midway, above] {\small $\Id{stak\vphantom j}$};
+    \draw [->, thick] (9,0)--(11,0) node[midway, above] {\small $\Id{afstak}$};
+    %
+    \begin{scope}[yshift = -3cm]
+    \node (0) at (0,0) [draw, fill=myblue, rectangle, inner sep = 4pt] {};
+    \node (0) at (1,0) [draw, fill=myblue, rectangle, inner sep = 4pt] {};
+    \node (0) at (2,0)  {$\cdots$};
+    \node (0) at (3,0) [draw, fill = myblue, rectangle, inner sep = 4pt] {};
+    \draw (3.5, .5) -- (-.5, .5);
+    \draw (-.5,-.5) -- (3.5, -.5);
+    \node at (1.5,1) [callout] {\emph{kø}};
+    \draw [->, thick] (7,0)--(5,0) node[midway, above] {\small $\Id{kø}$};
+    \draw [->, thick] (-6,0)--(-8,0) node[midway, above] {\small $\Id{afkø}$};
+    \end{scope}
+    %
+    \begin{scope}[yshift = -6cm]
+    \node (0) at (0,0) [draw, fill=myblue, rectangle, inner sep = 4pt] {};
+    \node (0) at (1,0) [draw, fill=myblue, rectangle, inner sep = 4pt] {};
+    \node (0) at (2,0)  {$\cdots$};
+    \node (0) at (3,0) [draw, fill = myblue, rectangle, inner sep = 4pt] {};
+    \draw (3.5, .5) -- (-.5, .5);
+    \draw (-.5,-.5) -- (3.5, -.5);
+    \node at (1.5,1) [callout] {\emph{dobbeltkø}};
+    \draw [->, thick] (7,0)--(5,0) node[midway, above] {\small $\Id{tilføjBagest\vphantom j}$};
+    \draw [->, thick] (9,0)--(11,0) node[midway, above] {\small $\Id{fjernBagest}$};
+    \draw [->, thick] (-4,0)--(-2,0) node[midway, above] {\small $\Id{tilføjForrest}$};
+    \draw [->, thick] (-6,0)--(-8,0) node[midway, above] {\small $\Id{fjernForrest}$};
+    \end{scope}
+  \end{tikzpicture}
+\]
+  \caption{\llabel{fig:queues}Operationer på stakke, køer og dobbeltkøer.}
+\end{figure}
+
+\begin{exerc}[Hanois tårne]
+  \index{stak}
+  \index{Hanois tårne}
+ \emph{
+  I det store brahmatempel i den hellige indiske by Varanasi, under den kuppel, som markerer verdens midtpunkt, ligger 64 skiver af det rene guld på en messingplade.
+   Skiverne har forskellig størrelse, og hver skive har et hul i midten.
+   Tempelpræsterne bærer disse skiver enkeltvis frem og tilbage mellem tre lange nåle i overensstemmelse med Brahmas urokkelige lov: ingen skive må anbringes på en mindre skive.
+   Da jorden blev skabt, lå alle 64 skiver på første nål; die dannede Brahmas tårn.
+   I vores tid er transporten af skiverne til den anden nål i fuld gang.
+   Når endelig Brahmas tårn genopstår i sin helhed på den anden nål, så er verdens undergang kommet og alt bliver støv.} 
+ \cite{Hof83}
+   \footnote{I virkligheden blev denne historie fundet på i 1883 af den franske matematiker Édouard Lucas som matematisk gåde.}
+   \index{Lucas, Édouard}
+
+   Giv en formel beskrivning af problemet at flytte et vilkårligt antal $k$ af skiver fra en nål til en anden ved hjælp af en tredje nål.
+   Skriv et program, som realiserer de tre tårn som stakke $\langle u_1,\ldots, u_l\rangle$ med indgange fra $\{1,\ldots,k\}$, hvor der altid skal gælde $u_1>\cdots>u_l$.
+   Programmet skal udlæse en følge af stakoperationer, som transformerer tilstanden 
+   $(\langle k,\ldots, 1\rangle, \langle\,\rangle, \langle\,\rangle)$
+   til tilstanden
+   $(\langle\,\rangle, \langle k,\ldots, 1\rangle, \langle\,\rangle)$.
+   \emph{Vink:} Løsningen er lettest at formulere rekursivt.
+\end{exerc}
+
+\begin{exerc}[Kø med to stakke]
+  \index{kø!to stakke}
+  Forklar, hvordan man kan implementere en kø ved hjælp af to stakke, sådan at hver kø\-operation tager konstant amortiseret tid.
+\end{exerc}
+
+Hvorfor gør vi os overhovedet tanker om følgetyperne stak, kø og dobbeltkø, når nu $\Id{Liste}$-datastrukturen allerede stiller samtlige deres operationer og flere til rådighed i konstant tid?
+Det er der mindst tre grunde til.
+For det første er programmer mere læsbare og indeholder færre fejl, hvis man udtrykkeligt indskrænker sig til snævrere anvendelsesmønstre.
+For den andet tillader smallere grænseflader en større fleksibilitet ved implementationen.
+På grund af deres enkelhed kan stakke og køer bruge specialiserede implementationer, som er mere pladsbesparende end implementationen af den almindelige type $\Id{Liste}$.
+Vi vil se nærmere på dette algoritmiske aspekt i resten af afsnittet.
+Især vil vi stræbe efter implementationer, som er baserede på rækker i stedet for lister.
+For det tredje er lister dårligt egnede til brug af yderlageret, idet hver adgang til en listeknude kan udløse en blokflytning.
+Når man derimod repræsenterer stakke og køer med rækker, fører deres sekventielle adgangsmønster til gentagen adgang til samme blok i nærlageret, hvilket leder til en stor forbedring af effektiviteten.
+
+Begrænsede stakke, hvis maksimale størrelse er kendt på forhånd, kan umiddelbart implementeres som begrænsede rækker.
+\index{kø!begrænset}
+For ubegrænsede stakke kan vi bruge ubegrænsede rækker.
+\index{kø!ubegrænset}
+Stakke kan også let repræsenteres som enkelthægtede lister; staktoppen svarer til listens begyndelse.
+Køer kan repræsenteres som enkelthægtede lister med en peger på den sidste kunde i listen.
+Dobbeltkøer kan derimod ikke repræsenteres som enkelthægtede lister på nogen effektiv måde.
+
+
+\begin{figure}
+  \begin{tabbing}
+    ~~~~\=~~~~\=\kill
+    \Class \Id{BegrænsetKø}(\Declare{$n$}{$\NN$}) \Of\Id{Element}\+\\
+    \Declare{$b$}{$\Array[0..n] \Of \Id{Element}$}\\
+  \DeclareInit{$h$}{$\NN$}{$0$}\qquad\comment{Indeks på første indgang\hspace*{3.2cm}}\\
+  \DeclareInit{$t$}{$\NN$}{$0$}\qquad\comment{Indeks på første ledige position\hspace*{0.5cm}\unitlength1cm\begin{picture}(2.5,0)\includegraphics[width=2.3cm]{img/cycle-queue.eps}\end{picture}}\\[2mm]
+    \TFunct{tom}{$\{0,1\}$}; \Return $h=t$\\[2mm]
+    \TFunct{første}{Element}; \Assert $\neg\Id{tom}$; $\Return b[h]$\\[2mm]
+  \TFunct{størrelse}{$\NN$}; \Return $(t-h+n+1) \bmod (n+1)$\\[2mm]
+    \Procedure \Id{tilføjBagest}(\Declare{$x$}{\Id{Element}})\+\\
+    \Assert $\Id{størrelse}<n$\\
+    $b[t] \Is x$\\
+    $t \Is (t+1)\bmod (n+1)$\-\\[2mm]
+    \Procedure \Id{fjernForrest} \Assert $\neg\Id{tom}$; $h \Is (h+1)\bmod (n+1)$%
+\end{tabbing}
+  \caption{
+    \llabel{alg:fifo}
+    Implementation af en begrænset kø med en række.
+  }
+\end{figure}
+
+Videre betragter vi nu en rækkebaseret implementationen af en begrænset kø, se figur~\lref{alg:fifo}.
+\index{kø!cyklisk række}
+Vi opfatter hertil rækken som en cyklisk struktur, hvis sidste indgang efterfølges af indgang~0.
+\index{række!cyklisk|textbf}
+Med andre ord er de mulige rækkeindeks tallene $0$, $\ldots$, $n$, og vi opfatter indeksene modulo $n+1$.
+Vi opretholder to indeks $f$ og $t$, som begrænser køens gyldige område; køen omfatter rækkepositionerne med indeks i $f..t-1$.
+Indeksene $f$ og $t$ vandrer rundt i ring, efterhånden som indgange stilles i køen og fjernes fra den.
+Indgangenes cykliske opførsel opnår man ved at regne modulo rækkestørrelsen $n+1$.%
+\footnote{På mange maskiner kan man opnå en mærkbar hastighedsforbedring af indeksberegningerne ved at vælge rækkestørrelsen som en to-potens og erstatte modulooperationen med bitoperationer.}
+Til enhver tid forbliver mindst én rækkeindgang ubenyttet; eller er det vanskeligt at skelne en fuld kø (med $n$ indgange) fra en tom kø.
+Implementationen kan let overføres til begrænsede dobbeltkøer.
+Cykliske rækker støtter også indiceret adgang med $[\cdot]$:
+\[
+  \operatorname{\textbf{Operator}} [i\colon\NN] \colon
+  \Element; \return b[i+j\bmod n]
+\]
+Rækkebaserede køer og dobbeltkøer kan gøres ubegrænsede ved hjælp af teknikkerne for ubegrænsede rækker fra afsnit~\lref{s:array}.
+
+Nu har vi set de væsentlige teknikker til implementationen af stakke, køer og dobbeltkøer.
+Disse teknikker kan kombineres for at opnå løsninger, som er specielt velegnede til meget lange følger og til eksterne lagermedier.
+
+\begin{exerc}[Lister af rækker]
+  \llabel{ex:blocklist}
+  \index{liste!af rækker}
+  TODO
+\end{exerc}
+
+\begin{exerc}[Stakke og køer i fjernlageret]
+    \index{liste!fjernlager}
+    TODO
+\end{exerc}
+
+\section{Sammenligning af lister og rækker}
+\llabel{s:o}
+
+Tabel~\lref{tab:operations} sammenfatter dette kapitels resultater.
+Rækker har fordele ved indeksbaseret adgang, hvorimod hægtede lister er mere velegnede til følger, som skal ændres (ved tilføjelse og fjernelse) på en vilkårlig plads.
+Begge tilgange kan realisere stak- og kø\-operationerne effektiv.
+Dog skal det siges, at rækker mere effektivt udnytter moderne lagerarkitektur, og at listers tidsgrænser gælder i værste fald.
+
+\begin{table}
+\begin{tabular}{llllll}
+  \toprule
+  Operation & $\Id{Liste}$ 
+  & $\Id{EListe}$ 
+  & $\Id{URække}$ 
+  & $\Id{CRække}$ 
+  & Forklaring af »$*$« \\ \midrule
+  $[\cdot]$ & $n$ & $n$ & 1 & 1 \\
+  $\Id{størrelse}$ & $1^*$ & $1^*$ & 1 & 1  & ikke med $\Id{splejs}$ for flere lister
+  \\
+  $\Id{første}$ & $1$ & $1$ & 1 & 1  \\
+  $\Id{sidste}$ & $1$ & $1$ & 1 & 1  \\
+  $\Id{indsæt}$ & $1$ & $1^*$ & $n$ & $n$  & kun for $\Id{indsætEfter}$\\
+  $\Id{fjern}$ & $1$ & $1^*$ & $n$ & $n$  & kun for $\Id{fjernEfter}$\\
+  $\Id{tilføjForrest}$ & $1$ & $1$ & $1^*$ & $1^*$  & amortiseret \\
+  $\Id{tilføjBagest}$ & $1$ & $1$ & $n$ & $1^*$  & amortiseret \\
+  $\Id{fjernForrest}$ & $1$ & $n$ & $1^*$ & $1^*$  & amortiseret \\
+  $\Id{fjernBagest}$ & $1$ & $1$ & $n$ & $1^*$  & amortiseret \\
+  $\Id{sammenføj}$ & $1$ & $1$ & $n$ & $n$  & \\
+  $\Id{splejs}$ & $1$ & $1$ & $n$ & $n$  & \\
+  $\Id{findNæste},\ldots$ & $n$ & $n$ & $n^*$ & $n^*$  & i praksis hurtigere pga.\ lagerblokke\\
+  \bottomrule
+\end{tabular}
+  \caption{
+    \llabel{tab:operations}
+    Udførelsestider for operationer på følger med $n$ indgange.
+    Det er underforstået, at hver tidsangivelse er omgivet af »$O(\cdot)$«.
+    $\Id{Liste}$ står for dobbelthægtet liste, $\Id{EListe}$ står for enkelthægtet liste,
+    $\Id{URække}$ står for ubegrænset række, $\Id{CListe}$ står for cyklisk række.
+  }
+\end{table}
+
+\index{følge!operationer i overblik}
+Enkelthægtede lister kan konkurrere med dobbelthægtede lister på de fleste punkter, men ikke alle.
+Den eneste fordel ved cykliske rækker i forhold til ubegrænsede rækker er deres effektive implementation af $\Id{indsætForrest}$ og $\Id{fjernForrest}$.
+
+\index{følge!pladsforbrug}
+Spørgsmål om datastrukturens pladseffektivitet er ligeledes ikketrivielle.
+Hægtede lister er meget kompakte, når selve indgangene er betydeligt større end pegerne.
+For indgangstyper med lavt pladsbehov er rækker normalt en mere kompakt løsning, fordi ingen ekstra plads skal bruges til pegere.
+Dette gælder med sikkerhed altid, når rækkestørrelsen er kendt i forvejen, så vi kan bruge begrænsede rækker.
+Ubegrænsede rækker udviser en god balance mellem pladseffektivitet og ekstra tidsforbrug for kopiering af indgangene ved operationen $\Id{realloker}$. 
+
+\section{Implementationsaspekter}
+
+De fleste programmeringssprog stiller begrænsede rækker til rådighed som grund\-datatype.
+% TODO changed "jede vernünftige" 
+Udover disse findes ubegrænsede rækker, lister, stakke, køer og dobbbeltkøer ofte tilgængeligt i standardbibliotekerne til  de gængse imperative programmeringssprog.
+Alligevel kommer man ofte i en situation, hvor man selv skal implementere listelignende datastrukturer, fx når de behandlende objekter forekommer samtidigt som indgange i flere sammenkædede lister.
+I den slags implementationer udgør lagerforvaltningen ofte en betydelig udfordring.
+
+\subsection{C++}
+\index{C++!følge}
+
+Klassen $\Id{vector}\langle\Id{Element}\rangle$ i STL (Standard Template Library) realiserer ubegrænsede rækker.
+\index{C++!vector@\Id{vector}}
+Alligevel tillader de færreste implementationer af STL at rækker krymper.
+Klassens funktionalitet omfatter fastlæggelsen af rækkens maximale senere omfang ved det tidspunkt, den bliver skabt.
+Normalt angiver man hertil på dette tidspunkt et skøn over følgens længde $n$.
+På den måde kan man undgå mange udvidelsesoperationer.
+Sommetider ved man også, hvornår rækkens vækst er afsluttet, og kan så fremtvinge egenskaben $w=n$.
+På grund af disse raffinementer findes der egentlig ingen grund til at bruge $C++$s indbyggede rækker.
+En yderligere fordel ved datatypen $\Id{vector}$ er, at dens instanser automatisk tilintetgøres, når de tilsvarende variables gyldighedsområde bliver forladt.
+I løbet af fejlfindingsfasen kan man desuden skifte over til varianter, som ved hver rækkeadgang foretager en kontrol af indeksgrænser.
+
+Der findes yderligere nogle aspekter at tage hensyn til, når man ofte har at gøre med voksende om krympende rækker og vil opnå særligt gode udførelsestider.
+I løbet af forstørrelsen og formindskningen skal klassen $\Id{vector}$ flytte indgange fra en række til en anden, hvortil den benytter konstruktøren $\Id{Copy}$ fra klassen $\Id{Element}$.
+I de fleste tilfælde vil det være meget tidseffektivt at kalde den maskinnære grundoperation $\Id{memcpy}$, som kopierer en nærmere betegnet blok af på hinanden følgende bytes.
+\index{C++!memcpy@\Id{memcpy}}
+En anden maskinnær optimeringsmulighed betstår i at realisere operationen $\Id{realloker}$ ved hjælp af C-standardfunktionen $\Id{realloc}$.
+\index{C!realloc@\Id{realloc}}
+Lagerforvaltningssystemet kan så muligvis helt undgå at kopiere data.
+
+Snublestenen ved anvendelsen af ubegrænsede rækker er den omstændighed, at pegere på rækkeindgange bliver ugyldige, når en ny række stilles til rådighed. 
+(Man siger, at »referenceintegriteten« er ødelagt.)
+\index{referenceintegritet}
+Man må altså ubetinget sikre, at rækken ikke bliver skiftet ud, mens sådan en peger er i brug.
+Når den slags udskiftning ikke kan udelukkes, må man referere til indgange ved hjælp af indekser i stedet for pegere.
+
+Både STL
+\index{STL!list@\Id{list}} 
+og LEDA 
+\index{LEDA!list@\Id{list}}~\cite{LEDA-AS} 
+stiller dobbbelthægtede lister til rådighed i form af klassen $\Id{list}\langle Element\rangle$, og enkelthægtede lister i form af klassen $\Id{slist}\langle Element\rangle$.
+
+[TODO incomplete]
+
+\subsection{Java}
+\index{java!følge}
+Siden Java~6 indeholder pakker $\Id{util}$ klassen $\Id{ArrayList}$ for ubegrænsede rækker og klassen $\Id{LinkedList}$ for dobbelthægtede lister.
+\index{java!hægtet liste}
+\index{java!dobbeltkø}
+\index{java!stak}
+\index{java!vector@\Id{Vector}}
+Der findes også en grænseflade $\Id{Deque}$ for dobbeltkøer, som implementeres både af klassen $\Id{ArrayDeque}$ og af klassen $\Id{LinkedList}$.
+Stakgrænsefladen $\Id{Stack}$ implementeres i Java som udvidelse af klassen $\Id{Vector}$.
+
+Mange javabøger forkynder stolt, at Java ikke indeholder pegere.
+Læseren kan altså spørge sig, hvordan man så kan implementere hægtede lister.
+Svaret er naturligvis, at referencer til objekter i al væsentlighed er pegere, og at man i hvert fald kan bruge dem som var de pegere.
+I en vis forstand kan man sågar sige, at Java \emph{kun} har pegere, fordi den eneste adgang til objekter af ikke-elementære datatyper er via referencer -- objekter gemmes aldrig i forælderobjektet.
+
+Eksplicit lagerforvaltning er i Java frivillig,
+\index{java!lagerforvaltning}
+fordi køretidssystemets skraldhåndtering tager sig af alle objekter, som ikke længere refereres til.
+
+\subsection{Python}
+\index{python!følge}
+
+Python er ikke noget maskinnært sprog og råder ikke over begrænsede rækker som del af de grundlæggende datatyper. 
+Den primære følgetype i Python er typen $\Id{List}$, som i reference\-implementationen er implementeret som en ubegrænset række.
+Standardmodulet $\Id{collections}$ indeholder datatypen $\Id{deque}$ for dobbbeltkøer, som er implementeret som en dobbelthægtet liste for hurtig manipulation i begge ender af følgen, men uden at understøtte hverken hurtig sammenføjning eller operationer på følgens interne indgange som fx $\Id{splejs}$.
+
+\section{Historiske anmærkninger og videre resultater}
+\llabel{s:further}
+
+Alle resultaterne i dette kapitler kan betragtes som »folklore«
+\index{folkloreresultat}
+i den forstand, at de er kendt meget længe, og ingen gør krav på at have opfundet dem.
+Faktisk har vi set, at mange af de grundlæggende abstrakte ideer er ældre end den digitale databehandling.
+Amortisering er lige så gammel som selve algoritmeanalysen.
+\emph{Bankkontometoden} og \emph{potentialemetoden} blev foreslået i begyndelsen af 1980'erne af 
+\index{Brown, M. R.}%
+\index{Mehlhorn, K.}%
+\index{Sleator, D.}%
+\index{Tarjan, R. E.}%
+\index{Huddlestone, S.}
+R.\,E.\,Brown, S.\,Huddlestone,
+K.\,Mehlhorn, D.\,D.\,Sleator og R.\,E.\,Tarjan
+\cite{Brown-Tarjan,Huddlestone-Mehlhorn,
+SleTar83,ST85}.
+Oversigtsartiklen~\cite{Tarjan:Amortized-Complexity} gjorde betegnelsen \emph{amortiseret analyse} alment anvendt;
+sætning~\lref{thm:universal} er fra~\cite{Me:amortisierte-Analyse}.
+
+Der findes en rækkelignende datastruktur for følger, som tillader indiceret adgang i konstant tid samt indføjelse og fjernelse på vilkårlig plads i amortiseret tid
+$O(\sqrt{n})$.
+Dette opnår man med et relativt enkelt kneb.
+Rækken realiseres som en følge af delrækker, hvoraf hver indeholder et antal
+$n'=\Theta(\sqrt{n})$ af indgange, borset fra den sidste, som muligvis indholder færre indgange.  
+Hver delrække organiseres cyklisk som beskrevet i afsnit ~\lref{s:stack}.
+Adgang $[i]$ til position $i$ forskydes derfor med en værdi $h$.
+Indgangen med indeks $i$ finder man på plads $i\bmod n'$ af delrække nummer $\floor{i/n'}$. 
+En ny indgang tilføjes i tid $O(\sqrt{n})$ i den delrække, som bestemmes af indeks $i$.
+Denne delrække får nu en overskydende indgang.
+For at opretholde invarianten, at hver delrække har eksakt $n'$ indgange, tilføjes den overskydende indgang som første element til den næste delrække.
+Denne proces af gentagen videresending af en overskydende indgang gentages nu
+$n/n'= O(\sqrt{n})$ gange, indtil den sidste delrække er nået.
+Fjernelser gøres på lignende måde.
+Sommetider skal der skabes en ny delrække, eller størrelsen $n'$ skal ændres og alle indgange omfordeles.
+De amortiserede omkostninger ved disse ekstraoperationer kan holdes små.
+Med yderligere en modifikation kan desuden alle dobbeltkøoperationer gennemføres i konstant tid.
+I~\cite{MorKat01}\index{Katajainen, J.} kan den interesserede læser finde nogle snedige implementationer af dobbeltkøer og et implementationsstudie.

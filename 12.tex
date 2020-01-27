@@ -1,0 +1,322 @@
+\chapter{Generelle tilgange til optimeringsproblemer}%
+\index{optimering|textbf}
+
+\renewcommand{\labelprefix}{ch:optimization}
+\llabel{}
+
+\section{Lineær programlægning}
+\llabel{s:black:box}
+\index{LP|siehe{lineær programlægning}}
+\index{linezr programlzgning@lineær programlægning (LP)|textbf}%
+
+\section{Grådige algoritmer}
+\llabel{s:greedy}%
+\index{algoritmekonstruktion!grådig|textbf}%
+\index{grådig algoritme|sieheunter{algoritmekonstruktion}}
+
+En algoritme er \emph{grådig}, hvis den behandler sine objekter i en specifik (ofte nøje udvalgt) rækkefølge og træffer beslutninger om hvert objekt (fx om det skal medtages i løsningen eller ej) i samme øjeblik, som objektet betragtes.
+Når en beslutning er taget, bliver den ikke ændret senere.
+Algoritmen for rygsæksproblemet fra sidste afsnit følger det grådige princip:
+Vi betrager objekterne i rækkefølgen givet ved deres profittæthed.
+Algoritmerne for korteste veje i acykliske grafer og for ikke-negative kantomkostninger
+(afsnit \ref{ch:spath:s:acyclic} og \ref{ch:spath:s:Dijkstra}) og for minimale spændetræer (kapitel~\ref{ch:mst:}) er ligeledes grådige.
+For eksempel betragter Dijkstras algoritme knuderne i voksende afstand af TODO.
+For disse problemer finder den grådige strategi en optimal løsning.
+
+%\begin{figure}[t]
+%%\begin{center}\psfrag{w}{$w$}\psfrag{pw}{$p/w$}\psfrag{p}{$p$}\psfrag{M}{$M$}\psfrag{M=3}{$M=3$}
+%%\psfrag{Instanz:}{Instanz:}\psfrag{Lösungen:}{Lösungen:}
+%%\psfrag{greedy}{greedy}\psfrag{optimal}{optimal}\psfrag{roundDown}{roundDown}\psfrag{roundDown,}{roundDown,}
+%%\includegraphics{\masterdir/optimization/knapsackI2.eps}
+%%\end{center}
+%\caption{\llabel{fig:knapsackI2}
+%  To instanser til rygsæksproblemet.
+%  \emph{Venstre}: for $p=(4,4,1)$, $w=(2,2,1)$ og $M=3$ giver \Id{grådig} et bedre resultat end \Id{afrundNedad}.
+%  \emph{Højre}: for $p=(1,M-1)$ og $w=(1,M)$ er løsningerne fra både \Id{grådig} og \Id{afrundNedad} langt fra optimale.}
+%\end{figure}
+%
+%Generelt leverer grådige algoritmer ikke optimale løsninger.
+%Betragt fx igen rygsæksproblemet.
+%En typisk grådig tilgang ville være at gennnemgå objekterne i rækkefølge af profittæthed og pakke et element i rygsækken, hvis der er plads til det.
+%Lad os kalde denne algoritme for \Id{grådig}.
+%\index{rygsæksproblem!grådig algoritme}
+%\index{algoritmekonstruktion!grådig!rygsæksproblem}
+%Figur~\lref{fig:knapsackI} og~\lref{fig:knapsackI2} viser eksempler.
+%Læg mærke til, at algoritmen \Id{greedy} giver løsninger, som altid er minst lige så gode som \Id{afrundNedad}:
+%Når algoritmen \Id{afrundNedad} standser, så snart den finder et objekt, so ikke får plads i rygskækken. 
+%Algoritmen \Id{grådig} fortsætter derimod med at lede og kan ofte finde plads i rygsækken til yderligere objekter med mindre vægt.
+%Selvom begge algoritmer havner i samme resultat på eksemplet i figur~\lref{fig:knapsackI}, så er resultaterne generelt forskellige.
+%Betragt hertil eksempelinstanserne i figur~\lref{fig:knapsackI2}.
+%Med profitter $p=(4,4,1)$, vægte $w=(2,2,1)$ og kapacitet $M=3$ vælger \Id{grådig} det første og det trejde objekt og opnår profit~5, mens \Id{afrundNedad} kun vælger det første objekt og opnår profit~4.
+%Begge algoritmer kan finde løsninger, som er meget langt fra optimale.
+%I det andet eksempel i figur~\lref{fig:knapsackI2} betragtes for vilkårlig kapacitet $M$ profitterne $p=(1,M-1)$ og vægtene $w=(1,M)$.
+%Både \Id{grædig} og \Id{afrundNedad} vælger det første objekt, idet det har en svagt højere profittæthed en det andet objekt, selvom dets absolutte profit 1 er meget lille.
+%Det havde været meget bedre, bare at tage det andet objekt og dermed opnå profit $M-1$.
+%
+%Denne betragtning kann omsættes til en forbedret algoritme, som vi kan kalde
+%\Id{afrund}.
+%\index{rygsæksproblem!2-approksimation (\Id{afrund})}
+%Algoritmen beregner to løsninger, nemlig løsningen $x^d$ fra \Id{afrundNedad} og løsningen $x^c$, som man opnår ved kun at vælge det kritiske objekt $x_j$ i brøkløsningen. 
+%\footnote{Vi går ud fra, at der findes en indledende oprydningsfase, som fjerner de objekter, som i forvejen er »for tunge«, dvs. hvor $w_i>M$, fra probleminstansen.}%
+%Algoritmen returnerer så det bedste af disse to svar.
+%
+%Algoritmen \Id{afrund} har en interessant kvalitetsgaranti.
+%På en vilkårlig instans finder den nemlig en løsning, som er mindst halvt så profitabel som en optimal løsning.
+%Generelt siger vi, at en algoritme opnår
+%\emph{approksimationsgaranti} $\alpha$,
+%\index{approksimationsalgoritme|textbf}
+%\index{approksimationsgaranti|textbf}  
+%hvis den på hver instans finder en løsning, hvis profit højst er en faktor $\alpha$ mindre end optimal. 
+%
+%\begin{theorem}
+%  Algoritmen \Id{afrund} har approksimationsgaranti~2.
+%\end{theorem}
+%\begin{proof}
+%  Betragt en instans $p, w, M$. 
+%  Lad $x^*$ være en vilkårlig optimal løsning, og lad $x^\textrm b$ være den optimale løsning $p,w,M$ for problemets brøktalsslækning. 
+%  Da gælder $p\cdot x^*\leq p\cdot x^\mathrm b$.
+%  Målfunktionens værdi kan ikke blive mindre af, at vi sætter $x_j=1$ i brøktalsløsningen.
+%  Dermed får vi, at
+%  \[p\cdot x^*
+%  \leq p\cdot x^f
+%  \leq p\cdot x^d+p\cdot x^c
+%  \leq 2\max\{p\cdot x^d,p\cdot x^c\}\,,\]
+%  dvs. at profitten for algoritme \Id{afrund} er mindst halvdelen af den optimale profit.
+%\end{proof}
+%
+%Algoritme \Id{afrund} kan raffineres på mange måder, uden at man behøver at give køb på approksimationsgarantien.
+%For eksempel kan man erstatte $x^d$ med løsningen fra den grådige algoritme.
+%Ligeledes kan vi udvide $x^c$ med en grådig løsning til den mindre instans, som opstår ved at  fjerne objekt~$j$ og reducere rygsækkens kapacitet med $w_j$.
+%
+%Vi vender os nu til en anden vigtig klasse af problemer, som hedder \emph{skemalægningsproblemer}.
+%\index{skemalægning|textbf}
+%\index{scheduling|sieheunter{skemalægning}}
+%Betragt følgende scenario, som er kendt som \emph{skemalægning af uafhængige, vægtede opgaver på identiske maskiner}.
+%Givet er $m$ maskiner, som skal udføre $n$ opgaver, hvor opgave $j$ tager tid $t_j$.
+%En tildeling $x\colon\{1,\ldots, n\}\rightarrow\{1,\ldots, m\}$ af opgaver til maskiner kaldes et \emph{skema}.    
+%\emph{Belastningen} $l_j$ for maskine $j$ er givet ved $\sum_{i \colon x(i)=j}\,t_i$. 
+%Målet er at finde en tildeling $x$ som minimerer den maksimale belastning (eller arbejdstid)
+%$L_{\max}=\max_{1 \le j \le m} \ell_j$.
+%%\index{Scheduling!makespan@\emph{makespan}|textbf}
+%%\index{makespan@\emph{makespan}|sieheunter{skemalægning}}
+%%TODO makespan?
+%
+%Vi begynder med en enkel grådig algoritme for dette problem \cite{Gra66}\index{Graham, R. L.}, som desuden ikke behøver at kende opgavestørrelserne i forvejen.
+%\index{algoritmekonstruktion!grådig!skemalægning}
+%\index{skemalægning!online-algoritme|textbf}%
+%\index{skemalægning!listeskemalægning@\emph{listeskemalægning}}
+%\index{listeskemalægning@\mbox{\emph{listeskemalægning}, algoritme}}
+%Opgavestørrelserne bliver læst en efter en, og blivertildelt  en maskine med det samme, inden næste opgave er behandlet.
+%Den slags algoritmer, som ikke »kender fremtiden« kaldes ofte \emph{online-algoritmer}.
+%\index{online-algoritme|textbf}.
+%Algoritmen \emph{listeskemalægning} arbejder helt enkelt på den måde, at opgave $i$ i samme øjeblik, som den ankommer, henvises til den maskine som momentant har den mindste belastning.
+%Denne regel kaldes sommetider »kortest kø«.
+%\index{kortest-kø-heuristik}
+%Formelt beregner vi for hver maskine $j$ den øjeblikkelige belastning $\ell_j=\sum_{h < i \wedge x(h) = j} t_h$ og henviser job $i$ til den maskine $j_i$, som opfylder ligningen $\ell_{j_i}= \min_{1 \le j \le m} \ell_j$.
+%Denne algoritme garantere ikke, at løsningen er optimal, men finder alligevel tæt på optimale løsninger.
+%
+%\newcommand{\imax}{i^\ast}
+%\newcommand{\jmax}{j^\ast}
+%\begin{theorem}
+%  \index{algoritmeanalyse!approksimationsalgoritme}
+%  Algoritmen \Id{listeskemalægning} opfylder
+%  \[ L_{\max}\leq \frac{1}{m}\sum_{i=1}^nt_i+\frac{m-1}{m}\max_{1 \le
+%  i \le n} t_i \,. \]
+%\end{theorem}
+%\begin{proof} 
+%  In der von \emph{listScheduling} erzeugten Zuordnung
+%  hat irgendeine Maschine $\jmax$ Last $L_{\max}$.
+%  Wir betrachten den letzten Job $\imax$,
+%  der auf Maschine $\jmax$ geplant wird. 
+%  In dem Moment, in dem Job $\imax$ der Maschine $\jmax$ zugewiesen wird,
+%  haben alle $m$ Maschinen Last mindestens
+%  $L_{\max}-t_{\imax}$, d.\,h., 
+%  $$\sum_{i\neq\imax}t_i\geq(L_{\max}-t_{\imax})\cdot m\punkt$$
+%  Wenn wir dies nach $L_{\max}$ auf"|lösen, erhalten wir
+%  \begin{equation}
+%    L_{\max}\leq \frac{1}{m}\sum_{i\neq\imax}t_i + t_{\imax}
+%    =  \frac{1}{m}\sum_{i}t_i + \frac{m-1}{m}t_{\imax}
+%    \leq \frac{1}{m}\sum_{i=1}^nt_i+\frac{m-1}{m}\max_{1 \le i \le n} t_i\punkt
+%    \tag*{\qed}
+%  \end{equation}%\proofendswithequation
+%\end{proof}
+%   
+%   \engig{\newcommand{\imax}{\hat{\imath}}
+%   \begin{theorem}\index{algorithm analysis!approximation algorithm}
+%   The shortest-queue algorithm ensures that 
+%   \[ L_{\max}\leq \frac{1}{m}\sum_{i=1}^nt_i+\frac{m-1}{m}\max_{1 \le
+%i \le n} t_i \punkt \]
+%   \end{theorem}
+%   \begin{proof} In the schedule generated by the shortest-queue algorithm, some
+%machine has a load $L_{\max}$. 
+%   We focus on the job $\imax$ that is the last job that has been assigned
+%   to the machine with the maximum load.
+%   When job $\imax$ is scheduled, all $m$ machines have a load of at least
+%   $L_{\max}-t_{\imax}$, i.e.,
+%   $$\sum_{i\neq\imax}t_i\geq(L_{\max}-t_{\imax})\cdot m\punkt$$
+%   Solving this for $L_{\max}$ yields
+%   $$L_{\max}\leq \frac{1}{m}\sum_{i\neq\imax}t_i + t_{\imax}
+%            =  \frac{1}{m}\sum_{i}t_i + \frac{m-1}{m}t_{\imax}
+%          \leq \frac{1}{m}\sum_{i=1}^nt_i+\frac{m-1}{m}\max_{1 \le i \le n} t_i\punkt$$%\proofendswithequation
+%   \qed\end{proof}}
+%
+%Wir sind fast fertig. 
+%Es bleibt nur noch zu beobachten, 
+%dass sowohl $\frac{1}{m}\sum_i t_i$ als auch
+%$\max_i t_i$ untere Schranken\index{untere Schranke}
+%für die maximale Last für \emph{jede} Zuweisung sind, 
+%also auch für die maximale Last bei einer optimalen Zuweisung. 
+%Es ergibt sich das folgende Korollar. 
+%\begin{corollary}
+%Die Approximationsgüte von Algorithmus\/ listScheduling\/ ist $2-1/m$. 
+%\end{corollary}
+%\begin{proof} Sei $L_1 = \sum_i t_i/m$ und $L_2 = \max_i t_i$. 
+%Die maximale Last bei der optimalen Lösung ist mindestens $\max\set{L_1,L_2}$. 
+%Die maximale Last bei der von Algorithmus \emph{listScheduling} erzeugten Zuordnung 
+%ist nicht größer als
+%\begin{align}
+%L_1 + \frac{m-1}{m} L_2 &\le \frac{m L_1 + (m-1) L_2}{m} \le \frac{(2m-1) \nonumber
+%\max\set{L_1,L_2}}{m} \\ &= (2 - \frac{1}{m}) \cdot \max\set{L_1,L_2} \eqndot \tag*{\qed}
+%\end{align} %\proofendswithequation
+%\end{proof}
+%
+%\engig{We are almost finished. We now observe that $\sum_i t_i/m$ and
+%$\max_i t_i$ are lower bounds\index{lower bound} 
+%on the makespan of any schedule and hence also
+%the optimal schedule. We obtain the following corollary. 
+%\begin{corollary}
+%The approximation ratio of the shortest-queue algorithm is  $2-1/m$. 
+%\end{corollary}
+%\begin{proof} Let $L_1 = \sum_i t_i/m$ and $L_2 = \max_i t_i$. The makespan of
+%the optimal solution is at least $\max(L_1,L_2)$. The makespan of the
+%shortest-queue 
+%solution is bounded by
+%\begin{align*}
+%L_1 + \frac{m-1}{m} L_2 &\le \frac{m L_1 + (m-1) L_2}{m} \le \frac{(2m-1)
+%\max(L_1,L_2)}{m} \\ &= (2 - \frac{1}{m}) \cdot \max(L_1,L_2) \eqndot
+%\end{align*} %\proofendswithequation
+%\qed\end{proof}}
+%
+%Wir bemerken noch, dass Algorithmus \emph{listScheduling} auch nicht besser ist als eben festgestellt.
+%Dazu betrachten wir eine Instanz mit
+%$n=m(m-1)+1$, $t_i=1$ für $i=1,\ldots,n-1$ und $t_n=m$. 
+%	Die optimale Lösung hat maximale Last $L_{\max}^{\Id{opt}}=m$, 
+%	wohingegen Algorithmus \emph{listScheduling} eine Lösung mit 
+%	maximaler Last $L_{\max}=2m-1$ liefert.
+% Algorithmus \emph{listScheduling} ist ein Online-Algorithmus.
+%Er erzeugt eine Lösung, die höchstens um den Faktor $2 - 1/m$ 
+%schlechter ist als ein Algorithmus, der die gesamte Eingabe kennt. 
+%In einer solchen Situation sagen wir, dass der Online-Algorithmus
+% einen \emph{kompetitiven Faktor}\index{kompetitiver Faktor|textbf} 
+%(engl.: \emph{competitive ratio}) von $\alpha = 2-1/m$ besitzt.
+%
+%\engig{The shortest-queue algorithm is no better than claimed above. Consider an instance
+%with $n=m(m-1)+1$, $t_n=m$, 
+%   and $t_i=1$ for $i<n$. The 
+%   optimal solution has a makespan $L_{\max}^{\Id{opt}}=m$, whereas the
+%shortest-queue 
+%algorithm produces a solution with a makespan $L_{\max}=2m-1$. The shortest-queue 
+%algorithm is an online algorithm. It produces a solution which is at
+%most a factor $2 - 1/m$ worse than the solution produced by an algorithm that
+%knows the entire input. In such a situation, we say that the online algorithm
+%has a \emph{competitive ratio}\index{competitive ratio|textbf} of $\alpha = 2-1/m$.}
+%
+%\begin{exercisestara}\llabel{ex:lpt}\index{Scheduling!listScheduling@\emph{listScheduling}!sortiert}
+%  Zeigen Sie, dass Algorithmus \emph{listScheduling} Approximationsgüte $4/3$ erreicht, 
+%	wenn man zu Beginn die Jobs nach ihrer Größe fallend sortiert. 
+%\end{exercisestara}
+%
+%\begin{exercisestara}[Binpacking]\llabel{ex:binpacking}\index{Binpacking}
+%Nehmen Sie an, die Chefin einer Schmugglerbande hat verderbliche Güter in ihrem Keller. 
+%Sie muss für die kommende Nacht genügend viele Träger anheuern, um alle Güter auf einmal
+%über die Grenze zu schaffen. 
+%Entwickeln Sie einen Greedy-Algorithmus,
+%der die Anzahl der benötigten Träger zu minimieren versucht,
+%unter der Annahme, dass jeder maximal Gewicht $M$ tragen kann.
+%Versuchen Sie, für Ihren Algorithmus 
+%zur Lösung des \emph{Binpackingproblems} eine Approximationsgüte zu beweisen.
+%\end{exercisestara}
+%
+%   \engig{\begin{exercisestara}\llabel{ex:lpt}\index{machine scheduling!decreasing-size algorithm}
+%   Show that the shortest-queue algorithm achieves an approximation
+%   ratio of $4/3$ if the jobs are sorted by decreasing size.
+%\end{exercisestara}
+%
+%
+%\begin{exercisestara}[bin packing.]\llabel{ex:binpacking}\index{bin packing}
+%Suppose a smuggler boss has perishable goods in her
+%cellar. She has to hire enough porters to ship all items
+%tonight. Develop a greedy algorithm that tries to minimize
+%the number of people she needs to hire, assuming that they can
+%all carry a weight $M$. 
+%Try to obtain an approximation ratio
+%for your \emph{bin-packing} algorithm.
+%\end{exercisestara}}
+%
+%\emph{Boolesche Formeln}\index{Boolesche Formel} 
+%stellen eine weitere mächtige Beschreibungssprache dar. 
+%Hier können Variablen die Booleschen Werte $\True$ und $\False$ annehmen,
+%und die Verknüpfungen $\wedge$, $\vee$ und $\neg$ werden benutzt, 
+%um ausgehend von Variablen Formeln aufzubauen.
+%Eine Boolesche Formel ist \emph{erfüllbar}\index{erfüllbar},
+%wenn es eine Belegung der Variablen mit Booleschen Werten gibt,
+%so dass die Auswertung der Formel $\True$ ergibt.  
+%Als Beispiel formulieren wir das Schubfachprinzip\index{Schubfachprinzip} 
+%(engl.: \emph{pigeonhole principle}\index{pigeonhole principle@\emph{pigeonhole principle}|sieheunter{Schubfachprinzip}})
+%als Instanzen des Erfüllbarkeitsproblems. 
+%Das Schubfachprinzip besagt, dass es unmöglich ist, $n+1$ Gegenstände so auf $n$ Behälter (Schubfächer)
+%zu verteilen, dass jeder Behälter höchstens einen Gegenstand enthält.
+%Wir benutzen Variablen $x_{ij}$ für $1 \le i \le n+1$ and $1 \le j \le n$. 
+%Index $i$ läuft also über Gegenstände, Index $j$ über Behälter. 
+%Variable $x_{ij}$ steht für die Aussage "`Gegenstand $i$ liegt in Behälter $j$"'.
+%Jeder Gegenstand muss in (mindestens) einem Behälter liegen, 
+%also bilden wir für jedes $i$ die Teilformel $x_{i1} \vee \ldots \vee x_{in}$.
+%Kein Behälter soll mehr als einen Gegenstand enthalten, 
+%also bilden wir für jedes $j$ die Teilformel $\neg(\vee_{1 \le i < h
+%\le n+1} (x_{ij} \wedge x_{hj}))$.
+%Die Konjunktion dieser $n+m+1$ Teilformeln ist unerfüllbar,
+%weil man aus einer erfüllenden Belegung eine Verteilung der 
+%$n+1$ Objekte auf $n$ Behälter ablesen könnte, die es nach
+%dem Schubfachprinzip nicht gibt. 
+%SAT-Löser oder SAT-Solver\index{SATLöser@SAT-Löser, SAT-Solver}\index{Boolesche Formel}
+%entscheiden, ob eine vorgelegte Boolesche Formel erfüllbar ist oder nicht
+%und berechnen gegebenenfalls eine erfüllende Belegung.
+%Obwohl das Erfüllbarkeitsproblem $\NP$-vollständig ist, gibt es 
+%heute SAT-Löser, die Probleminstanzen aus echten Anwendungen 
+%lösen können, die Hunderttausende von Variablen umfassen.\footnote{Siehe \url{http://www.satcompetition.org/}.}  
+%
+%\begin{myexercise} Formulieren Sie das Schubfachprinzip für $n+1$ Objekte und $n$ Behälter 
+%als ein ganzzahliges lineares Programm (ILP).  
+%\end{myexercise}\index{lineare Programmierung@lineare Programmierung (LP)!ganzzahlig (ILP)!Schubfachprinzip}
+%
+%
+\section{Dynamisk programlægning}
+\llabel{s:dynamic}%
+\index{dynamisk programlægning|sieheunter{algoritmekonstruktion}}%
+\index{algoritmekonstruktion!dynamisk programlægning|textbf}%
+
+\section{Udtømmende søgning}
+\llabel{s:systematic}%
+\index{algoritmekonstruktion!udtømmende søgning|textbf}
+\index{Thompson, K.}
+
+\section{Lokal søgning}
+\llabel{s:local}
+\index{algoritmekonstruktion!lokal søgning|textbf}
+\index{lokal søgning|sieheunter{algoritmekonstruktion}}
+
+\section{Evolutionære algoritmer}
+\llabel{s:genetic}%
+\index{algoritmekonstruktion!evolutionær algoritme|textbf}%
+\index{evolutionær algoritme|sieheunter{algoritmekonstruktion}}%
+
+\section{Implementationsaspekter}
+\llabel{s:implementation}
+\index{Algoritmeimplementation}%
+\section{Historiske anmærkninger og videre resultater}
+\llabel{s:further}
+
+
+\emph{Udeladte}
+
+

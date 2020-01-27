@@ -6,32 +6,32 @@
 \index{programanalyse|siehe{algoritmeanalyse}}
 \index{analyse|siehe{algoritmeanalyse}}%
 
-Vi kan sammenfatte de hidtil betragtede principper for algoritmeanalyse som følger.
-Vi har bortabstraheret komplikationerne i en reel datamat ved at betragte ram-modellen.
-I denne model måles beregningstid ved at tælle antallet af udførte kommandoer.
-Vi forenkler analysern yderligere ved at inddele indput efter størrelse og fokussere på værstefald.
-Den asympotiske notation gør det muligt at ignorere konstante faktorer og lavereordens termer.
-Dette grove perspektiv tilloder os også at betragte øvregrænser
-\index{øvregrænse|siehe{beregningstid, værstefald}}
-for udførelsestiden, så længe det asympototiske resultater forbliver uændret.
-Samlet leder disse forenklinger til, at vi kan analysere beregningstiden af pseudokode direkte, uden at behøve at oversætte programmet til en maskinsprog.
+Vi kan sammenfatte de hidtil betragtede principper for algoritmeanalyse på følgende måde.
+Vi abstraherer bort fra  komplikationerne i en virkelig datamat ved at betragte registermaskinen.
+I denne model måles udførelsestid ved at tælle antallet af udførte kommandoer.
+Vi forenkler analysen yderligere ved at inddele problemer efter instans\-størrelse og fokusere på værstefald.
+Den asympotiske notation gør det muligt at ignorere konstante faktorer og lavere\-ordens termer.
+Dette grovkornige perspektiv tillader os også at betragte øvre grænser
+\index{zzvre@øvre grænse|siehe{udførelsestid, værstefald}}
+for udførelsestiden i stedet for eksakte vurderinger, så længe det asymptotiske resultater forbliver uændret.
+Samlet leder disse forenklinger til, at vi kan analysere udførelsestiden af pseudokode direkte, dvs.\ uden at behøve at oversætte programmet til maskinsprog.
 
 Vi skal nu præsentere et sæt enkle regler for analyse af pseudokode.
 \index{algoritmeanalyse}
-\index{beregningstid} 
-Lad $T_n(I)$ være den maksimale beregningstid for en programstump $I$ på indput af en bestemt størrelse $n$.
-\index{indputstørrelse}
-\index{stzrrelse@størrelse!indput-} 
-For beregningstiden af større programmer gælder da følgende:
+\index{udførelsestid} 
+Lad $T_n(I)$ være den maksimale udførelsestid for en programstump $I$ på instanser af størrelse~$n$.
+\index{instansstørrelse}
+\index{stzrrelse@størrelse!instans-} 
+For udførelsestiden af større programmer gælder da følgende:
 \begin{itemize}
 \item For på hinanden følgende kommandoer: $T_n(I; J)\le T_n(I)+T_n(J)$.
 \item For betingede kommandoer: $T_n(\text{\If $C$ \Then $I$ \Else $J$})=
   T_n(C)+\max\set{T_n(I),T_n(J)}$.
-\item For løkker: $T_n(\text{\Repeat $I$ \Until $C$})=\sum_{i=1}^{k(n)} T_n'(I,C,i)$, hvor $k(n)$ angiver det maksimale antal løkkegennemløg på indput at størrelse $n$, og 
-$T_n'(I,C,i)$ er beregningstiden for det $i$te gennemløb af løkken, inklusive betingelsen $C$.
+\item For løkker: $T_n(\text{\Repeat $I$ \Until $C$})=\sum_{i=1}^{k(n)} T_n'(I,C,i)$, hvor $k(n)$ angiver det maksimale antal løkkegennemløb på instanser af størrelse $n$, og 
+$T_n'(I,C,i)$ er udførelsestiden for det $i$te gennemløb af løkken, inklusive betingelsen $C$.
 \end{itemize}
 Underprogrammer betragtes i afsnit~\lref{s:recurrences}.
-Bland de reglerne foroven er det kun løkkereglen, der kan give anledning til vanskeligheder, idet man skal vurdere summer.
+Bland reglerne foroven er det kun løkkereglen, der kan give anledning til vanskeligheder, idet man skal vurdere summer.
 
 \subsection{Summer}
 
@@ -52,8 +52,8 @@ Derfor er det samlede antal gennemløb gennem den indre løkke højst
  =\sum_{i=1}^{n-1} i 
  =\frac{n(n-1)}{2} = O(n^2)\,,\]
 hvor den anden ligning følger af (\ref{app:notation:eq:sumi}).
-Iden udførelsen af den indre lykke kræver tid $O(1)$, bliver udførelsestid i værstefald $\Theta(n^2)$.
-Alle indlejrede løkker hvis antal iterationer kan forudsiges let, kan analyseres på en tilsvarende måde:
+Idet et enkelt gennemløb af den indre løkke kræver tid $O(1)$, bliver udførelsestid i værste fald $\Theta(n^2)$.
+Alle indlejrede løkker, hvis antal iterationer er let at bestemme, kan analyseres på en tilsvarende måde:
 man arbejder »indfra og ud«, og prøver at finde et estimat for udførelsestiden af den aktuelle »indre løkke« som et lukket udtryk.
 Med simple omformninger som
 $\sum_i ca_i=c\sum_ia_i$,
@@ -62,7 +62,7 @@ $\sum_{i=2}^n a_i=-a_1+\sum_{i=1}^n a_i$
 kan man ofte få summerne på en pæn form, som man kan finde i et katalog over summeformler.
 Et lille udvalg af den slags formler findes i appendix~\ref{app:notation:}.
 Idet vi normal kun interesserer os for asympototisk opførsel, kan vi se bort fra præcise formler for disse summer og i stedet nøjes med estimater.
-For eksempel kan vi i stedet for at udregne summen foroven eksakt begrænse den opad- og nedadtil meget nemmere (for $n\ge 2$):
+For eksempel kan vi i stedet for at udregne summen foroven eksakt, begrænse den opad- og nedadtil meget nemmere (for $n\ge 2$):
 \begin{align*}
 \sum_{i=2}^n (i-1) &\leq \sum_{i=1}^n n = n^2 = O(n^2)\,,\\
 \sum_{i=2}^n (i-1) &\geq \sum_{i=\ceil{n/2}+1}^n n/2 = \left\lfloor\frac{n}{2}\right\rfloor \cdot\frac{n}{2}=
@@ -75,23 +75,24 @@ For eksempel kan vi i stedet for at udregne summen foroven eksakt begrænse den 
 \index{algoritmeanalyse!rekursion}
 \index{rekursion|sieheauchunter{algoritmekonstruktion; algoritmeanalyse}}%
 I vores regler for algoritmeanalyse har vi hidtil ikke bekymret os om kald til underprogrammer.
-Ikkerekursive underprogrammer er lette at håndtere, fordi vi kan analysere underprogrammet for sig og sætte den resulterende grænse ind i udtryk for beregningstiden for det kaldende program.
-Men når vi bruger denne fremgangsmåde på rekursive underprogrammer, fører den in ikke til en lukket formel, men en rekurstionligning.
+Ikke-rekursive underprogrammer er lette at håndtere, fordi vi kan analysere underprogrammet for sig og sætte den resulterende grænse ind i udtryk for udførelsestiden for det kaldende program.
+Men når vi bruger denne fremgangsmåde på rekursive underprogrammer, fører den ikke til en lukket formel, men til en rekursionsligning.
 
-For eksempel optræder ved analysen af antallet af elementaroperationer i den rekursive udgave af skolemetoden for multiplikation ligningerne
+I den rekursive udgave af skolemetoden for multiplikation 
+optræder ved analysen af antallet af elementaroperationer for eskempel ligningerne
  $T(1)=1$ og $T(n)=4T(\ceil{n/2})+4n$.
-De tilsvarnde ligninger for Karatsubas algoritme lyder
+De tilsvarnde ligninger for Karatsubas algoritme er
 $T(n)=3n^2$ for $n \le 3$ og 
 $T(n)=3T(\ceil{n/2} + 1)+8n$ for $n > 3$.
-Generelt definerer en \emph{rekursionsligning} en funktion i termer af funktionens værdier på mindre argumenter.
+Generelt definerer en \emph{rekursionsligning} som en funktion i termer af funktionens værdier på mindre argumenter.
 Definition fuldstændiggøres ved udtrykkelige definitioner af små parameterværdier (»basis«). 
-Løsningen af rekursionsligninger, dvs. at finde en ikke-rekursiv, lukked formel for en rekursivt definieret funktion, er en interessant og omfattende del af matematikken.
-I vores kontekst skal vi hovedsageligt koncentere os på den slags rekursionsligninger, som optræder i forbindelse med analysen af del-og-hersk-algoritmer.
+Løsningen af rekursionsligninger, dvs.\ at finde en ikke-rekursiv, lukket formel for en rekursivt definieret funktion, er en interessant og omfattende del af matematikken.
+I vores kontekst skal vi hovedsageligt koncentere os om den slags rekursionsligninger, som optræder i forbindelse med analysen af del-og-hersk-algoritmer.
 \index{algoritmekonstruktion!del-og-hersk}
 Vi begynder med et enkelt specialtilfælde for at gøre hovedidéen forståelig.
-Givet indput af størrelse $n=b^k$ for et naturligt tal $k$.
+Givet en instans af størrelse $n=b^k$ for et naturligt tal $k$.
 For $k \ge 1$ benytter vi lineært meget arbejde for at opdele instansen i $d$ mindre instanser af størrelse $n/b$ og for at kombinere resultaterne af de rekursive kald på de enkelte delinstanster.
-For $k=0$ finder ingen rekursive kald sted, og vi bruger $a$ meget arbejde for at løse opgaven for instansen direkte.
+For $k=0$ sker ingen rekursive, og vi bruger $a$ meget arbejde for at løse opgaven for instansen direkte.
 \index{del-og-hersk-ligninger|sieheunter{algoritmeanalyse}}\index{algoritmeanalyse!del-og-hersk-ligninger|textbf} 
 
 \begin{thm}[Klassifikation af del-og-hersk-ligninger, enkel form]\llabel{thm:master}
@@ -174,18 +175,18 @@ Da gælder
 Illustration af de tre fald i klassifikationen af del-og-hersk-ligninger.
 Instanser fremstilles som rektangler, hvis længde repræsenterer instansens størrelse.
 Delinstanserne, som opstår ud fra en instans, er vist et niveau længere nede.
-  Figurens øvre del viser faldet $d = 2$ og $b = 4$, i hvilket en instans leder til to delinstanser med en fjerdedel af størrelsen -- den samlede størrelse af delinstanserne udgør altså halvdelen af den oprindelige instans.
-  Figurens midterste del viser faldet 
- $d = b = 2$, og den nederste del faldet $d =3$ og $b = 2$.}
+  Figurens øvre del viser tilfældet $d = 2$ og $b = 4$, i hvilket en instans leder til to delinstanser med en fjerdedel af størrelsen -- den samlede størrelse af delinstanserne udgør altså halvdelen af den oprindelige instans.
+  Figurens midterste del viser tilfældet 
+ $d = b = 2$, og den nederste del  $d =3$ og $b = 2$.}
 \end{figure}
 %
-Figur \lref{fig:master} illustreren den centrale indsigt, som ligger til grund for sætning~\lref{thm:master}.
+Figur \lref{fig:master} illustrerer den centrale indsigt, som ligger til grund for sætning~\lref{thm:master}.
 Vi betragter tidsforbruget på hvert niveau af rekursionen.
 Vi begynder med en instans af størrelse $n$.
 På nivau $i$ af rekursionen har vi $d^i$ delinstanser af størrelse $n/b^i$ hver.
 Det samlede størrelse af alle instanser på niveau $i$ er derfor
 \[ d^i \frac{n}{b^i} = n \left( \frac{d}{b} \right)^i \,. \]
-Tidsforbruge for en instans (bortset fra de rekursive kald, den selv måtte lede til) er $c$ gange instansstørrelse.
+Tidsforbruget for en instans (bortset fra de rekursive kald, den selv måtte lede til) er $c$ gange instansstørrelse.
 Derfor er det samlede tidsforbrug på et rekursionsniveau proportionalt med den samlede størrelse af alle instanser på dette niveau.
 Afhængigt af, om $d/b$ er mindre end $1$, lig med $1$, eller større end $1$, opstår der forskellige opførsler.
 
@@ -204,9 +205,9 @@ Vi skal nu gennemgå disse overvejelser i detaljer.
   Lad os kalde den for niveau $0$ i rekursionen.%
   \footnote{I beviset holder vi os til terminologien af rekursive programmer med henblik på at støtte intuitionen for, hvad der foregår.
   De matematiske overvejelser kan dog bruges for alle ligninger af sætning~\lref{thm:master}, uanset om de stammer fra et rekursivt program eller ej.}
-  På niveau 1 findes $d$ instanser af størrelse $n/b = b^{k - 1}$ hver.
-  På niveau 2 findes  $d^2$ instanser af størrelse $n/b^2 = b^{k - 2}$ hver.
-  Generlt finder der på det $i$te niveau  $d^i$ instanser af størrelse $n/b^i = b^{k - i}$ hver.
+  På niveau~1 findes $d$ instanser af størrelse $n/b = b^{k - 1}$ hver.
+  På niveau~2 findes $d^2$ instanser af størrelse $n/b^2 = b^{k - 2}$ hver.
+  Generelt findes der på det $i$te niveau $d^i$ mange instanser af størrelse $n/b^i = b^{k - i}$ hver.
   I bunden af rekursionen, på niveau $k$, findes $d^k$ instanser af størrelse $n/b^k = b^{k - k} = 1$ hver.
   Hver sådan instans forårsager omkostning $a$, så den samlede omkostning på rekursionens sidste niveau er $ad^k$.
 
@@ -214,7 +215,7 @@ Vi skal nu gennemgå disse overvejelser i detaljer.
   På niveau $i$ forekommer $d^i$ rekursive kald, hver til én instans af størrelse $b^{k-i}$. 
   Hvert sådant kald forårsager omkostning $ c \cdot b^{k - i}$;
   den samlede omkostning på niveau $i$ er derfor $d^i\cdot c\cdot b^{k-i}$. 
-  Ved at summere bidraget fra alle niveauer fra $0$ bis $k-1$, fås
+  Ved at summere bidraget fra alle niveauer fra $0$ bis $k-1$ fås
   \[ \sum_{i=0}^{k-1}d^i\cdot c\cdot b^{k-i}=
   c\cdot
   b^k \cdot \sum_{i=0}^{k-1}\left(\frac{d}{b}\right)^i=cn \cdot \sum_{i=0}^{k-1}\left(\frac{d}{b}\right)^i\,.
@@ -223,7 +224,7 @@ Vi skal nu gennemgå disse overvejelser i detaljer.
   \begin{description}
     \item[$d=b$:]
       Vi får omkostning $ad^k=ab^k=an=\Theta(n)$ for rekursionens sidste niveau $k$ og
-      samlet omkostning $cnk=cn\log_{b}n=\Theta(n\log n)$ for del-or-hersk-skridtene.
+      samlet omkostning $cnk=cn\log_{b}n=\Theta(n\log n)$ for del-og-hersk-skridtene.
 
 \item[$d<b$:] Vi får omkostning $ad^k<ab^k=an=O(n)$ for rekursionens sidste niveau.
   Til del-og-hersk-skridtene benytter vi ligning (\ref{app:notation:eq:geometric}) for summen af en geometrisk række,
@@ -256,7 +257,8 @@ Vi skal nu gennemgå disse overvejelser i detaljer.
   \end{description}
 \end{proof}
 
-Vi kommer til at bruge del-og-hersk-klassifikationen i sætning~\lref{htm:master} mange gange i denne bog.
+Vi kommer til at bruge del-og-hersk-klassifikationen i sætning~\lref{htm:master} mange gange i denne bog.\footnote{Ovs. anm.: 
+Klassifikationen lader til at fylde så meget i mange grundlæggende fremstillinger af algoritmeanalysens matematiske værktøjer, at den i mange kredse er kendt under det noget højttravende navn »mestersætningen«.} 
 Desværre dækkes fx rekursionsligningen $T(n) \le 3n^2$ for $n \le 3$ og  $T(n) \le 3T(\ceil{n/2} + 1) + 8n$ for $n>3$, som optræder i analysen af Karatsubas algoritme, ikke af sætningen i sin enkle form, fordi den ikke tager hensyn til hverken uligheder eller afrundinger i de indgående udtryk.
 Det kan også forekomme, at den additive term i rekursionsligningen ikke er lineær.
 Vi skal nu vise, hvordan man kan udvide sætningen til at gælde for mere generelle utryk i form af en 
@@ -421,7 +423,7 @@ O(n^s\log n) & \text{for $d = b^s$, dvs. $\log_b d = s$}\,;\\
 \end{proof}
 
 Der findes mange yderligere generaliseringer af sætning~\ref{thm:master}:
-Man kan  afbryde rekursionen tidligt, variere delinstansernes størrelse mere, lade antallet af delinstanser afhænge af instansstørrelsen osv.
+Man kan afbryde rekursionen tidligt, variere delinstansernes størrelse mere, lade antallet af delinstanser afhænge af instansstørrelsen osv.
 For mere information henvises læseren til bøgerne~\cite{GKP94,Sedgewick-Flajolet}\index{Sedgewick, R.}\index{Flajolet, P.}\index{Knuth, D.}\index{Graham, R.
  L.}\index{Patashnik, O.}.
 
@@ -454,9 +456,468 @@ De teknikker for algoritmeanalyse, vi har introduceret foroven, er »syntaktiske
 For at analysere et større program, betragter vi i første omgang de enkelte dele og kombinerer derefter deres analyseresultater til en samlet analyse af hele programmet.
 Ved kombinationsskridtet benyttes summer og rekursionsligninger.
 
-Vi skal dog også bruge en helt anden fremgångsmåde, so man kunne kalde »semantisk«.
-Her associerer vi dele af programmets udførelse til dele af en kombinatorisk struktur og argumenter siden i termen af denne struktur.
+Vi skal dog også bruge en helt anden fremgångsmåde, som man kunne kalde »semantisk«.
+Hertil associerer vi dele af programmets udførelse til dele af en kombinatorisk struktur og argumenter siden i termen af denne struktur.
 For eksempel kan vi observere, at en bestemt programstump udføres højst én gang per kant i en graf, og at derfor den samlede omkostning svarer til antallet af kanter i grafen.
 Eller vi kan observere, at udføreslsen af en vis del af programmet fordobler størrelsen af en vis struktur;
 hvis man derudover ved, at strukturens størrelse begynder med 1 og ender som højst $n$ i slutningen af programmet, kan den pågældende del af programmet højst udføres $\log n$ gange.
+
+\section{Gennemsnitsanalyse}
+\llabel{s:average case analysis}
+
+
+\index{algoritmeanalyse!gennnemsnit|textbf}
+\index{udførelsestid!gennnemsnit}%
+I denne afsnit præsenterer vi gennemsnitsanalysen af algoritmer.
+Vi gør dette ved hjælp af tre eksempler af voksende kompleksitet. 
+Vi går ud fra, at læseren er fortrolig med sandsynlighedsregningens grundlæggende begreber, fx udfaldsrum, middelværdi, indikatorvariabel og middelværdiens linearitet.
+Disse begreber er sammenfattede i afsnit~\ref{app:notation:s:prob}.
+\index{udfaldsrum}% 
+\index{stokastisk variabel}% 
+\index{linearitet af middelværdi}% 
+\index{middelværdi}% 
+\index{indikatorvariabel}% 
+
+\subsection{Tælle én op}
+
+Vi begynder med et enkelt eksempel.
+Givet er en række $a[0..(n-1)]$ at nuller og ettere.
+Opgaven er at forøge (modulo $2^n$) det binære tal beskrevet af cifrene $a[n-1]$,\ldots, $a[0]$.
+\begin{indentedcode}
+$i \Is 0$\\
+\While $(i < n$ and $a[i] = 1)$ \Do $a[i] = 0\mathtt{;}$ $i\Increment$\\
+\If $i < n$ \Then $a[i] = 1$
+\end{indentedcode}
+Hvor ofte bliver løkkens krop udført?
+I værste fald (nemlig når $a = [1,\ldots, 1]$) klart $n$ gange, og i bedste fald (nemlig når $a[0] = 0$) klart $0$ gange.
+Men hvad er gennemsnitstiden?
+For at spørgsmålet giver mening, skal vi først definere en stokastisk model, dvs.\ det udfaldsrum, som ligger til grund for analysen.
+\index{udfaldsrum}
+Lad os fastlægge os på følgende stokastiske model:
+Hvert ciffer er 0 eller 1 med sandsynlighed $\frac12$, og cifrene er uafhængige.
+Ækvivalent kunne vi sige, at hver bitfølge med $n$ bit har samme sandsynlighed, nemlig $(\frac12)^n$.
+Løkkekroppen bliver udført $k$ gange for $k\in\{0,\ldots, n\}$ hvis og kun hvis enten $k<n$ og $a[0]=\cdots=a[k-1]=1$ og $a[k] = 0$,  eller hvis $k=n$ og $a = [1,\ldots, 1]$. 
+Den første hændelse sker med sandsynlighed $2^{-(k+1)}$, den anden med sandsynlighed $2^{-n}$.
+Middelværdien for antallet af løkkegennemløb er altså
+\[ \sum_{k=0}^{n-1} k 2^{-(k + 1)} + n 2^{-n} \le \sum_{k=0}^{n-1} (k+1) 2^{-(k + 1)} < \sum_{k \ge 1} k 2^{-k} = 2
+\,,\]
+hvor den sidste ligning findes i appendix som (\ref{app:notation:eq:ipowi}).
+
+\subsection{Finde maksimum}\llabel{s:left:to:right}
+
+Vores næste eksempel er mere krævende.
+Vi betragter følgende programstump, som finder den største ingang i rækken $a[1..n]$:
+
+\begin{indentedcode}
+$m \Is a[1]$\emph{;}\qquad 
+\For $i \Is 2$ \To $n$ \Do \If $a[i] > m$ \Then $m \Is a[i]$
+\end{indentedcode}
+
+Hvor ofte udføres tildelingen $m \Is a[i]$?
+I værste fald (fx når $a=\seq{1,\ldots, n}$) sker tildelingen ved hvert løkkegennemløb, dvs.\ $(n-1)$ gange.
+I bedste fald (fx når $a= \seq{1,\ldots,1}$) slet ikke. 
+For at bestemme gennemsnittet skal vi igen begynde med at bestemme udfaldsrummet.
+Lad os antage, at rækken består af $n$ forskellige indgange, og at hver rækkefølge er lige sandsynlig.
+Med andre ord består udfaldsrummet af de $n!$ forskellige permutationer af rækkens indgange. 
+Hver permutation er lige sandsynlig, nemlig $1/n!$.
+Det er for analysen ligegyldig, hvilke konkrete værdier, der står i rækken (bare de er forskellige); vi kan altså antage, at $a$ indeholder tallene fra $1$ til $n$ i en eller anden rækkefølge.
+Vi interesserer os nu for det forventede antal af »foreløbige maksima«.
+\index{foreløbigt maksimum|textbf}
+Her kaldes en indgang $a[i]$ for \emph{foreløbigt maksimum}, hvis den er større end alle tidligere indgange.
+For eksempel har følgen $\seq{1,2,4,3}$ tre foreløbige maksima, og følgen $\seq{3,1,2,4}$ har to foreløbige maksima.
+Antallet af gange, tildelingen $m \Is a[i]$ bliver udført, er 1 mindre end antallet af foreløbige maksima.
+For en permutation%
+\index{permutation}
+$\pi$ af tallene fra $1$ til $n$ lad $M_n(\pi)$ være antallet af foreløbige maksima i $\pi$.
+Det står tilbage at bestemme middelværdien $E[M_n]$.
+Vi skal vise to måder at gøre det på.
+For små $n$ er det nemt at udregne middelværdien direkte.
+For $n=1$ findes der kun én permutation, nemlig $\seq{1}$, 
+med ét foreløbigt maksimum, så $M_1=1$ og derfor $E[M_1=1]$.
+For $n = 2$ findes der to permutationer, nemlig $\seq{1,2}$ og $\seq{2,1}$.
+De har henholdsvis 2 og 1 foreløbige maksima, hvorfor $E[M_2] = \frac32$.
+For større $n$ skal vi bruge følgende analyse.
+
+Skriv $M_n$ som sum af indikatorvariablerne $I_1$  til $I_n$, dvs. $M_n=I_1+\cdots+I_n$, hvor $I_k=1$ for en permutation $\pi$, hvis den $k$te indgang i $\pi$ er et foreløbigt maksimum.
+For eksempel er $I_3(\seq{3,1,2,4}) = 0$ og $I_4(\seq{3,1,2,4}) = 1$. 
+Da gælder
+\begin{align*}
+E[M_n] &= E[I_1 +  \cdots + I_n] \\
+&= E[I_1] +  \cdots
++ E[I_n] \\
+&= \Pr(I_1 = 1) +  \cdots + \Pr(I_n = 1) \,,
+\end{align*}
+hvor vi har brugt middelværdiens linearitet for den anden ligning (\ref{app:notation:eq:linearity}), og tredje ligning gælder fordi $I_k$'erne er indikatorvariable.
+Vi skal stadig beregne sandsynligheden for hændelsen $I_k = 1$. 
+Den $k$te indgang i en tilfældig permutation
+\index{Permutation!zufällige}
+er et foreløbigt maksimum hvis og kun hvis den er størst blandt de $k$ første indgange.
+I en tilfældig permutation står den største af de $k$ første indgange på hver af pladserne med samme sandsynlighed.
+Derfor har vi $\Pr(I_k = 1) = 1/k$,  og der gælder
+\[ E[M_n] = \sum_{k=1}^n \Pr(I_k = 1) = \sum_{k=1}^n \frac{1}{k} \,. \]
+Hermed kan man fx udregne $E[M_4] = 1 + \frac12 + \frac13 + \frac14 = \frac{1}{12}(12 + 6 + 4 + 3) = \frac{25}{12}$.
+Summen  $\sum_{k=1}^n 1/k$ vil dukke up igen senere i bogen.
+Den kaldes det »$n$te harmoniske tal« 
+\index{sum!harmonisk}
+\index{harmonisk sum|sieheunter{sum}}
+\index{Hn@$H_n$|sieheunter{sum, harmonisk}} 
+og betegnes $H_n$. 
+Man kan begrænse den som  $\ln n \le H_n \le 1 + \ln n$, dvs. $H_n \approx \ln n$, se~(\ref{app:notation:eq:harmonic}).
+Vi konkluderer, at antallet af foreløbige maksima i gennemsnit er meget mindre end i værste fald.
+
+\begin{exerc}
+  \llabel{ex:harmonic}
+  Bevis $\displaystyle\sum_{k=1}^n \frac{1}{k}\leq \ln n + 1$. 
+  \emph{Vink}:
+  Begynd med at vise $\displaystyle\sum_{k=2}^n \frac{1}{k}\leq \int_{1}^n \frac{1}{x}\ dx$.
+\end{exerc}
+
+Nu skal vis beskrive en anden metode for at bestemme det forventede antal af foreløbige maksima.
+Vi vil forkorte $A_n=E[M_n]$ for $n\ge1$ og sætter $A_0=0$. 
+Enhver permutations første indgang er et foreløbigt maksimum, og hvert tal har sandsynlighed $1/n$ for at stå på første plads.
+Når første tal er $i$, kan kun tallene fra $i+1$ til $n$ være foreløbige maksima længere til højre.
+Disse $n-i$ står i resten af permutationen i tilfældig rækkefølge; derfor er det forventede antal yderligere foreløbige maksima givet ved $A_{n-i}$. 
+Vi har altså rekursionsligningen
+\[ A_n = 1 + \frac{1}{n}\cdot\sum_{i=1}^{n} A_{n - i}  \qquad\text{dvs.}\qquad
+nA_n = n + \sum_{i=1}^{n-1} A_i 
+\,.\]
+Denne ligning kan forenkles med et standardtrick.
+Samme ligning for $n-1$ i stedet for $n$ giver $(n-1)A_{n-1} = n-1 + \sum_{i=1}^{n-2} A_i$.
+Vi trækker denne ligning fra ligningen for $n$ og opnår
+\[ nA_n - (n-1)A_{n-1} = 1 + A_{n-1} \qquad\text{dvs.}\qquad A_n = 1/n + A_{n-1}
+\,,\]
+som giver $A_n = H_n$.  
+
+\subsection{Lineær søgning}
+
+Vi er nået til det tredje og og mest krævende eksempel.
+Det drejer sig om følgende søgningsproblem.
+\index{søgning!lineær}
+\index{søgning!dynamisk|textbf}
+Vi begynder med at placere indgange med nummer 1 til $n$ på en eller anden måde, indgang $i$ står fx på position $\ell_i$.
+Efter placeringen gennemføres nogle søgninger.
+For at lede efter en indgang med nøgle $x$, gennemgås følgen fra venstre til højre, til vi støder på nøgle $x$.
+På denne måde koster det $\ell_i$ skridt at få adgang til den  $i$te indgang.   
+
+Vi antager nu, at sandsynligheden for at søge efter en bestemt indgang er den samme for hver søgning.
+Vi vedtager, at indgang nummer $i$ søges med sandsynlighed $p_i$.
+Der gælder $p_i \ge 0$ for alle $i\in\{1,\ldots,  n\}$, og $\sum_i p_i = 1$.
+I denne situation er de \emph{forventede} eller \emph{gennemsnitlige} omkostninger ved en søgning lig med $\sum_i p_i \ell_i$, fordi vi leder efter den $i$te indgang med sandsynlighed $p_i$, og denne søgning koster $\ell_i$ skridt. 
+
+Hvad er nu den »bedste« måde at arrangere de $n$ indgange på, dvs.\ den ordning, som minimerer gennemsnitssøgetiden?
+Intuitivt er det klart, at indgangene nok bør sorteres efter faldende søgningssandsynlighed.
+Lad os vise dette.
+
+\begin{lemma} 
+  En ordning er optimal med hensyn til den forventede søgetid, hvis der gælder $\ell_i<\ell_j$ for alle $i,j\in\{1,\ldots,m\}$ med $p_i>p_j$.
+  For søgningssandsynligheder med  $p_1 \ge p_2 \ge \cdots \ge p_n$ fører ordningen $\ell_1= 1$, $\ldots$, $\ell_n =n$ til den optimale forventede søgetid $\sum_i p_i i$. 
+\end{lemma} 
+%
+\begin{proof} 
+  Betragt modsætningsvist en optimal ordning, hvor der findes $i$ og $j$ med $p_i > p_j$ og $\ell_i > \ell_j$, dvs.\ at indgang $i$ er mere sandsynlig end indgang $j$ men alligvel ordnet længere bagved.
+  Hvis vi bytter runndt på de to ingange, er ændringen i gennemsnitlig søgetid givet ved
+  \[ - (p_i \ell_i + p_j \ell_j) + (p_i \ell_j + p_j \ell_i) = (p_j - p_i) (\ell_i - \ell_j) < 0
+  \,. \]
+  Med andre ord er den nye ordning bedre end den gamle, i modstrid med antagelsen.
+
+  Betragt først tilfældet $p_1 > p_2 > \cdots > p_n$. 
+  Idet der kun findes endelig mange ordninger (nemlig $n!$), eksisterer der en optimal ordning.
+  Hvis $i<j$ og indgang $i$ er ordnet efter indgang $j$, så kan ordningen ifølge afsnittet foroven ikke være optimal.
+  Derfor placerer den optimale ordning indgang $i$ på plads $\ell_i = i$, og den resulterende forventede søgetid er derfor $\sum_i p_i i$. 
+
+  Hvis $p_1 \ge p_2 \ge \cdots \ge p_n$, så er ordningen $\ell_i = i$ for alle $i$ stadig optimal.
+  Hvis nogle af sandsynlighederne er ens, findes mere end en optimal ordning.
+  Men ordningen af indgange med samme sandsynlighed er irrelevant.
+\end{proof}  
+
+%TODO extremely unsatisfying proof
+
+Kan vi også gøre noget snedigt, hvis vi ikke kender sandsynlighederne $p_i$? 
+Svaret er ja, og den enkle strategi er den såkalde »flyt-forrest«-heuristik.
+\index{flyt-forrest}
+\index{heuristik!flyt forrest}
+Den virker på følgende måde.
+Antag, at en søgning leder efter indgang $i$ og finder den på plads $\ell_i$.
+Hvis $\ell_i = 1$, så er vi godt tilfredse og gør ikke mere.
+Ellers flytter vi ingang $i$ til første plads og forskyder indgangene på pladsern $1$, $\ldots$,  $\ell_i-1$ en position bagud.
+På denne måde håber vi, at hyppigt søgte indgange står tidligt i ordningen, mens sjældent søgte indgange befinder sig længere bagud.
+Lad os analysere den forventede opørsel af flyt-forrest-heuristiken.
+
+\begin{thm} 
+  Ser man bort fra den første søgning efter hvert element, så er den gennemsnitlige omkostning ved søgning med flyt-forrest-heuristikken højst dobbelt så stor som den gennemsnitlige omkostning ved en optimal, fast ordning.
+\end{thm}
+
+\begin{proof}
+\newcommand{\MTF}{{\mathit{ff}}}%
+Vi går ud fra, at de $n$ indgange i listen oprindeligt står i en bestemt, men vilkårlig rækkefølge.
+Vores stokastiske model er en følge af søgningsrunder, hvor hver runde \emph{uafhængigt af tidligere runder} søger efter en indgang, og denne indgang er valgt sådan, at indgang $i$ vælges med sandsynlighed $p_i$.
+Den første søgning efter indgang $i$ afhænger hovedsagligt af den oprindelige rækkefølge og har derfor ikke særlig meget med heuristikken at gøre.
+Derfor ignorerer vi den første søgning efter indgang $i$ og vedtager helt enkelt, at den har omkostning 1.
+\footnote{Hermed ignorer vi omkostninger på højst $n(n-1)$.
+Man kan vise, at den forventede afvigelse ved denne forenkling af argumentet for den $t$te søgning er 
+$n\cdot \sum_i p_i(1-p_i)^{t-1}$.
+Lad $t > n$. 
+Idet funktionen $p\mapsto p(1-p)^{t-1}$ har sit maksimum i $p=1/t$, bliver summen maksimeret ved at sætte $p_1=\cdots=p_{n-1}=1/t$ og $p_n=1-(n-1)/t$.
+Afgivelsen er altså  $n(n-1)(1/t)(1-1/t)^{t-1} < n^2/et$.}%
+Betragt søgerunde~$t$.
+Lad $C_{\MTF}$ betegne omkostningen i runde $t$.
+For hvert  $i$ lad $\ell_i$ angive indgang $i$s plads i listen i begyndelsen af runde $t$.
+Betragt de stokastiske variable $\ell_1$, $\ldots$ , $\ell_n$; de afhænger kun af, hvad der er sket i de første $t-1$ runder.
+Hvis $t$ søger efter indgang $i$, så er omkostningen  $1+Z_i$, hvor
+\[ Z_i = 
+  \begin{cases}  
+  \ell_i - 1 & \text{hvis $i$ blev søgt før runde $t$}\,,\\
+            0 & \text{ellers.}
+  \end{cases}
+\]
+De stokastiske variable $Z_1$, $\ldots$, $Z_n$ afhænger kun af, hvad der er sket i de første $t-1$ runder.
+Vi har altså $C_{\MTF} = \sum_i p_i (1+E[Z_i]) = 1 + \sum_i p_i E[Z_i]$.
+Vi skal nu bestemme $E[Z_i]$ for givet $i$.
+Definér hertil for alle $j\neq i$ indikatorvariablen  
+\[ I_{ij} = \begin{cases}  1 & \text{$j$ står før $i$ i starten af runde  $t$,}\\[-0.5ex]
+  & \text{og minst en af de to indgange blev søgt før runde $t$}\\
+           0 & \text{ellers.}\end{cases} \]
+Da gælder $Z_i \le \sum_{j\colon j\neq i} I_{ij}$. 
+(Hvis runde $t$ er den første runde, som søger efter $i$, så er $Z_i=0$. 
+Hvis runde $t$ ikke er den første runde, som søger efter $i$, så er $I_{ij}=1$ for hvert $j$, som står før $i$ i listen, dvs. $Z_i=\sum_{j\colon j\not= i} I_{ij}$.)
+%TODO What?
+Derfor gælder også $E[Z_i] \le \sum_{j\colon j\not= i} E[I_{ij}]$.
+Vi skal altså bestemme middelværdien $E[I_{ij}]$ for hvert $j\not= i$. 
+
+Hvis der ikke forekom nogen søgning efter hverken $i$ eller $j$ for runde $t$, har vi $I_{ij}=0$.
+Ellers betragter vi den sidste runde $t_{ij} < t$, som søgte efter enten $i$ eller $j$.
+Den betingede sandsynlighed for, at denne søgning var efter $j$ i stedet for efter $i$, dvs.\ at $I_{ij} = 1$, er $p_j/(p_i+p_j)$.
+Samlet får vi: 
+$E[I_{ij}]=\Pr{I_{ij}=1} \le p_j/(p_i+p_j)$, dvs. $E[Z_i] \le \sum_{j \colon j\not= i} p_j/(p_i+p_j)$.
+
+Ved at summere over alle $i$ får vi nu:
+\[ C_{\MTF} = 1 + \sum_i p_i E[Z_i]  \le
+1 + \sum_{i,j \colon i \not= j} \frac{p_i p_j}{p_i + p_j}\,. \]
+Bemærk nu, at termen $p_i p_j/(p_i + p_j) = p_j p_i/(p_j + p_i)$ optræder to gange i summen for hvert par $(i,j)$ med $j < i$. 
+For at forenkle notationen antager vi, at $p_1 \ge p_2 \ge \cdots \ge p_n$.
+\index{online-algoritme} 
+Med $\sum_i p_i=1$ fås
+\begin{align*}
+C_{\MTF} &\le 1 + 2 \sum_{i,j \colon j < i} \frac{p_i p_j}{p_i + p_j} 
+         = \sum_i p_i \left(1 + 2 \sum_{j \colon  j < i} \frac{p_j}{p_i + p_j}\right) \\
+         &\le \sum_i p_i \left(1 + 2 \sum_{j \colon  j < i} 1\right) 
+         < \sum_i p_i 2i = 2 \sum_i p_i i = 2 \Id{Opt} \,. 
+\end{align*}
+       
+\end{proof}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Randomiserede algoritmer}
+\llabel{s:random}
+\index{randomiseret algoritme|sieheunter{algoritmekonstruktion; algoritmenanalyse}}%
+\index{algoritmekonstruktion!randomiseret|textbf}
+\index{algoritmeanalyse!randomiseret|textbf}
+
+Lykke deltager i et underholdningsprogram på tv, som drejer sig om 100 æsker, nummereret fra 1 til 100, som hun har lov til at åbne i vilkårlig rækkefølge.
+Æske~$i$ indeholder $m_i$~kr.
+Lykke kender ikke $m_i$ inden hun har åbnet æske~$i$.
+Forskellige æsker indeholder forskellige beløb.
+Reglerne er:
+\begin{itemize}
+\item I begyndelsen af spillet får Lykke 10 jetoner fra studieværten.
+\item Når hun åbner en æske, som indeholder et større beløb end alle tidligere åbnede æsker, betaler hun en jeton.
+\footnote{Den først åbnede æskes beløb er per definition større end alle tidligerede åbnede æsker. 
+    Det koster altså Lykke under alle omstændigheder 1~jeton at åbne den første æske.}
+\item Når Lykke skal betale en jeton, men ikke har flere, ender spillet og Lykke har tabt.
+\item Hvis Lykke kan åbne samtlige æsker, får hun lov til at beholde alle pengene.
+\end{itemize}
+Æskerne er dekorerede med pudsige billeder, og studieværten forsøger sommetider at påvirke Lykke ved at foreslå, hvilken æske hun burde åbne hernæst.
+Lykkes tante, som aldrig går glip af et eneste afsnit at tv-programmet, kan fortælle hende, at spillet kun sjældent har en vinder.
+Lykke spørger sig selv, om det overhovedet kan betale sig at deltage i programmet.
+Findes der en strategi, der giver en god gevinstchance?
+Og er studieværtens forslag værd at følge?
+
+Lad os begynde med at analysere den åbenlyse algoritme, nemlig at Lykke altid følger studieværtens forslag.
+I værste fald vil han pege på æsker med voksende beløb.
+Så skal hun aflevere en jeton ved hver æske og har tabt, når spillet er nået til den 11. æske.
+Både kandidater og tv-publikum ville ærge sig over den fæle studievært, seertallene ville falde, og studieværten blive fyret.
+Værstefaldsanalysen hjælper os ikke meget videre.
+I bedste fald foreslår studieværten straks den bedste æske, dvs.\ den med det største beløb.
+Lykke ville være godt tilfreds, men programmet ville være for kort til en reklamepause og den venlige studievært ville også blive fyret.
+Bedstefaldsanalysen hjælper os altså heller ikke videre.
+
+Efter en smule overvejelse indser vi, at spillet egentlig bare er en omformulering af problemet at finde foreløbige maksima fra foregående afsnit.
+Lykke bliver af med en jeton, hver gang hun støder på et nyt maksimum.
+Fra sidste afsnit ved vi, at det forventede antal foreløbige maksima i en tilfældig permutation er
+\index{Permutation!zufällige}
+er det  $n$te harmoniske tal $H_n$.%
+\index{sum!harmonisk}
+\index{foreløbigt maksimum} 
+For $n = 100$ gælder $H_n < 6$. 
+Hvis studieværten altså foreslår æskerne i (uniformt) tilfældig orden, kommer Lykke af med lidt under 6 jetoner i gennemsnit. 
+Men hvorfor skulle studienværten følge netop denne strategi?
+Der er jo fra hans perspektiv ingen grund til at nærmest garantere deltagerens sejr.
+
+Løsningen for Lykke er at tage skæbnen i egen hånd ved at \emph{åbne æskerne i tilfældig rækkefølge.}
+Hun vælger en æske tilfældigt og åbner den, vælger næste æske tilfældigt bland de uåbnede, åbner denne, og så videre.
+Hvordan vælger hun en tilfældig æske?
+Hvis der er $k$ uåbnede æsker tilbage, vælger hun et tilfældigt heltal
+\index{tilfældigt tal|textbf}
+i området fra $1$ til $k$, fx ved at dreje en snurretop, hvis rand er en regelmæssig $k$-kant, eller ved at bruge et lykkehjul med $k$ muligheder.
+På denne måde skaber Lykke en tilfældig permutation af æskerne, og vi kan genbruge analysen fra foregående afsnit.
+I gennemsnit skal hun betale færre end 6~jetoner, og de 10~jetoner er næsten altid nok.
+Vi har netop beskrevet en \emph{randomiseret algoritme}.
+Det er værd at understrege, at selvom den matematiske analyse er identisk med den situation, hvor studieværten anbefaler æskerne i tilfældig rækkefølge, så er konklusionen helt forskellig.
+I gennemsnitsscenariet er vi afhængige af, at studienværten vitterlig benytter en tilfældig rækkefølge.
+I så fald gælder analysen, men hvis han følger en anden strategi, gælder analysen ikke.
+Hvad der virkelig er foregået i programmet, kan man i bedste fald sige noget om efter rigtig mange udsendelser og kun i bakspejlet. 
+Situationen i scenariet »Lykke bruger en randomiseret algoritme« er helt anderledes.
+Hun udfører nemlig selv de tilfældige hændelser og skaber derved en tilfældig permutation.
+Analysen gælder, uanset hvad studieværten foretager sig.
+
+\subsection{Formel model}
+
+Formelt udstyrer vi registermaskinenn med yderligere en instruktion:
+$R_i \Is \Id{tilfældigtTal}(R_j)$
+tildeler register $R_i$ en tilfældig værdi i mængden $\{0,\ldots,k-1\}$, hvor $k$ er indholdet af $R_j$. 
+Alle $k$ værdier har samme sandsynlighed, og udfaldet er uafhængigt at samtlige tildigere tilfældige valg.	
+ 
+I pseudokode skriver vi $v \Is \Id{tilfældigtTal}(C)$, hvor $v$ er en heltalsvariabel og $C$ en heltalsværdi.
+Vi vedtager, at det tager konstant tid at vælge et tilfældigt tal.
+Algoritmer uden den slags tilfældige tildelinger kaldes
+\emph{deterministiske}.
+\index{algoritmekonstruktion!deterministisk|textbf}
+\index{deterministisk algoritme|sieheunter{algoritmekonstruktion}}. 
+
+Udførelsestiden for en randomiseret algoritme afhænger af dens tilfældige valg.
+Dermed er udførelsestiden for instans $i$ ikke længere et tal, men en stokastisk variabel, som afhænger af algoritmens tilfældige valg.
+Vi kan undgå at lade udførelsestiden afhænge af de tilfældige valg ved at udstyre maskinen med et »stopur«.
+I begyndelsen af programudførelsen sætter vi stopuret til værdien $T(n)$, hvor $n$ angiver størrelsen af instansen.
+Under udførelsen tæller vi uret ned skridt for skridt, og standser efter $T(n)$ skridt.
+Skulle programmet standses »i utide« på denne måde, kommer det ikke til at producere sit sædvanlige svar og udførelsen bedømmes som mislykket. 
+
+En randomiseret algoritmes svar kan ligeledes afhænge af de tilfældige valg.
+Man kan naturligvis sætte spørgsmålstegn ved værdien af en algoritme, hvis svar på instans $i$ afhænger af tilfældigheder -- det kan fx være »ja« den ene dag og »nej« den anden.
+Hvis de to svar er lige sandsynlige, er algoritmens svar ganske rigtig værdiløs.
+Men hvis det rigtige svar er meget mere sandsynligt end det forkerte, så er svaret af nytte.
+Vi forklarer det med et eksempel.
+
+Ane og Bo er forbundet over en langsom telefonledning. 
+Ane kender et $n$-bitstal $x$, Bo kender et $n$-bitstal $y$.
+De ønsker at finde ud af, om de to tal er ens.
+Fordi deres kommunikationskanal er langsam, vil de kommunikere mindst mulig information.
+På den anden side spiller det ingen rolle, hvor store beregninger de hver især skal gennemføre.
+
+Den oplagte løsning er, at Ane sender sit tal til Bo, som undersøger, om de to tal er ens, og sender resultatet tilbage.
+Dette kræver, at $n$ bit information kommunikeres over ledningen.
+Alternativt kan Ane formidle sit tal ciffer for ciffer, Bob kan så sammenligne cifrene et ad gangen og annoncere resultatet, så snart han kender det, dvs.\ så snart to cifre på samme plads er forskellige.
+I værste fald skal alle $n$ cifre kommunikeres, nemlig når begge tal er det samme.
+Vi skal nu se, at randomisering fører til en dramatisk forbedring.
+Vi vil blot kommunikere $O(\log n)$ bit inden resulatet om lighed eller ulighed kan annonceres, og svaret er korrekt med høj sandsynlighed.
+
+Ane og Bo bruger følgende protokol.
+Hver av dem skaber en ordnet liste $p_1,\ldots,p_L$ af primtal, nemlig de $L$ mindste primtal større end $2^k$.
+Vi skal se forneden, hvordan værdierne for $k$ og $L$ skal bestemmes (i afhægighed af $n$).
+På denne måde sikres, at Ane og Bo skaber samme lister.
+Nu vælger Ane et tilfældigt indeks $i\in\{1,\ldots, L\}$ og sender $i$ samt $x_A \bmod p_i$ til Bo.
+Han beregner $x_B \bmod p_i$. 
+Hvis $x_A \bmod p_i \not= x_B \bmod p_i$, så melder han, at tallene er forskellige.
+Ellers, at de er ens.
+Hvis $x_A = x_B$, så er det klart, at Bos svar bliver »ens«.
+Hvis derimod $x_A \not= x_B$, men alligevel  $x_A  \bmod p_i = x_B \bmod p_i$, så vil Bo fejlagtigt erklære det to tal for ens. 
+Hvor stor er sandsynligheden for denne fejl?
+  
+Fejlen opstår, når $x_A \not= x_B$ og $x_A \equiv x_B \pmod{p_i}$.
+Det sidste betingelse er ensbetydende med, at $p_i$ deler differensen $D = x_A - x_B$.
+Absolutværdien af denne differens er højst $2^n$.
+Idet hvert $p_i$ er større end  $2^k$, indeholder Anes liste højst $n/k$ primtal, som deler $D$.
+(Lad $d$ være antallet af primtal i listen, som deler $D$. 
+Da gælder $2^n \ge |D|  \ge (2^k)^d = 2^{kd}$, altså $d \le n/k$.)
+Derfor er fejlsandsynligheden højst $(n/k)/L$.
+Denne sandsynlighed kan gøres vilkårlig lille ved at lade $L$ være tilstrækkelig stor.
+Hvis vi fx vil have fejlsandsynlighed højst $\num{0,000001} = 10^{-6}$, sætter vi $L=10^6 (n/k)$.
+%TODO mindre end?
+
+Men hvordan vælges $k$?
+For tilstrækkeligt store $k$ er der bland tallene i $\{2^k,\ldots,2^{k+1}-1\}$ omtrent $2^k/\ln(2^k)\approx \num{1,4427}\cdot 2^k/k$ mange primtal.%
+\footnote{For $x\ge1$ lad $\pi(x)$ betegne antal primtal, som er mindre end eller lig med $x$.
+For eksempel er $\pi(10) = 4$, fordi der findes fire primtal (2, 3, 5 og 7), som er mindre end eller lig med 10.
+Ifølge talteoriens Primtalssætning gælder $x/(\ln x + 2) < \pi(x) < x/(\ln x - 4)$ for all $x\ge 55$.
+}
+Hvis altså $2^k/k  \ge  10^6 n/k$, består listen udelukkende af tal med $k+1$~bit.
+Betingelsen $2^k \ge  10^6 n$ er ensbetydende med $k \ge \log n + 6\log 10$.
+Dette valg af $k$ medfører, at Ane sender  $\log L + k + 1 = \log n + 12 \log 10 + 1$~bit.
+\emph{Dette udgør en eksponentiel forbedring i forhold til den naive protokol!}
+
+Hvordan kan vi reducere fejlsandsynligheden yderligere, fx til højst $10^{-12}$?
+Vi kan selfølgeligt bare sætte $L = 10^{12} n/k$ i argumentet foroven.
+En alternativ løsning er at køre protokollen to gange, og annoncere, at de to tal er ens, hvis begge udførsler erklærer tallene for ens.
+Denne totrinsprotokol tager fejl, kun hvis begge trin tog fejl; derfor er fejlsandsynligheden
+højst $10^{-6} \cdot 10^{-6} = 10^{-12}$.  
+
+%TODO confusion in original about "at most" and "less than"
+
+\begin{exerc}
+  Sammenlign udførelsestiden for de to metoder, som opnår fejlsandsynlighed $10^{-12}$.
+\end{exerc}
+
+\begin{exerc} 
+  Det virker fjollet, at Ane og Bo skal skabe enormt lange lister af primtal.
+  Diskuter i stedet følgende variation af protokollet:
+  Ane vælger et tilfældigt tal $p$ med $k+1$ bit (og foranstillet $1$) og afgør, om $p$ er primsk.
+  Hvis dette ikke er tilfældet, gentager hun forsøget.
+  Hvis $p$ er et primtal, sender hun $p$ og $p$ und $x_A\bmod p$ til Bo.
+  Bo udregner $x_B\bmod p$ og sammenligner. 
+\end{exerc}
+
+\begin{exerc}\llabel{e:decreasing-error-probability} 
+  Antag, at du har en randomiseret algoritme, som giver det forkerte svar med sandsynlighed højst $\frac14$.
+  Gentag algoritmen $k$ gange og returner flertalsafgørelsen, dvs. det svar, som optræder mere end $k/2$ gange, hvis det findes. 
+  Beregn fejlsandsynligheden som funktion af $k$.
+  Find et præcist udtryk for  $k=2$ og $k=3$, og en øvre grænse for større $k$.
+  Hvordan skal man vælge $k$ for at opnå en fejlsandsynlighed, som er mindre en et givet $\epsilon$?
+\end{exerc}
+
+\subsection{Las-Vegas- og Monte-Carlo-algoritmer}
+
+Der findes i grunden to varianter af randomiserede algoritmer, 
+nemlig Las-Vegas-algoritmer%
+\index{algoritmekonstruktion!randomiseret!Las Vegas|textbf}
+\index{Las-Vegas-algoritme|sieheunter{algoritmekonstruktion, randomiseret}} 
+og Monte-Carlo-algoritmer.
+\index{algoritmekonstruktion!randomiseret!Monte Carlo|textbf}
+\index{Monte-Carlo-algoritme|sieheunter{algoritmekonstruktion, randomiseret}}
+En \emph{Las-Vegas-algoritme} giver altid det rigtige svar, men dens udførelsestid på input~$i$ er en stokastisk variabel. 
+Vores løsning til tv-programmet med Lykke er en Las-Vegas-algoritme, hvis vi fortsætter med at lade den lede efter den rigtige æske;
+men antallet af foreløbige maksima, dvs. antallet af betalte jetoner, er en stokastisk variabel.
+En Monte-Carlo-algoritme har altid den samme udførelsestid, men der findes en positiv sandsynlighed for, at den giver et forkert svar.
+Sandsynligheden for et forkert svar er højst $\frac14$.
+Algoritmen, som sammenligner to tal over en telefonforbindelse, er en Monte-Carlo-algoritme. 
+Opgave~\lref{e:decreasing-error-probability} viser, at fejlsandsynligheden for en Monte-Carlo-algoritme kan gøres vilkårlig lille ved gentalse.  
+
+\begin{exerc}
+  Antag, at du har en Las-Vegas-algoritme med forventet udførelsestid $t(n)$. 
+  Lad den køre i $4t(n)$ skridt.
+  Skulle den give et svar inden for denne tid, returneres dette svar, ellers returneres en vilkårlig værdi.
+  Vis, at den resulterende algoritme er en Monte-Carlo-algoritme.
+\end{exerc}
+
+\begin{exerc}
+  Antag, at du har en Monte-Carlo-algoritme med udførelsestid $m(n)$, som giver det rigtige svar med sandsynlighed mindst $p$, og en deterministisk algoritme, som i tid $v(n)$ kan afgøre, om Monte-Carlo-algoritmens svar er korrekt.
+  Beskriv, hvordan de to algoritmer kan kombineres til et Las-Vegas-algoritme med forventet udførelsestid $(m(n)+v(n))/(1-p)$.
+\end{exerc}
+
+Afslutningsvis vender vi tilbage til Lykkes tv-program.
+Hun har 10 jetoner og forventer at skulle bruge færre end 6 af dem.
+Hvor sikker kan hun være på at vinde?
+Vi skal altså vurdere sandsynligheden for, at $M_n$ er mindst 11, idet Lykke taber hvis og kun hvis antallet af foreløbige maksima i følgen af åbnede æskebeløb er 11 eller mere.
+Hertil bruges \emph{Markovs ulighed}:
+\index{Markov@Markov, A.}
+\index{Markovs ulighed|sieheunter{ulighed}}
+\index{ulighed!Markovs}
+Lad $X$ være en ikke-negativ stokastisk variabel og $c\ge 1$ en vilkårlig konstant.
+Da gælder $\Pr(X \ge c \cdot E[X])\le 1/c$, se~(\ref{app:notation:eq:markov}).
+Vi bruger dette med $X = M_n$ og $c = \frac{11}{6}$ og får
+\[ \Pr(M_n \ge 11) \le \Pr(M_n \ge \tfrac{11}{6} E[M_n]) \le \tfrac{6}{11}
+\,,\]
+så Lykkes vinder med sandsynlighed større end $5/11$.
+
+
+
 

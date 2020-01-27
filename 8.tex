@@ -1,0 +1,370 @@
+\chapter{Repræsentation af grafer}
+\renewcommand{\labelprefix}{ch:grepresent}
+\llabel{}
+\vspace*{-4.5cm}
+\begin{flushright}
+%\includegraphics[width=3.5cm]{\masterdir/grepresent/spinnennetz.ps}
+\includegraphics[width=3.5cm]{img/spiderweb2.eps}
+\end{flushright}
+
+\noindent
+\emph{Videnskabelige resultater er først og fremmest tilgængelige som artikler i tidsskrifter og konferencerapporter, men også i forskellige kilder på WWW.
+\footnote{Billedet forover viser et edderkoppespind.}
+Disse artikler er ikke selv-indeholdte, men bygger videre på og citerer tidligere publiceret arbejde med beslægtet indhold.
+Hvis man i dag læser en artikel fra 1975, som indeholder et interessant delresultat, spørger man sig umiddelbart, hvilke fremskridt der er gjort siden dengang.
+Især er man interesseret i nyere artikler, der citerer 1975-resultatet.
+Projekter som »Google Scholar« stiller denne funktionalitet til rådighed ved at analysere literaturhenvisningerne i en artikel og bygge en database, der gør det muligt at finde de artikler, som citerer en given artikel.
+\index{graf!citationsnetværk}. 
+}
+\medskip
+
+\index{graf!som model|textbf}%
+Situationen foroven kan enkelt modelleres som en rettet graf.
+Grafen indeholder en knude for hver artikel og en kant for hver citation.
+Kanten $(u,v)$ fra artikel $u$ til artikel $v$ betyder, at $v$ citeres af $u$.
+I denne repræsentation gemmer hver knude (artikel) $u$  alle udgående kanter (til de i $u$ citerede artikler), men ikke de indgående kanter (fra de artikler, som citerer $u$).
+Hvis vi også skulle gemme de indgående kanter sammen med hver knude, ville det være let at finde de citerende artikler.
+En af de centrale opgaver ved realiseringen af Google Scholar er netop konstruktionen af de modsatrettede kanter.
+Dette eksempel illustrerer, at omkostningen ved en elementær grafoperation, nemlig at finde de indgående kanter, er stærkt afhængig af grafens repræsentation.
+Hvis de indgående kanter er gemte eksplicit, er operationen enkel, ellers er den ikke-triviel.
+
+I dette kapitel gennemgår vi forskellige muligheder for digital repræsentation af grafer.
+Vi vil fokusere på rettede grafer og går ud fra, at en urettet graf $G=(V,E)$ er repræsenteret som det tilsvarende dobbeltrettede graf
+\index{graf!doppeltrettet} 
+$G'=(V,\bigcup_{\set{u,v}\in E}\set{(u,v),(v,u)})$
+(jf. afsnit~\ref{ch:intro:s:graphnot}). 
+I figur~\lref{fig:adjarray} vises foroven en urettet graf den dens dobbeltrettede modpart. 
+de fleste datastrukturer, som behandles i dette kapitel, tillader også repræsentationen af (parallelle) multikanter	
+\index{multigraf}
+\index{graf!multigraf}
+\index{kante!parallel}
+og løkker $(v,v)$.
+Vi vil begynde med at skabe os et overblik over de operationer, som muligvis skal kunne understøttes.
+
+\begin{itemize}
+\item \emph{Adgang til informationskomponenter.} 
+  Ofte vil man have adgang til information, som er knyttet til et given knude eller kant,
+  \index{knude!tilknyttet information}
+  \index{kant!tilknyttet information}
+  fx vægten 
+  \index{kant!vægt}
+  af den kant eller afstanden til en særlig knude.
+  I mange graf\-repræsentationer er knuder og kanter objekter, og vi kan derfor direkte gemme informationen i objektets instansvariable.
+  Medmindre andet er sagt, sætter vi $V=\{1,\ldots, n\}$,
+  \index{knude!nummerering} 
+  så vi kan gemme den til en knude knyttede information i række.
+  \index{knude!knuderække|textbf}
+  \index{knuderække@\Id{knuderække}|textbf}
+  Hvis der ikke er en anden mulighed, kan man gemme knude- og kantinformation i en hakketabel.
+  \index{haking!anvedelse}
+  I hvert fald kan adgangen til informationskomponenter implementeres på en sådan måde, at de tager konstant tid.
+  I resten af bogen vil vi abstrahere bort fra de forskellige muligheder for denne adgang og bruger datatyperne \Id{knuderække} og \Id{kantrække}
+  \index{kantrække@\Id{kantrække}|textbf}
+  \index{kant!kantrække|textbf}
+  for at vise, at det drejer sig om en rækkelignende datastruktur, hvis indeksområde er mængden af kanter hhv. knuder. 
+\item \emph{Navigation.}\index{graf!navigation} 
+  For en givet knude vil man ofte have adgang til de udgående kanter.
+  Det viser sig, at denne operation er af central betydning for de fleste grafalgoritmer.
+  Som vi har set i det indledende eksempel, er det sommetide også nødvendigt at have adgang til de indgående kanter til en knude.
+\item \emph{Kantforespørgsler.}
+  \index{Kantforespørgsel}
+  For et givet par af knuder $(u,v)$ vil vi måske vide, om parret udgør en kant i grafen. 
+  Dette kan man altid implmentere som en hakketabel,
+  \index{hakning!anvendelse}
+  men sommetider ønsker vi en endnu hurtigere proces.
+  En mere speciel, men vigtig forespørgsel er givet kanten $(u,v)$ i $G$ at finde (repræsentationen af) den \emph{modsatrettede kant} 
+  \index{graf!modsatrettet kant} $(v,u)\in E$,
+  såfremt den findes.
+  Denne operation kan implementeres ved at lade en peger forbinde hver kant med sin modsatrettede kant.
+\item \emph{Konstruktion, omvandling og udgift.}
+\index{graf!omvandling}%
+\index{graf!konstruktion}%
+\index{graf!udgift }%
+\index{graf!indgift}%
+    Sommetider er en graf givet i en anden repræsentation end den, der er bedst egnet til løsningen af det aktuelle algoritmiske problem.
+Det er ikke noget større problem, fordi de fleste graf\-repræsentationer kan omvandles til hinanden i lineær tid.
+\item \emph{Aktualisiering.}
+  \index{graf!dynamisk} 
+  Sommetider vil man tilføje eller fjerne knuder og kanter i en graf.
+    Fx er beskrivelsen af nogle algoritmer enklere, hvis man tilføjer en knude, som kan nå alle andre knuder (se fx figur~\ref{ch:spath:a: all pair}). 
+\end{itemize}
+
+%---------------------------------------------------------------------
+\section{Uordnede kantfølger}\index{graf!kantfølge}
+
+Den måske enkleste fremtilling af en gra fer som uordnet følge af kanter.
+Hver kant indeholder et par af knudeindeks og muligvis yderligere information som fx kantvægten.
+Om disse knudepar skal repræsentere en rettet eller urettet graf er et fortolkningsspørgsmål.
+Repræsentation som kantliste bliver ofte brugt til input og output.
+\index{graf!input}
+\index{graf!output}
+I denne repræsentation er det let at tilføje knuder og kanter i konstant tid.
+Mange andre operationer, især navigation i grafen, er derimod så langsomme, at repræsentationen stort set er ubrugelig.
+Derfor arbejder kun få grafalgoritmer godt med kantlister;
+de fleste har nemlig brug for hurtig adgang til en knudes nabokanter.
+I disse tilfælde foretrækker man de ordende repræsentationer, som diskuteres i de følgende afsnit.
+I kapitel~\ref{ch:mst:} skal vi møde to algoritmer for minimalt spændetræ;
+den ene virker fint selv med kant\-liste\-repræsentationen, den anden har brug for en mere raffineret datastruktur.
+ 
+%---------------------------------------------------------------------
+\section{Naborækker -- statiske grafer}
+\llabel{ss:adjarray}%
+\index{graf!naborække|textbf}%
+\index{naborække|sieheunter{graf}}%
+\index{graf!statisk}
+
+For at tillade hurtigere adgang til de udgående kanter for given knude kan man for hver knude gemme dens udgånde kanter i en række.
+Når der ikke er knyttet yderlige information til kanterne, indeholder denne række blot målknudernes indeks.
+Når grafen er \emph{statisk}, dvs. ikke forandres i løbet af tiden, kan man føje de små rækker sammen til én stor kantrække $E$.
+En yderligere række $V$ med $n+1$ indgange gemmer begyndelsespositionerne for de små rækker, dvs. for hver knude $v$ indeholder $V[v]$ det første index i $E$, som indeholder en kant med startknude $v$.
+I $V[n+1]$ står attrapværdien $m+1$.
+For hver knude $v$ finder man de udgående kanter fra $v$ nemt som $E[V[v]]$, \ldots, $E[V[v+1]-1]$;
+attrapværdien sikrer, at denne regel også gælder for $v=n$.
+Et eksempel på sådan en naborække finder man i figur~\lref{fig:adjarray} (i midten til venstre).
+
+Lagerbehovet for en graf med $n$ knuder og $m$ kanter er $n+m+\Theta(1)$ maskinord.
+Det er endnu mere kompakt end de $2m$ maskinord, som bruges i kant\-liste\-repræsentationen.
+
+Repræsentationen som naborække kan udvides til at gemme yderligere information:
+Kantinformation kan man gemme enten i en yderligere række med $m$ indgange eller i selve kantrækken.
+Hvis de indgående kanter også skal repræsenteres eksplicit, kan man gemme den omvendte graf i yderligere rækker $V'$ og $E'$.
+
+
+\begin{figure}[t]
+\begin{center}
+%\leavevmode\includegraphics[width=0.9\textwidth]{\masterdir/grepresent/represent3.eps}
+\leavevmode\includegraphics[scale=0.416]{img/represent3.eps}
+\end{center}
+\vspace*{-3cm}\hspace*{0.7\textwidth}$\displaystyle\left(\;\begin{array}{c@{\;\;\;}c@{\;\;\;}c@{\;\;\;}c}
+  0&1&0&1\\
+  1&0&1&1\\
+  0&1&0&1\\
+  1&1&1&0
+\end{array}\;\right)$
+\vspace*{2cm}
+\caption{\llabel{fig:adjarray}
+\emph{Foroven}: En urettet graf og dens tilsvarende dobbeltrettede graf.
+\emph{Midte}: Repræsentation af samme graf som naborække og som nabolister. 
+\emph{Forneden}: Repræsentation som sammenhægtede kantobjekter og som nabomatrix.}
+\end{figure}
+
+\begin{exerc}\index{graf!konvertering}
+  Beskriv en algoritme som konverterer kant\-liste\-representationen til naborækker i lineær tid.
+  Brug kun $O(1)$ ekstra plads.
+  \emph{Vink}:
+  Tænk på problemet som opgaven at sortere kanter efter startknude
+  \index{startknude}
+  og ændr algoritmen i figur~\ref{ch:sort:alg:KsortArray} til heltalssortering, så den kan bruges her.
+\end{exerc}
+
+
+%---------------------------------------------------------------------
+\section{Naborækker -- dynamiske grafer}
+\llabel{ss:adjlist}%
+\index{graf!naboliste|textbf}%
+\index{naboliste|sieheunter{graf}}%
+\index{graf!dynamisk}%
+\index{liste}
+
+Kantrækker repræsenterer grafer på en kompakt og effektiv måde.
+Deres hovedsaglige ulempe er, at tilføjelse og fjernelse af kanter er dyr.
+Antag fx, at vi skal tilføje en ny kant $(u,v)$.
+Selv hvis der stadig er plads i kantrækken $E$, skal en kant for hver af knuderne $u+1$ til $n$ flyttes til højre, hvilket kræver tid $O(n)$.
+
+I kapitel~\ref{ch:sequence:} har vi set, hvordan man implementerer dynamiske følger.
+Alle disse løsninger kan bruges til at konstruere en datastruktur for dynamiske grafer.
+For hver knude $v$ fremtiller vi følgen $E_v$ af dens udgående kanter (eller dens indgående kanter, eller både og) som ubegrænset række \index{række!ubegrænset} eller (dobbelt eller enkelt) hægtet liste.
+Fordele og ulemper ved de forskellige følge\-repræsentationer overføres selvfølgeligt. 
+Ubegrænsede rækker bruger lagerhierarkiet bedre.
+% TODO cache
+Hægtede lister muliggør tilføjelse og fjernelse på vilkårlig plads i konstant tid.
+De fleste grafer er »tynde«
+\index{graf!tynd} 
+i den forstand, at hver knude i gennemsnit kun har få ind- og udgående kanter. 
+Hægtede lister til repræsentation af tynde grafer bør implementeres uden attrapknuden
+\index{liste!attrapknude}
+fra afsnit~\ref{ch:sequence:s:list},
+fordi de nødvendige ekstra $n$ knuder udgør et betydligt pladsspilde.
+I eksemplet i figur~\lref{fig:adjarray} (midten) bruges derfor cirkulært dobbelthægtede lister. \index{liste!cirkulær} 
+
+
+\begin{exerc}
+  Antag, at hver knude $u$s udgående kanter er gemt i en ubegrænset række $E_u$.
+  En kant $e=(u,v)$ er givet ved sin position i $E_u$.
+  Forklar, hvordan $e$ kan fjernes i amortiseret konstant tid.
+  \emph{Vink}: De andre kanter relative orden behøver ikke at blive bevaret.
+\end{exerc}
+
+
+\begin{exerc}
+  \llabel{ex:dagtest}
+  \index{graf!kredsgenkendelse}
+  \index{kø}
+  Betragt igen algoritmen fra afsnit~\ref{ch:intro:s:graphnot}, som afgør, om en givet rettet graf er kredsfri.
+  Forklar, hvordan den kan implementeres til at arbejde i lineær tid.
+  Det kræves en passende repræsentation af dynamiske grafer samt en algoritme, som kan bruge denne repræsentation effektivt.
+  \emph{Vink}:
+  Brug en kø til at gemme knuder med udgrad $0$.
+\end{exerc}
+
+
+Doppeltrettede 
+\index{graf!doppeltrettet}
+\index{graf!hægtede kantobjekter}
+grafer forekommer i mange sammenhænge. 
+Urettede grafer kan repræsenteres som dobbeltrettede på en naturlig måde, og visse algortimer for rettede grafer har også brug for hurtig adgang til en knudes indgående kanter.
+I denne situation ønsker man ofte at gemme den information, som hører til en urettet kant (eller til en rettet kant og dens omvending), kun én gang.
+Ligeledes ønsker man nem adgang fra en kant til dens omvending.
+
+Vi vil beskrive to løsninger, som opfylder disse krav.
+Den første forsyner enkelt hver rettede kant med to yderligere pegere.
+Den ene peger på den omvendte kant, den anden på den information, som er knyttet til kanten.
+
+Den anden løsning nøjes med en enkelt listeknude for hver kant og henviser til denne knude i to nabolister.
+For urettede grafer skulle altså listeknuden for den urettede kant $\{u,v\}$ forekomme både i listen $E_u$ og i listen $E_v$.
+Hver knude $u$ gemmer en peger på en af sine hosliggende kanter og giver derigennem adgang til hele nabolisten.
+Hvis nabolisten skal være dobbelthægtet (selvom en cirkulært hægtet liste ofte er tilstrækkelig), behøver sådan en listeknude fire pegere:
+to pegere på $u$s naboliste $E_u$ og to pegere på $v$s naboliste $E_v$.
+Fra den pågældende listeknude kan man gennemløbe alle dens hosliggende kanter.
+Et eksempel er vist forneden i figur~\lref{fig:adjarray}.
+Det er en smule omstændigt at finde frem til knuden i den anden ende af en kant.
+Listeknuden for kanten bruger ikke nogen særlig ordning til at gemme endeknuderne.
+Når vi altså i kantlisten støder på en hosliggende kant til $u$, skal vi inspicere begge knuder og vælge den, der er forskellig fra $u$.
+Alt afhængig af, om dette er den første eller anden knude i objektet, skal næste skridt i gennemløbet tages ud fra det første eller det andet par af pegere.
+Et elegant alternativ er at gemme værdien $u\oplus v$ i listeknuden for kanten $\{u,v\}$.
+\cite{Naeher-Zlotowski}
+\index{Naher@Näher, S.}
+\index{Zlotowski, O.} 
+Bitvis ekslusivt-eller af denne indgang med et endepunkt leverer så det andet.
+Denne repræsentation sparer pladsen for et knudenavn.
+Diese Darstellung spart den Platz für einen Knotennamen ein. 
+Dog skal man nu træffe en beslutning of, i hvilken ordning listepegerne svarer til kantens endepunkter. 
+For eksempel kan man vedtage, at listeknuden for kanten $\{u,v\}$ med $u<v$ bruger sig første par af pegere til $u$s naboliste og sit andet par til $v$s.
+
+For rettede grafer, hvor hver kant $(u,v)$ skal gemmes som udkant til $u$ og som indkant til $v$, forekommer listeknuden for den rettede kant $(u,v)$ i listen af $u$s udkanter og i listen av $v$s indkanter.
+Også her skal man for hver kant bruge fire pegere i dens listeknude, to for dens rolle som udkant og to for dens rolle som indkant.
+Hver grafknude har en peger på en af sine udkanter, og en peger på en af sine indkanter.
+
+%---------------------------------------------------------------------
+\section{Nabomatriser}%
+\index{graf!nabomatrix|textbf}%
+\index{matrix}%
+\index{nabomatrix|sieheunter{graf}}%
+\index{graf!tæt}%
+\index{algoritmedesign!algebraisk}
+
+En graf med $n$ knuder kan repræsenteres som \emph{nabomatrix} $A$ af dimension 
+$n\times n$.
+Indgangen ${A}_{ij}$ er 1, hvis $(i,j)\in E$, og 0 ellers.
+Indsættelse og fjernelse af en kant såvel som kantforespørgsler kan gennemføres i konstant tid.
+For finde en hosliggende kant til en knude, kræves tid $\Theta(n)$.
+For meget tætte grafer med $m=\Omega(n^2)$ bør det anses som effektivt. 
+Lagerbehovet er $n^2$~bit.
+For meget tætte grafer kan dette være bedre end de $n + m + O(1)$ maskinord, som man bruger på naborækker.
+Men selv for disse grafer er besparelsen ringe, når kanterne indeholder yderligere information.
+
+\begin{exerc}
+  \index{graf!nabomatrix!urettet}
+  Forklar, hvordan man kan repræsentere en urettet graf på $n$ knuder og uden løkker med kun $n(n-1)/2$~bit. 
+  Kantforespørgsler skal gøres i tid $O(1)$.
+\end{exerc}
+
+Måske vigtigere end lageraspekterne ved brug af nabomatriser er den strukturelle sammenhæng mellem grafer og lineær algebra,
+\index{lineær algebra},
+som skabes af nabomatrisen $A$.
+På den ene side kan nogle grafteoretiske problemer løses ved hjælp af metoder fra lineær algebra.
+Hvis vi fx sætter ${C}={A}^k$, så er  ${C}_{ij}$ antallet af (ikke nødvendigvist simple) veje
+\index{graf!antal veje} 
+fra knude $i$ til knude $j$ med præcis $k$ kanter.
+
+\begin{exerc}
+  Forklar, hvordan man kan gemme en $n\times n$-matrix ${A}$ med $m$ indgange forskellig fra 0 i plads $O(m+n)$, således at matrix-vektor-produktet ${A}{x}$ kan udregnes i tid $O(m+n)$.
+  Beskriv multiplikationsalgoritmen.
+  Udvid repræsentationen, så den også omfatter produkter på formen ${x}^{\textsf{T}}{A}$ i tid $O(m+n)$.
+\end{exerc}
+
+På den anden side kan grafteoretiske koncepter være nyttige til at løse problemer fra lineær algebra.
+Antag fx, at vi vil løse matrixligningen ${B}{x}={c}$, hvor $B$ er en symmetrisk matrix.
+Begragt den tilsvarende nabomatrix ${A}$, for hvilken ${A}_{ij}=1$ hvis og kun hvis ${B}_{ij}\neq 0$.
+Når en algoritme for sammenhængskomponenter finder ud af, at grafen, som beskrives af  $A$, har to sammenhængskomponenter, kan vi bruge denne opdeling til at omorganisere rækker og søjler i $B$ til en ensbetydende ligning:
+$$
+\left(\begin{array}{cc}
+{B}_1 & {0} \\
+{0}   & {B}_2
+      \end{array}\right) 
+\left(\begin{array}{c}
+{x}_1\\
+{x}_2
+\end{array}\right)
+=
+\left(\begin{array}{c}
+{c}_1\\
+{c}_2
+\end{array}\right)\,.
+$$
+Denne ligning kan løses ved at løse hver af de to ligninger ${B}_1{x}_1= {c}_1$
+og ${B}_2{x}_2={c}_2$ for sig.
+I praksis er situationen mere speget, fordi matriser sjældent har den egenskab, at deres tilsvarende urettede graf er usammenhængende.
+Alligevel kan man bruge mere præcise grafteoretiske koncepter som fx snit
+\index{graf!snit}
+til at opdage strukturer i matrisen, som muliggør mere effektiv løsning af ligningssystemet.
+
+\section{Implicitte repræsentationer}%
+\index{graf!gitter-}
+
+Mange anvendelser arbejder på grafer med speciel struktur.
+Ofte kan man udnytte denne situation til at opnå enklere og mere effektive repræsentationer.
+Vi giver to eksempler.
+
+\emph{Gittergrafen} $G_{k\ell}$ med knudemængden
+$ V= \{1,\ldots,k\}\times \{1,\ldots,\ell\}$
+og kantmængden
+$$E=\{\,((i,j),(i,j'))\in V^2\colon \abs{j-j'}=1\,\}\cup
+   \{\,((i,j),(i',j))\in V^2\colon \abs{i-i'}=1\,\}$$
+   er en graf, som er helt bestemt af de to parametre $k$ og $\ell$.
+  Figur~\lref{fig:grid} viser $G_{3,4}$.
+  Kantvægte bør man gemme i to todimensionelle rækker, en for de vertikale og en for de horisontale kanter.
+
+En \emph{intervalgraf}
+\index{graf!intervalgraf} 
+er givet ved en endelig mængde af intervaller i $\RR$.
+Til hvert interval findes en knude i grafen, og to knuder er naboer, hvis de tilsvarende intervaller overlapper.
+
+\begin{figure}[h]
+\sidecaption
+\leavevmode\includegraphics[width=6cm]{img/grid.eps}
+\caption{\llabel{fig:grid} Gittergrafen $G_{34}$ (\emph{venstre}) og en intervalgraf med fem knuder og seks kanter (\emph{højre}).}
+\end{figure}
+
+\begin{exerc}[Repræsentation af intervalgrafer]
+  \llabel{ex:interval} 
+\begin{description}
+  \item[(a)] Vis, at der for hver mængde af $n$  intervaller i $\RR$ findes en mængde af intervaller, hvis endepunkter er heltal i $\{1,\ldots,2n\}$ og som definerer samme graf.
+  \item[(b)] Beskriv en algoritme, som afgør, om en intervalgraf givet som $n$ intervaller er sammenhængende.
+  \emph{Vink}: 
+  Algoritmen bør sortere intervallernes endepunkter
+  \index{sortering!anvendelse}
+  \index{algoritmekonstruktion!sortering!anvendelse} 
+  og derefter gennemgå dem i stigende rækkefølge.
+  Oprethold herunder mængden af af påbegyndte, men ej afsluttede, intervalle.
+  \item[(c*)] 
+    Beskriv en repræsentation af intervalgrafer, som nøjes med $O(n)$ plads og understøtter effektiv navigation i følgende forstand:
+    Givet et interval $I$ skal alle intervaller $I'$ rapporteres, som overlapper $I$;
+    ved overlap forstås her at $I$ indeholder et af $I'$s endpunkter eller der gælder $I\subseteq I'$. 
+    Hvordan kan man givet $I$ finde samtlige intervaller af begge slags?
+\end{description}
+\end{exerc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementationsaspekter}\llabel{s:implementation}
+
+\emph{Udeladt}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historiske anmærkninger og yderligere resultater}
+\llabel{s:further}
+
+\emph{Udeladt}
+
+

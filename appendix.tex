@@ -1,3 +1,7 @@
+\chapter{Appendix}
+\renewcommand{\labelprefix}{app:notation}
+\llabel{}
+
 \newenvironment{mydescription}
 {\begin{list}{}{\setlength\labelwidth{0pt}%
                \setlength\itemindent{-\leftmargin}%
@@ -7,8 +11,8 @@
 {\end{list}}
 \newcommand*\mydescriptionlabel[1]{#1}
 
-\newcommand{\lref}[1]{\eqref{#1}}
 \section{Matematiske symboler}
+\llabel{math}
 
 \begin{mydescription}
 \item[$\{e_1,\ldots,e_n\}$] mængden af elementer $e_1$, $\ldots$, $e_n$.
@@ -63,7 +67,7 @@
 \item[$H_n$] $\sum_{i=1}^n1/i$, kaldt »det $n$te harmoniske tal« (se ulighed (A.12)).
 \item[$\log x$] logaritmen til $x$ med grundtal $2$, $\log_2x$, for $x>0$.
 \item[$\log^* x$] for $x>0$, det mindste tal $k\geq 0$ for hvilket $\log(\log(\cdots (\log x)\cdots ))\leq 1$ ($k$-foldig gentagelse af logaritmen).
-\item[$\ln x$] den naturlige logaritme til $x$ med grundtal $2,7182818284590\ldots$, for $x>0$.
+\item[$\ln x$] den naturlige logaritme til $x$ med grundtal $\num{2,7182818284590}\ldots$, for $x>0$.
 \item [$\mu(s,t)$] længden af den korteste vej fra $s$ til $t$; $\mu(t):=\mu(s,t)$.
 \item[$\ddiv$] kvotienten ved heltalsdivision; $m\ddiv n := \lceil m/n\rceil $ for $n>0$.
 \item[$\bmod$] resten ved heltalsdivision; $m\bmod n := m - n(m\ddiv n)$ for $n>0$.
@@ -75,7 +79,8 @@
 
 \end{mydescription}
 
-\section{Matematiske begreber}\label{mathconcepts}
+\section{Matematiske begreber}
+\llabel{mathconcepts}
 
 \newcommand{\Oh}[1]{\operatorname{O}(#1)}
 \newcommand{\Om}[1]{\Omega(#1)}
@@ -92,10 +97,9 @@
   \item[ækvivalensrelation]
     \index{relation!aekvivalens@ækvivalens-|textbf}
     \index{aekvivalensrelation@ækvivalensrelation|textbf}
-    eine transitive, reflexive und
-    symmetrische Relation. 
+    en transitiv, refleksiv og symmetrisk relation. 
 
-  \item[asymptotische Notation] 
+  \item[asymptotisk notation] 
     \begin{align*}
       \Oh{f(n)} &=  \{\,g(n)\colon\exists c>0\colon\exists n_0\in\NN_+\colon\forall n\geq n_0\colon g(n)\leq c\cdot f(n)\,\}.\\
       \Om{f(n)} &=  \{\,g(n)\colon\exists c>0\colon\exists n_0\in\NN_+\colon\forall n\geq n_0\colon g(n)\geq c\cdot f(n)\,\}.\\
@@ -207,7 +211,264 @@
 
 \end{mydescription}
 
-\section{Sandsynlighedsregningens grundlag}
+\section{Grundlæggende sandsynlighedsregning}
+\llabel{s:prob}
+
+\newcommand{\SampleSpace}{\mathcal S}
+\newcommand{\Sample}{s}
+\renewcommand{\prob}[1]{\Pr(#1)}
+\newcommand{\Exp}[1]{E[#1]}
+
+Sansynlighedsregningen er baseret på begrebet \emph{udfaldsrum}.
+$\SampleSpace$ 
+\index{udfaldsrum|textbf}
+For at beskrive kast med to terninger, skulle vi anvende udfaldsrummet
+$\set{1,\ldots,6}\times \set{1,\ldots,6}$ med 36 elementer, dvs. at elementerne i udfaldsrummet (som også kaldes elementarhændelser) er tuplerne $(x,y)$ med $1 \le x,y \le 6$ og $x,y \in \NN$.  
+Generelt er udfaldsrummet en vilkårlig ikke-tom mængde.
+I denne bog er alle udfaldsrum endelige.%
+\footnote{%Anmerkung für die deutsche Ausgabe: 
+  Udsagnene i dette afsnit gælder i alt væsentligt med de samme beviser også for tælleligt uendelige udfaldsrum.
+  Den slags rum behøver man fx til at modellere eksperimentetet »slå en terning, indtil du får en 6er.«
+  }
+  For hvert tilfældige eksperiment 
+\index{tilfældigt eksperiment|textbf}
+tildeles hvert element $\Sample \in \SampleSpace$ en \emph{sandsynlighed}  eller \emph{punktsandsynlighed}
+\index{sandsynlighed|textbf}
+\index{punktsandsynlighed|textbf}
+$p_\Sample \ge 0$, så der gælder $\sum_{\Sample \in \SampleSpace} p_\Sample = 1$.
+Den funktion, som afbilder hver hændelse $\Sample$ til sin sandsynlighed $p_\Sample$, hedder \emph{sandsynlighedsfunktionen} eller \emph{fordeling}.
+% TODO orig has fordeling
+Udfaldsrummet sammen med en fordeling kaldes \emph{sandsynlighedsfelt}.
+\index{sandsynlighedsfelt|textbf}
+I denne bog bruges næsten udelukkende \emph{uniforme fordelinger}; sådanne fordelinger opfylder $p_\Sample = p =
+1/\abs{\SampleSpace}$.
+En delmængde $\mathcal{E}$ af udfaldsrummet kaldes en \emph{hændelse}\index{hændelse|textbf}. 
+Sandsynligheden $\prob{\mathcal{E}}$ af en hændelse $\mathcal{E}\subseteq \SampleSpace$ er summen af punktsandsynlighederne for elementarhændelserne.
+I det uniforme tilfælde indebærer det, at $\prob{\mathcal{E}}=|\mathcal{E}|/|\SampleSpace|$. 
+For eksempel indeholder udfaldsrummet for terningekast hændelsen $\setGilt{(x,y)}{x + y = 7} = \set{(1,6),(2,5),\ldots,(6,1)}$ med  sandsynlighed $\frac{6}{36} = \frac{1}{6}$, hvorimod hændelsen $\setGilt{(x,y)}{x + y \ge 8}$ har sandsynlighed $\frac{15}{36} = \frac{5}{12}$.
+
+En \emph{stokastisk variabel}
+\index{stokastisk variabel|textbf} 
+er en afbildning fra udfaldsrummet til de reelle tal.
+Stokastiske variable betegnes sædvanligvis med store bogstaver, for at adskille dem fra andre værdier.
+I terningeeksemplet kan vi lade stokastiske variable $X$ angive antallet af øjne på den første terning, $Y$ angive antallet af øjne på den anden terning og $S$ summen af de to terninger.
+Formelt har vi $(x,y) \in \SampleSpace$, at $X((x,y)) = x$, $Y((x,y)) = y$
+og $S((x,y)) = x + y = X((x,y)) + Y((x,y))$.
+
+Givet nogle stokastiske variable kan man definere nye ved at danne utryk ud fra variablerne og sædvanlige værdier.
+Fx kan man ud fra de stokastiske variable $V$ og $W$ skabe de nye stokastiske variable $(V+W)(\Sample)=V(\Sample)+W(\Sample)$, $(V\cdot W)(\Sample)=V(\Sample)\cdot W(\Sample)$ og
+$(V+3)(\Sample)=V(\Sample)+3$.
+
+Hændelser angives ofte som prædikater, i hvilke der indgår stokastiske variable. 
+For eksempel betegner $X \le 2$ hændelsen $\setGilt{(1,y),(2,y)}{1 \le y \le 6}$; hermed kan man udtrykke $\prob{X \leq 2}=\frac{1}{3}$.
+På samme måde kan man udtrykke $\prob{X+Y=11}=\prob{\set{(5,6),(6,5)}}=\frac{1}{18}$.
+
+En \emph{stokastisk indikatorvariabel}
+\index{Stokastisk variabel!indikator|textbf}
+(kort: indikatorvariabel) er en stokastisk variabel, som kun antager værdierne $0$ og $1$.
+Indikatorvariabler spiller en fremtrædende rolle i sandsynlighedsteoretiske analyser af algoritmer, fordi de gør det muligt at udtrykke komplekse algoritmers opførsel i termer af enkel matematiske objekter.
+Indikatorvariabler betegnes ofte med bogstaverne $I$ og $J$. 
+Hændelser og indikatorvariabler svarer til hinanden en-til-en:
+Til hændelsen $\mathcal{E}$ hører indikatorvariablen $I_{\mathcal{E}}$, som har værdien 1 netop for 
+$\Sample\in\mathcal{E}$.
+Hvis en hændelse er beskrevet af prædikatet $P$, skriver man ofte kort $[P]$ for den tilsvarende indikatorvariable, dvs. $[P](\Sample)=1$ hvis $P(\Sample)$ gælder, ellers $[P](\Sample)=0$.
+
+\emph{Middelværdien}
+\index{middelværdi|textbf}
+for en stokastisk variabel $Z:\SampleSpace\rightarrow \RR$, også kaldt forventingsværdien, er
+\addtocounter{equation}{-1}%
+\begin{equation}\llabel{eq:expected}
+\Exp{Z}=\sum_{\Sample \in \SampleSpace} p_\Sample \cdot Z(\Sample) = \sum_{z \in Z[\SampleSpace]}
+z\cdot\prob{Z=z} \,.
+\end{equation}
+Mao. bidrager hver hændelse $\Sample$ med værdien af $Z$ på $\Sample$, ganget med sandsynligheden af   $\Sample$.
+Alternativt kan vi for hvert $z$ i værdiområdet $Z[\SampleSpace]$ for $Z$ samle alle hændelser $\Sample$, som opfylder $Z(\Sample) = z$, til en enkelt hændelse  $Z = z$ og så summere over alle $z \in Z[\SampleSpace]$. 
+
+For den stokastiske variable $X$ fra vores eksempel foroven gælder $\Exp{X}=\frac{1}{6}({1+2+3+4+5+6})= \frac{21}{6}=\num{3,5}$,
+% TODO dezimalkomma
+dvs. at middelværdien for antallet af øjne på den første terning er $\num{3,5}$. 
+Det samme gælder naturligvis for den anden terning.
+For indikatorvariable $I$ sælder 
+\[ \Exp{I}= 0\cdot \prob{I = 0} + 1\cdot \prob{I=1} = \prob{I = 1} \,. \]
+
+Ofte er det ikke udfaldsrummet, som er så interessant, men den stokastiske variable $Z$ og den opførsel i $\RR$.
+I så fald er det nok at kende mængden $Z[\SampleSpace]$  sammen med sandsynlighederne 
+$\prob{Z=z}$, $z\in Z[\SampleSpace]$. 
+Man kan sågar opfatte $Z[\SampleSpace]$ som (afledt) udfaldsrum, hvis fordeling er givet ved $\prob{Z=z}$ for $z\in Z[\SampleSpace]$. 
+Derfor kaldes funktionen $z\mapsto\prob{Z=z}$, som knytter den pågældende sandsynlighed til hvert $z\in Z[\SampleSpace]$, ofte for \emph{fordelingen af $Z$}.
+\index{fordeling!af en stokastisk variabel|textbf}.
+To stokastiske variable $Y$ og $Z$ med samme fordeling kaldes 
+\emph{identisk fordelte}, 
+\index{identisk fordelt|textbf}
+begrebet udvides til mere end to variable.
+
+For stokastiske variable $Z$, som kun antager værdier i de naturlige tal, gælder følgende meget nyttige formel for middelværdien:
+\begin{equation}\llabel{eq:expected:summation}
+\Exp{Z}=\sum_{k\ge 1} \prob{Z\ge k} \text{, hvis }Z[\SampleSpace]\subseteq\NN \,.
+\end{equation}
+Beviset er meget let.
+Sæt $p_k=\prob{Z\ge k}$ og $q_i=\prob{Z = i}$ for $k,i\in\NN$.
+Da gælder $p_k=\sum_{i \ge k} q_i$ og derfor, efter en enkel ombytning af summationsrækkefølgen,
+\[
+ \Exp{Z}=\sum_{z \in Z[\SampleSpace]} z\cdot\prob{Z=z} = \sum_{i \in \NN} i\cdot\prob{Z=i} = \sum_{i \in \NN} \sum_{1 \le k \le i} q_i
+ = \sum_{k \ge 1} \sum_{i \ge k} q_i = \sum_{k \ge 1} p_k.
+\]
+
+Ofte er man interesseret i middelværdien for en stokastisk variabel, som er defineret i termer af en anden stokastisk variabel.
+For summen af stokastiske variabler er dette særlig enkelt.
+Grunden er \emph{linearitet af middelværdien}
+\index{linearitet af middelværdien|textbf}
+\index{middelværdi!linearitet|textbf}
+for stokastiske variabler.
+For vilkårlige stokastiske variabler $V$ og $W$ gælder
+\begin{equation}\llabel{eq:linearity}
+  \Exp{V+W}=\Exp{V}+\Exp{W}\,.
+\end{equation}
+Denne ligning er yderst anvendelig.
+Beviset er nemt, det koger i al væsentlighed ned til at bruge den distributive lov.
+Der gælder
+\begin{align*}
+\Exp{V+W} &= \sum_{\Sample \in \SampleSpace} p_\Sample \cdot (V(\Sample) + W(\Sample)) \\
+          &= \sum_{\Sample \in \SampleSpace} p_\Sample \cdot V(\Sample) +  \sum_{\Sample \in
+\SampleSpace} p_\Sample \cdot W(\Sample) \\
+ &= \Exp{V} + \Exp{W} \,. 
+\end{align*}
+Som første anvendelse vil vi beregne det forventede antal øjne af to terninger.
+Der gælder
+ \[ \Exp{S} = \Exp{X + Y} = \Exp{X} + \Exp{Y} = \num{3,5} + \num{3,5} = 7 \,.\]
+Læg mærke til, at resultatet fremkommer stor set uden beregninger.
+Hvis man ville etablere samme resultat uden at bruge middelværdiens linearitet, skulle man gennemføre nogle omstændige udregninger:
+\begin{align*}
+\Exp{S} &=\textstyle 2 \cdot \frac{1}{36} + 3 \cdot \frac{2}{36} + 4 \cdot \frac{3}{36} +  5 \cdot
+\frac{4}{36} + 6 \cdot \frac{5}{36} + 7 \cdot \frac{6}{36}+ 8 \cdot \frac{5}{36}  + \cdots + 12\cdot\frac{1}{36}\\
+&= \frac{2\cdot 1 + 3\cdot 2 + 4\cdot 3 + 5 \cdot 4 + 6\cdot 5 + 7\cdot 6 +
+8\cdot 5 + \ldots + 12\cdot 1}{36} = 7 \,.
+\end{align*}
+Lige så enkelt som  (\lref{eq:linearity}) viser man, at der gælder  $\Exp{aV}=a\Exp{V}$ for $a\in\RR$.
+Man kan let udvide (\lref{eq:linearity}) til flere end to termer, vilket bevises ved fuldstændig indkuktion.
+
+\begin{exerc} 
+Hvad er det forventede antal øjne ved kast med tre terninger?
+\end{exerc}
+
+Som eksempel på et noget mere komplekst udfaldsrum betragter vi nu et tilfældigt eksperiment, hvor $n$ bolde kastes i $m$ kurve.
+Hver bold lander i en (uniformt) tilfældig kurv, og forskellige kast er uafhængige.
+Formelt er udfaldsrummet mængden af alle funktioner $f$ fra $\{1,\ldots, n\}$ til  $\{1,\ldots,m\}$.
+Udfaldsrummet har størrelse $m^n$; for hvert $i\in\{1,\ldots, n\}$ angiver $f(i)$ den kurv, som den $i$te bold havner i.
+Alle udfald i udfaldsrummet har samme sandsynlighed.
+Hvor mange bolde kan vi forvente i den første kurv?
+Antallet af bolde i første kurv er en stokastisk variabel, som vi kalder $W$.
+For at bestemme dens middelværdi, benytter vi indikatorvariablen $I_i$ for $i\in\{1,\ldots, n\}$.
+Variablen $I_i$ er 1, når den $i$te bold havner i første kurv, og 0 ellers.
+Formelt: $I_i=[f(i)=1]$.
+Da gælder $W = \sum_i I_i$ og derfor
+\[ \Exp{W} = E\biggl[\sum_i I_i\biggr] = \sum_i \Exp{I_i} = \sum_i \prob{I_i = 1} \,.\]
+Her har vi brugt linearitet af middelværdien for den anden lighed, mens den trejde følger af, at $I_i$erne er indikatorvariabler. 
+Nu skal vi bare bestemme sandsynligheden for, at $I_i = 1$. 
+Idet boldene kastes tilfældigt i kurvene, er der samme sandsynlighed for hver kurv for at blive ramt af den $i$te bold.
+\footnote{Formelt: der findes nøjagtigt $m^{n-1}$ funktioner $f$ med $f(i) = 1$, og $m^{n-1}/m^n=1/m$.} 
+Heraf følger $\prob{I_i = 1} = 1/m$,
+og derfor
+\[ \Exp{W} = \sum_i \prob{I_i = 1} = \sum_i \frac{1}{m} = \frac{n}{m} \,.\]
+
+Produktet
+\index{stokastisk variabel!produkt|textbf} af stokastiske variabler opfører sig anderledes en summen.
+Generelt gælder $\Exp{X\cdot Y} \not= \Exp{X}\cdot\Exp{Y}$.
+Der findes en vigtig undtagelse: 
+for \emph{uafhængige}
+\index{stokastisk variabel!uafhængighed|textbf}
+stokastiske variabler $X$ og $Y$ gælder lighed. 
+Her kaldes stokastiske variabler $X_1$, \ldots, $X_k$ for uafhængige, hvis der gælder
+\begin{equation}
+  \prob{X_1=x_1\wedge\ldots\wedge X_k=x_k}= \prod_{i=1}^k
+  \prob{X_i =x_i} \text{ for alle }
+   x_1,\ldots,x_k\in\RR.
+\end{equation}
+Hvis vi følger eksemplet med de to terninger, er antal øjne på den første hhv. den anden terning uafhængige stokastiske variabler.
+Antallet på den første terning og summen af de to terninger derimod ej uafhængige.
+(Ikke-uafhængige stokastiske variabler kaldes \emph{afhængige}.) 
+
+\begin{exerc} 
+ Lad $I$ og $J$ være uafhængige indikatorvariabler og definer $X$ som $X= (I + J) \bmod 2$, dvs. at $X$ er 1 hvis og kun hvis $I$ og $j$ er forskellige.
+ Vis, at $I$ og $J$ er uafhængige, men at $I$, $J$ og $X$ er afhængige.
+ \end{exerc}
+
+Betragt nu to uafhængige stokastiske variable $X$ og $Y$.
+For at vise, at middelværdien er multiplikativ, regner vi:
+\begin{align*}
+  \Exp{X} \cdot \Exp{Y} &= \left(\sum_{x} x \cdot \prob{X = x}\right) \cdot \left(\sum_{y} y \cdot \prob{X = y}\right)\\
+  &= \sum_{x,y}  x \cdot y \cdot \prob{X = x} \cdot \prob{X = y}\\
+  &= \sum_{x,y} x \cdot y \cdot \prob{X = x \wedge Y = y}\\
+  &= \sum_z \sum_{x,y\colon   z = x\cdot y} z \cdot \prob{ X = x \wedge Y = y} \\
+  &= \sum_z \ z \cdot \sum_{x,y\colon  z = x\cdot y} \prob{ X = x \wedge Y = y} \\
+  &= \sum_z \ z \cdot \prob{ X \cdot Y = z} \\
+  &= \Exp{X \cdot Y} \,.
+\end{align*}
+
+Hvor (u)sandsynligt er det, at et stokastisk variable afviger fra sin middelværdi?
+\emph{Markovs ulighed}
+\index{ulighed!Markovs|textbf} 
+giver en enkel, men nyttig grænse.
+Lad $X$ være en ikke-negativ stokastisk variabel og vælg $c>0$ vilkårlig.
+Da gælder
+\begin{equation}\llabel{eq:markov} 
+\prob{X \ge c \cdot \Exp{X}} \le \frac{1}{c} \,.
+\end{equation} 
+Beviset er nemt. Vi har:
+\begin{align*}
+\Exp{X} &= \sum_{z \in X[\SampleSpace]} z \cdot \prob{X = z} \\
+& \ge \sum_{z \in X[\SampleSpace], \, z \ge c \cdot \Exp{X}} z
+\cdot \prob{X = z} \\
+& \ge c \cdot \Exp{X} \cdot \prob{X \ge c \cdot \Exp{X}} \,,
+\end{align*}
+hvor den første lighed udnytter, at vi summerer over en delmængde af mulige værdier og $X$ er ikke-negativ.
+Den anden ulighed udnytter, at faktoren $z$ i hver term i linje 2 er mindst $c \Exp{X}$.
+
+For stokastiske variabel, som opfylder stærkere krav, kan man etablere meget stærkere grænser.
+Følgende situation opstår flere steder i denne bog.
+Vi har en sum $X=X_1+\ldots+ X_n$ af $n$ uafhængige indikatorvariabler $X_1,\ldots,X_n$ og vil vurdere sandsynligheden for, at $X$ afviger meget fra sin middelværdi.
+I denne situation er følgende variant af \emph{chernoffgrænsen}
+\index{chernoffgrænse|textbf}
+\index{ulighed!Chernoffs|textbf}
+nyttig. 
+For hvert $\epsilon > 0$ gælder:
+\begin{align}\llabel{eq:lowerchernoff}
+  \prob{X<(1-\epsilon)\Exp{X}}&\leq \exp(-\epsilon^2\tfrac{1}{2}\Exp{X}) \,,\\
+\prob{X > (1 + \epsilon)\Exp{X}} &\le \Biggl( \frac{e^\epsilon}{(1 + \epsilon)^{(1
++ \epsilon)}}\Biggr)^{\Exp{X}} \,.
+\end{align}
+
+Den slags grænser kaldes \emph{halegrænser},
+\index{halegrænse|textbf}
+fordi de begrænser »halen« af sandsynlighedsfordelingen, dvs. den del, for hvilken $X$ er langt fra sin middelværdi.
+Vi betragter et eksempel.
+Når vi slår plat og krone $n$ gange og $X_i$ er indikatorvariablen, som er $1$ hvis og kun hvis det $i$te kast er »krone«, så angiver den stokastiske variabel $X = X_1+\ldots+ X_n$ antallet af kroneudfald under hele processen.
+Åbenbart gælder $\Exp{X} = \frac{1}{2}n$.
+Chernoffgrænsen fortæller os, at $\prob{X \le (1-\epsilon)\frac{1}{2} n} \le \exp(-\epsilon^2 \frac{1}{4}n)$.
+Hvis vi fx sætter $\epsilon = \frac{1}{10}$, får vi $\prob{X \le \frac{9}{10} \cdot \frac{1}{2}n} \le \exp{-\frac{1}{100}\cdot \frac{1}{4}n}$.
+For $n=\num{10000}$ er middelværdien $\num{5000}$, og sandsynligheden for, at $X$ ligger under  $\num{4500}$, er altså  mindre end det forsvindende lille $e^{-25}$.
+
+
+\begin{exerc}
+  Vurder sandsynligheden for at $X$ er større end $\num{5050}$ i eksemplet foroven. 
+\end{exerc}
+%TODO passim im Original: Dezimalkomma
+
+Når indikatorvariablerne er uafhængige og har samme fordeling, fx
+$\prob{X_i=1}=p$ for noget tal $p$, så  er  $X$ \emph{binomialfordelt}
+(mit parametre $p$ og $n$):
+\begin{equation}\llabel{eq:binomialdef}
+\prob{X=k}=\binom{n}{k}p^k(1-p)^{n-k}\text{, for }0 \le k\le n\,.
+\end{equation}
+
+\begin{exerc}[Bolde i kurve, fortsætning] 
+  Lad $W$ som foroven være antallet af bolde i første kurv.
+  Vis:
+\[ \prob{W = k} = \binom{n}{k}\left(\frac{1}{m}\right)^k
+\left(1-\frac{1}{m}\right)^{n-k} \,, \]
+og forsøg at beregne $\Exp{W}$ som $\sum_k \prob{W = k} k$.
+\end{exerc}
+
 
 \section{Nogle nyttige formler og uligheder}
 
@@ -216,13 +477,13 @@ Beviser for nogle af dem finder man forneden.
 
 \begin{itemize}
   \item Enkle grænser for fakultetsfunktionen:
-    \begin{equation}\label{eq:factorial}
+    \begin{equation}\llabel{eq:factorial}
       \left(\frac{n}{e}\right)^n \le n! \le n^n \text{, eller skarpere: } e \left(\frac{n}{e}\right)^n \le n! \le (en)\left(\frac{n}{e}\right)^n.
     \end{equation}
 
   \item 
     Stirlings approksimationsformel for fakultetsfunktionen:
-    \begin{equation}\label{eq:stirling}
+    \begin{equation}\llabel{eq:stirling}
       n! = \left(1+\Th{\frac{1}{n}}\right)\sqrt{2\pi n}\left(\frac{n}{e}\right)^n \,,\
     \end{equation}\index{Stirlings formel|textbf}
     eller mere nøjagtig:
@@ -233,50 +494,50 @@ Beviser for nogle af dem finder man forneden.
     \end{equation}
 
   \item En øvre grænse for binomialkoefficienten:
-    \begin{equation}\label{eq:bincoeff}
+    \begin{equation}\llabel{eq:bincoeff}
       \binom{n}{k}\leq\left(\frac{n\cdot e}{k}\right)^k .
     \end{equation}\index{binomialkoefficient|textbf}
 
   \item
     Summen af de første $n$ positive heltal:
-    \begin{equation}\label{eq:sumi}
+    \begin{equation}\llabel{eq:sumi}
       \sum_{i=1}^ni = \frac{n(n+1)}{2} .
     \end{equation}
 
 
   \item De harmoniske tal:
-    \begin{equation}\label{eq:harmonic}
+    \begin{equation}\llabel{eq:harmonic}
       \ln n\leq H_n=\sum_{i=1}^n \frac{1}{i}\leq \ln n+1 .
     \end{equation}\index{sum!harmonisk|textbf}
 
 
   \item 
     Geometrisk sum og geometrisk række:
-    \begin{equation}\label{eq:geometric}
-      \sum_{i=0}^{n-1}q^i=\frac{1-q^n}{1-q} \quad\text{für $q \not= 1$ und}\quad \sum_{i \ge 0} q^i =
-      \frac{1}{1 - q} \quad \text{ für $|q| < 1$} .
+    \begin{equation}\llabel{eq:geometric}
+      \sum_{i=0}^{n-1}q^i=\frac{1-q^n}{1-q} \quad\text{for $q \not= 1$ og}\quad \sum_{i \ge 0} q^i =
+      \frac{1}{1 - q} \quad \text{ for $|q| < 1$} .
     \end{equation}
     \index{sum!geometrisk|textbf}
 
-    \begin{equation}\label{eq:ipowi}
+    \begin{equation}\llabel{eq:ipowi}
       \sum_{i \ge 0} 2^{-i} = 2 \quad\text{og}\quad \sum_{i\geq 0}i\cdot 2^{-i}=
       \sum_{i\geq 1}i\cdot 2^{-i}=2 .
     \end{equation}
 
   \item Jensens ulighed:
     For hver konkave funktion $f$ og hver følge $(x_1,\ldots,x_n)$ af reelle tal i definitionsområrdet for $f$ gælder:
-    \begin{equation}\label{eq:concave}
+    \begin{equation}\llabel{eq:concave}
       \sum_{i=1}^n f(x_i)\leq n\cdot f\left(\frac{\sum_{i=1}^n x_i}{n}\right)\,,
     \end{equation}\index{ulighed!Jensens|textbf}%
     for hver konvekse funktion $f$ og hver følge $x_1,\ldots,x_n$ af reelle tal i definitionsområrdet af $f$ gælder:
-    \begin{equation}\label{eq:convex}
+    \begin{equation}\llabel{eq:convex}
       \sum_{i=1}^n f(x_i)\ \ge n\cdot f\left(\frac{\sum_{i=1}^n x_i}{n}\right)\,.
     \end{equation}
 \end{itemize}
 
 \subsection{Beviser}
 
-For (\lref{eq:factorial})observerer vi først, at der gælder $n! = n(n-1)\;\cdots\; 1 \le n^n$. 
+For (\lref{eq:factorial}) observerer vi først, at der gælder $n! = n(n-1)\;\cdots\; 1 \le n^n$. 
 Fra analysen vides det, at eksponentialfunktionen kan skrives som 
 $\exp(x)=\sum_{i\ge 0}x^i/i!$.
 Derfor gælder $e^n \ge n^n/n!$, hvilket medføre den nedre grænse for $n!$. 
@@ -292,7 +553,7 @@ Heraf følger
 På samme måde følger af uligheden $\ln (i-1) \le \int_{i-1}^{i} \ln x \, dx$,
 at der gælder $(n-1)! \le \int_1^{n} \ln x \, dx = e\left(\frac{n}{e}\right)^n$, hvilket medfører $n! \le (en)\left(\frac{n}{e}\right)^n$.
 
-Uligheden (\lref{eq:bincoeff}) følger næsten direkte af \eqref{eq:factorial}. 
+Uligheden (\lref{eq:bincoeff}) følger næsten direkte af (\lref{eq:factorial}).
 Vi har
 \[  \binom{n}{k} = \frac{n(n-1)\cdots(n - k+1)}{k!} \le \frac{n^k}{(k/e)^k} = \left(\frac{n\cdot e}{k}\right)^k \,. \]
 \smallskip

@@ -1,0 +1,362 @@
+\section{P og NP}
+\llabel{s:P and NP}
+
+\index{P@$\classP$|textbf}%
+\index{NP@$\NP$|textbf}%
+\index{effektivitet|siehe{udførelsestid}}%
+
+Hvornår kalder vi en  algoritme for »effektiv«?
+Findes der problemer, for hvilke der ikke findes effektive algoritmer?
+Selvfølgeligt er det lidt af en smagssag, hvor man præcis vil trække grænsen mellem »effektive« og »ueffektive« algoritmer.
+Men det har vist sig, at følgende adskillelse er nyttig:
+En algoritme $\mathcal{A}$ bruger \emph{polynomiel tid} eller er en  \emph{polynomialtidsalgoritme},
+\index{udførelsestid!polynomiel|textbf}
+\index{algoritme!polynomialtids-|textbf}
+hvis der findes et polynomium $p(n)$, således at udførelsestiden  af $\mathcal{A}$ på instanser af størrelse $n$ tilhører $O(p(n))$. 
+Medmindre andet er sagt, vil vi måle instansstørrelsen i antal bit.
+Vi siger at et problem \emph{kan løses i polynomiel tid}, hvis der findes en polynomialtidsalgoritme for det.
+Nu sætter vi lighedstegn mellem »kan løses effektivt« og »kan løses i polynomiel tid«. 
+En af fordelene ved denne definition er, at implementationsdetaljer normalt ikke spiller nogen rolle.
+For eksempel er det underordnet, om en snedig datastruktur er i stand til at reducere udførelsestiden af en $O(n^3)$-algoritme med en faktor $n$.
+Alle kapitler i denne bog, med undtagelse af kapitel~\ref{ch:optimization:}, drejer sig om effektive algoritmer.
+  
+Der findes mange problemer, for hvilke der findes algoritmer, uden at man kender en \emph{effektiv} algoritmer for dem.
+Vi vil nævne seks eksempler:
+\begin{itemize}
+  \item Hamiltonkredsproblemet:
+    Givet en urettet graf.
+    Afgør, om den indeholder en hamiltonkreds.
+    \index{kreds!hamilton-}
+  \item Opfyldningsproblemet for boolske formler:
+    \index{tildelingsproblem|textbf} 
+    Givet en boolsk formel på \emph{konjunktiv normalform}. 
+    Afgør, om der findes en opfyldende tildeling. --
+    Her er en boolsk formel på konjunktiv normalform en konjunktion 
+    $C_1 \wedge \cdots \wedge C_k$ af \emph{klausuler}. 
+    En klausul er en disjunktion $(\ell_1 \vee \cdots \vee \ell_h)$ af \emph{literaler},
+    og en literal er en boolsk variabel $x_i$ eller en negeret boolsk variabel $\neg x_i$.  
+    Et eksempel på en klausul er $(x_1 \vee \neg x_3 \vee \neg x_9)$. 
+    En tildeling knytter en boolsk værdi til hver variabel, den er \emph{opfyldende}, hvis den gør formlen sand.
+  \item Klikeproblemet:
+    \index{klike|sieheunter{graf}}
+    \index{graf!klike|textbf}
+    \index{graf!fuldstændig}
+    Givet en urettet graf og et naturligt tal $k$.
+    Afgør, om grafen indeholder en fuldstændig delgraf (også kaldt en \emph{klike}) med $k$ knuder.
+    -- En graf kaldes \emph{fuldstændig}, hvis hvert par af knuder er forbundet med en kant;
+    et eksempel er »5-kliken« $K_5$ i figur.~\lref{fig:graphexample}.
+  \item Rygsæksproblemet:
+    \index{rygsæk|textbf} 
+    Givet $n$ par $(w_i,p_i)$  af naturliget tal for $i\in \{1,\ldots, n\}$ og to naturlige tal $M$ og $P$. 
+    Afgør, om der findes en delmængde $I \subseteq \{1,\ldots, n\}$ af indeks, som opfylder 
+    $\sum_{i \in I} w_i \le M$ og $\sum_{i \in I} p_i \ge P$.
+    -- Man skal tænke på dette som $n$ givne objekter, hvor objekt $i$ har volumen $w_i$ og profit $p_i$, og som man prøver at pakke i en rygsæk med volumen $M$ for at opnå en samlet profit på mindst $P$.
+  \item Handelsrejsendeproblemet:
+    \index{handelsrejsendeproblemet|textbf}
+    \index{tsp|siehe{handelsrejsendeproblemet}}
+    Givet en kantvægtet urettet graf og det naturligt tal $C$.
+    Afgør, om grafen indeholder en hamiltonkreds af længde højst $C$.
+    (Se nærmere i afsnit~\ref{ch:mst:ss:tsp}.)
+  \item Graffarvningsproblemet:
+    \index{graf!farvning|textbf} 
+    Givet en urettet graf og et naturligt tal $k>0$.
+    Afgør, om der findes en farving af knuderne i grafen med $k$ farver, således hvert par af naboknuder har forskellige farver.
+\end{itemize}
+Bare fordi vi ikke kender nogle effektive algoritmer for noget af disse seks problemer, kan vi selvfølgeligt ikke udelukke, at den slags algoritmer alligevel findes.
+Man ved det helt enkelt ikke.
+Især har vi ingen matematiske beviser for, at der for disse problemer ikke kan findes en effektiv algoritme.
+Generelt er det meget vanskeligt at bevise, at der for et givet problem ikke kan findes en algoritme inden for en bestemt tidsgrænse.
+(Enkle eksempler på den slags nedre grænser skal vi dog lære at kende i kapitel~\ref{ch:sort:s:lower}.)
+De fleste algoritmikere tror dog ikke, at der findes effektive algoritmer for de seks problemer.
+
+Teorien for beregningskompleksitet,
+\index{beregningskompleksitet}
+\index{kompleksitetsteori}
+bland dataloger ofte bare kaldt »kompleksitetsteorien«, giver en interessant måde at argumentere for disse problemers sværhed.
+Teorien sammenfatter algoritmiske problemer i store grupper, kaldt »kompleksitetsklasser«, således at problemer i samme klasse er ækvivalente med hensyn til deres kompleksitet.
+Især findes der en stor gruppe af ækvivalente problemer, som kaldes
+\emph{$\NP$-fuldstændige}.
+\index{NP-fuldstændig@$\NP$-fuldstændig|textbf} 
+Her er »$\NP$« en forkortelse for »nondeterministisk polynomiel tid«. 
+Det er unødvendigt for forståelsen af resten af afsnittet, om læseren kender begrebet »nondeterministisk polynomiel tid« eller ej. 
+De seks problemer foroven er allesammen $\NP$-fuldstændige, ligesom mange andre naturlige problemer.
+I resten af asnittet vil vi definere klassen $\NP$ og klassen af $\NP$-fuldstændige problemer formelt.
+For en grundig fremstilling af teorien henviser vi til lærebøger i beregningsteori og kompleksitetsteori~\cite{Ausiello-et-al:book,Garey-Johnson:book,Sipser,Wegener:ComplexityTheory}.
+\index{Garey, M. R.}
+\index{Johnson, D. S.}
+\index{Ausiello, G.}
+\index{Sipser, M.}
+\index{Wegener, I.}
+
+Som sædvandligt i kompleksitetsteorien går vi ud fra, at instansen til problemet er kodet som streng over et fast, endeligt alfabet $\Sigma$ med $|\Sigma|\ge2$.
+(Man kan tænke sig ASCII- eller Unicode-alfabeterne, eller binær\-repræsentationen af disse alfabeter. 
+I det sidste tilfælde er $\Sigma=\{0,1\}$.)
+Mængen af strenge (eller »ord«) med bogstaver fra $\Sigma$ betegnes $\Sigma^*$.
+For $x=a_1\cdots a_n \in\Sigma^*$ bruger vi antallet $|x|$ af tegn i $x$ som størrelsesmål, med konventionen $n=|x|$.\footnote{
+Undtagelsen er grafer.
+I denne bog, ligesom i resten af literaturen, bruges $n$ for at betegne antallet af \emph{knuder} i grafen, se afsnit~\ref{s:graphnot}.
+Størrelsen af en graf med $n$ knuder og $m$ kanter er derimod $\Theta(n+m)$ eller $\Theta(n^2)$, afhængigt af den valgte repræsentation (se afsnit~\ref{ch:grepresent}).
+Graferne i denne bog er næsten udelukkende »simple« (der gælder $E\subseteq V\times V$, dvs. vores grafer har ingen multikanter i samme retning), så vi har $m\leq n^2$. 
+Derfor er  grafers størrelse polynomiel i $n$, og den uheldige sammenblanding af $n$ og $n+m$ gør ingen forskel med hensyn til polynomialtidsreduktioner.}
+%TODO add footnote to original
+Et \emph{beslutningsproblem}
+\index{beslutningsproblem} 
+er en delmængde $L \subseteq \Sigma^*$.
+Med $\chi_L\colon \Sigma^*\to\{0,1\}$ (læs: »chi«, udtalt med k) betegner vi den  \emph{karakteristiske funktion}
+\index{karakteristisk funktion} af $L$, definieret som 
+\begin{equation*}
+  \chi_L(x)= 
+  \begin{cases}1\,, &\text{hvis } x \in L\,,\\
+    0\,,& \text{hvis } x \not\in L\,.    
+  \end{cases}
+\end{equation*}
+Et beslutningsproblem kan \emph{løses i polynomiel tid}, hvis dens karakteristiske funktion kan beregnes i polynomiel tid.
+Med $\classP$ betegnes klassen af beslutningsproblemer, som kan løses i polynomiel tid.
+Et beslutningsproblemer $L$ tilhører klassen $\NP$, hvis der findes et prædikat $Q(x,y)$,
+(dvs. en mængde $Q\subseteq(\Sigma^*)^2$) og en polynomium $p$, således at der gælder følgende:  
+\begin{enumerate}[(1)]
+\item For hvert $x \in \Sigma^*$ gælder $x \in L$, hvis og kun hvis der eksisterer $y \in \Sigma^*$ med $\abs{y} \le p(\abs{x})$ og således at $Q(x,y)$ gælder;
+\item den karakteristike funktion for $Q$ kan beregnes i polynomiel tid. 
+\end{enumerate}
+Hvis  $x\in L$ og $y$ opfylder $Q(x,y)=\mathit{sand}$, kalder vi $y$ for et \emph{vidne} eller \emph{certifikat} for $x$ ($y$ bevidner altså den omstændighed, at $x\in L$).
+For vores eksempelproblemer kan man let vise, at de tilhører $\NP$.
+For hamiltonkredsproblemet er vidnet en hamiltonkreds i instansgrafen.
+Et vidne for en boolsk funktion er en tildeling af de variable, som gør formlen sand.
+At en instans rygsæksproblemet kan løses, bevidnes af en delmænge af objekterne, hvis samlede volumen får plads i rygsækken og som samlet udgør mindst den ønskede profit.
+
+\begin{exerc}
+  Vis, at klikeproblemet \index{graf!klike}, handelsrejsendeproblemet \index{handelsrejsendeproblem} og graffarvningsproblemet tilhører $\NP$.
+\end{exerc}
+
+Man formoder, at $\classP$ er en ægte delmængde af $\NP$.
+Selvom der findes gode argumenter for denne formodning, som vi straks skal se, er den ikke bevist.
+Et bevis for formodningen ville medføre, at der ikke findes effektive algoritmer for $\NP$-fuldstændige problemer. 
+
+Beslutningsproblemet $L$  kan \emph{reduceres i polynomiel tid}
+ (eller bare \emph{reduceres})
+\index{reduktion|textbf}
+\index{reducibel|textbf} 
+til beslutningsproblemet $L'$, 
+hvis der findes en funtion $g$, som kan beregnes i polynomiel tid,
+og for hvilken der gælder for alle $x \in \Sigma^*$, at $x \in L$ hvis og kun hvis $g(x) \in L'$.
+Hvis $L$ kan reduceres til $L'$, og $L'$ tilhører $\classP$, indses nemt at $L$ også tilhører $\classP$.
+(Bevis: Givet en algoritme for reduktionensfunktionen $g$ med polynomiel tidsgrænse $p(n)$ og en algoritme for $\chi_{L'}$ med polynomiel tidsgrænse $q(n)$.
+Så har vi følgende algoritme for  $\chi_L$. 
+På input $x$ beregner vi $g(x)$ i tid højst $ p(|x|)$ med den første algoritme, hvorefter vi bruger den anden algoritme for at afgøre om $g(x)\in L'$.
+% TODO Turing machines suddenly appear in original
+Afgørelsen tager tid $q(|g(x)|)$.
+For at begrænse længden af strengen $g(x)$ er det nok an indse, at den første algoritme i tid $p(|x|)$ højst kan skabe en streng af længde $p(|x|)$; strengt taget er dette et udsagn om maskinmodellen, som behøver mindst en tidsenhed for at skabe et tegn i den nye streng og fx gemme den i en lagercelle for sig -- detaljer for forskellige repræsentationer af bl.a. tegnfølger findes i kapitel~\ref{s: sequence}.
+Vi har altså, at $|g(x)| \le |x| + p(|x|)$, så den samlede udførelsestid er $p(|x|) + q(|x|+p(|x|))$,
+hvilket er et polynomium i $|x|$.)
+På lignende måde kan man indse, at reducibilitet er en transitiv relation.
+Beslutningsproblemetet $L$  kaldes \emph{$\NP$-svært},
+\index{NP-svxr@$\NP$-svær|textbf} 
+hvis \emph{hvert} problem i $\NP$ kann reduceres til $L$ i polyniel tid.
+Et problem kaldes \emph{$\NP$-fuldstændigt}, hvis det er  $\NP$-svært  og tilhører $\NP$.
+Umiddelbart virker det meget vanskeligt at bevise, at der overhovedet findes $\NP$-fuldstændige problemer -- blandt andet skal man jo vise, at \emph{hvert} problem i $\NP$ kan reduceres til $L$. 
+Men netop det gjordes i år 1971, da Cook og Levin viste (uafhænigt af hinanden), at opfyldningsproblemet for boolske formler er $\NP$-fuldstændigt~\cite{Cook71,Lev73}.
+Siden har det været »let« at etablere $\NP$-fuldstændighed.
+Antag, at vi vil vise, at $L$ er $\NP$-fuldstændigt.
+Dertil skal vi vise to ting:
+(1) $L \in \NP$, og (2) der findes et andet problem $L'$, hvis $\NP$-fuldstændighed allerede er etableret, og som kan reduceres til $L$.
+Hvert nye $\NP$-fuldstændige problem gør det lettere, at vise andre problemers $\NP$-fuldstændighed. 
+% TODO removed reference to Kann's survey
+Vi ser nu nærmere på et eksempel på en reduktion.
+
+\begin{lemma} 
+  Opfyldningsproblemet for boolske formler kan reduceres i polynomiel tid til klikeproblemet.
+\end{lemma}
+
+\begin{proof} 
+  Lad $F = C_1 \wedge \cdots \wedge C_k$ være en boolsk formel på konjunktiv normalform, med 
+  $C_i = (\ell_{i1} \vee \ldots \vee \ell_{ih_i})$ og $\ell_{ij} = x_{ij}^{\beta_{ij}}$ for $i\in\{1,\ldots, n\}$ for $j\in\{1,\ldots,r\}$. 
+  Her er $x_{ij}$ en boolsk variabel, og $\beta_{ij} \in \{0,1\}$.
+  Toptegnet $0$ angiver en negeret variabel. 
+  Betragt nu følgende graf $G$.
+  Knuderne svarer til formlens literaler, dvs.  $V = \{\,r_{ij}\colon 1 \le i \le k \text{ og } 1 \le j \le h_i\}$.
+  Et par af knuder $r_{ij}$ og $r_{i'j'}$ er naboer, hvis $i \not= i'$ og enten $x_{ij} \not= x_{i'j'}$ eller $\beta_{ij} = \beta_{i'j'}$.
+  Med andre ord:
+  Knuderne for to literaler er naboer, hvis og kun hvis literalerne hører til forskellige klausuler, og der findes en tildeling, som opfylder begge samtidigt.
+  Vi påstår, at $F$ kan opfyldes, hvis og kun hvis $G$ har en klike af størrelse $k$.
+
+  Antag først, at der findes en tildeling $\alpha$, som opfylder $F$.
+  Denne tildeling opfylder mindst en literal per klausul, lad os sige literalen
+  $\ell_{i,j(i)}$ i klausul $C_{i}$ for $i\in\{1,\ldots, k\}$.     
+  Betragt nu den delgraf af $G$, som induceres af de $k$ mange knuder $r_{i,j(i)}$ for  $i\in\{1 ,\ldots, k\}$. 
+  Vi påstår, at delgrafen er en klike.
+  Antag modsætningsvist, at $r_{i,j(i)}$ og $r_{i',j(i')}$ ikke er naboer.          
+  I så fald gælder $x_{i,j(i)} = x_{i',j(i')}$ og $\beta_{i,j(i)} \not= \beta_{i',j(i')}$.
+  Men da er literalerne $\ell_{i,j(i)}$ og $\ell_{i',j(i')}$ hinandens komplement, og $\alpha$ kan ikke opfylde dem begge, i modstrid med konstruktionen.
+
+  Antag omvendt, at $G$ har en klike $K$ bestående af $k$ knuder.
+  Da kan vi konstruere en opfyldende tildeling $\alpha$ for $F$.
+  Kliken $K$ indeholder en knude for hvert $i\in\{1,\ldots, k\}$, som vi kalder $r_{i,j(i)}$.
+  Lad nu $\alpha$ være givet ved $\alpha(x_{i,j(i)}) = \beta_{i,j(i)}$, for de øvrige variable kan $\alpha$ vælges vilkårligt.
+  Læg mærke til, at $\alpha$ er veldefineret, idet $x_{i,j(i)} = x_{i',j(i')}$ medfører $\beta_{i,j(i)} = \beta_{i',j(i')}$;
+  ellers skulle knuderne $r_{i,j(i)}$ og $r_{i',j(i')}$ ikke være naboer. 
+  Det er klart, at $\alpha$ opfylder $F$.
+\end{proof}
+
+\begin{exerc} 
+  Vis, at hamiltonkredsproblemet kan reduceres til opfyldningsproblemet for boolske formler.
+\end{exerc}
+
+\begin{exerc} 
+  Vis, at graffarvningsproblemet kan reduceres til opfyldningsproblemet for boolske formler.
+\end{exerc}
+
+De $\NP$-fuldstædige problemer »sidder i samme båd«.
+Hvis nogen skulle være i stand til at løse \emph{et eneste} af dem i polynomiel tid, så ville $\NP=\classP$.
+Idet rigtig mange mennesker uden success har prøvet at udvikle den slags algoritmer, bliver det mere og mere vanskeligt at forestille sig, at det nogensinde skulle lykkes.
+% TODO skulle lykkedes?
+De $\NP$-fuldstædige problemer dokumenterer altså sammenn deres egen vanskelighed.
+
+Kan man bruge $\NP$-fuldstændighedsteorien også på optimeringsproblemer?
+Optimeringsproblemer
+\index{optimeringsproblem} 
+(se kapitel~\ref{ch:optimization:}) 
+kan let omvandles til beslutningsproblemer.
+I stedet for at lede efter en optimal løsning, prøver vi bare at afgøre, om der \emph{findes} en gyldig løsning med målfunktionsværdien mindst $k$, hvor $k$ er del af input.
+Den omvende konstruktion gælder ligeledes:
+Hvis der findes en algoritme for at afgøre, om der findes en gyldig løsning med målfunktionsværdi mindst $k$, kan vi bruge kombinationen af eksponentiel og binær søgning
+\index{søgning!eksponentiel}
+\index{søgning!binær-} 
+(se afsnit~\lref{s:binary search}) 
+for at bestemme den optimale værdi af målfunktionen.
+
+En algoritme for beslutningsproblemet svarer »ja« eller »nej«, afhængig af, om input tilhører det tilsvarende sprog eller ej.
+Den giver dog ikke noget vidne.
+Ofte kan man konstruere vidner ved at udføre beslutningsalgoritmen gentagne gange på lettere forandrede instanser.
+Lad os fx antage, at grafen $G$ indeholder en klike af størrelse $k$, og at vi ønsker at finde sådan en klike.
+Antag, at har en algorime, der afgør, om en givet graf indeholder en klike af en givet størrelse.
+For $k=1$ kan en vilkårlig knude i $G$ bruges som svar på den eftersøgte klike. 
+Eller vælger vi en vilkårlig knude $v$ i $G$ og spørger, og konstruerer grafen $G'$ som $G'=G\setminus v$ 
+(notationen beskriver grafen $G$ uden knude $v$ og dens hosliggende kanter)
+Vi spørger nu algoritmen, om $G'$ indeholder en klike af størrelse $k$.
+I bekræftende fald, fortsætter vi søgningen efter en $k$-klike rekursivt i $G'$.
+I modsat fald må $v$ indgå i samtlige $k$-kliker i $G$.
+Da betragter vi mængden $V'$  af naboer til $v$ og fortsætter søgningen efter en $(k-1)$-klike $K'$ rekursivt i den af $V'$ inducerede delgraf. 
+Mængden  $\set{v} \cup K'$ er en $k$-klike $G$. 
+%TODO wrong in original, V' need not be a clique
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Implementationsaspekter}
+\llabel{s:implementation}
+
+Vores pseudokode 
+\index{pseudocode} 
+lader sig nemt oversætte til programmer i imperative programmeringssprog.
+For \CC, Java og Python går vil lidt mere i detaljer. 
+Programmeringssproget Eiffel\index{Eiffel}~\cite{Meyer97}
+\index{Meyer, B.}
+gør det muligt at arbejde med antagelser, invarianter, før- og efterbetingelser.
+
+Vores specialværdier $\bot$, $-\infty$ og $\infty$ stilles til rådighed for kommatal
+\index{kommatal}
+\index{IEEE-kommatal|siehe{kommatal}} 
+af programmeringssproget.
+For andre datatyper skal man simulere disse værdier.
+For eksempel kan man bruge det mindste og største heltal for  $-\infty$ hhv. $\infty$.
+\index{uendeligt ($\infty$)}
+Udefinerede pegere repræsenteres ofte af nulpegeren {\bf null}. 
+Sommetider bruger vi specialværdierne $\bot$, $-\infty$ og $\infty$ kun af bekvemmelighedsgrunde;
+en robust implementation skulle i forvejen undgå deres brug.
+Vi skal se nogle eksempler på dette i de senere kapitler.
+
+Randomiserede algoritmer har brug for en tilfældighedskilde.
+\index{tilfældighedskilde}
+Her har man valget mellem en maskinel tilfældighedsgenerator, som producerer ægte tilfældige tal, og en algoritmisk generator, der genererer pseudotilfældige tal.
+
+\subsection{\protect\CC}\index{C++@\CC}
+Man kan opfatte vores pseudokode som en kompakt notation for en delmængde af \CC.
+Lagerforvaltningsoperationerne $\tAllocate$ og $\tDispose$ ligner operationerne \Id{new} og \Id{delete} i \CC.    
+Når en række bliver skabt i \CC, kaldes den underliggende types standardkonstruktoren for hver indgang i rækken; det tager altså $\Omega(n)$ tid at skabe en række af længde $n$, hvorimod det kun tager konstant tid at skabe en række af $n$ elementer af heltalstypen \Id{int}. 
+I bogens fremstilling foretages der ingen initialisering. 
+Vi går derimod ud fra, at rækker uden udtrykkelig initialisering er fyldt med vilkårligt indhold, ofte kaldt »\emph{affald}«.
+I \CC\ kan man opnå den samme opførsel ved at benytte de mere grundlæggende C-funktioner  
+\Id{malloc} og \Id{free}.
+Denne fremgangsmåde der dog ildeset og bør kun bruges i undtagelsestilfælde, når initialisering af rækken udgør en flaskehals i kørslen.
+Hvis lagerforvaltningen for mange små objekter bliver kritisk for udførelsestiden, kan man tilpasse \CC\-standardbibliotekets klasse \Id{allocator} til respektive situation.
+
+Vores parameterisering af klasser ved brug af $\Of$ er et specialtilfælde af \CC-sprogets mønstermekanisme.
+De parametre, der ved objektdeklarationen tilføjes klassenavnet i parenteser svarer til \CC-konstruktorens parametre.
+
+Antagelser implementeres som C-makroer i et inkluderet arkiv kaldt {\tt assert.h}.
+Normalt udløser en brudt antagelse en køretidsfejl; fejlmeddelselsen indeholder antagelsen position i programteksten.
+Ved at definere makroen \Id{NDEBUG} slår man den automatiske sikring af antagelser fra.
+
+For mange af de datastrukturer og algoritmer, som diskuteres i denne bog, findes der fremragende implementationer i diverse standardbiblioteker.
+Gode biblioteker er \emph{Standard Template Library} (STL)\index{STL}~\cite{Plau00},
+BOOST\index{Boost}~\cite{boost} for \CC\
+og LEDA\index{LEDA}~\cite{LEDAbook,LEDA-AS}.
+
+\subsection{Java}
+\index{Java}
+I Java findes ingen udtrykkelig lagerforvaltning.
+Derimod findes et separat lagerrensningsprogram, 
+\index{lagerrensning|textbf}
+\index{garbage collection|siehe{lagerrensning}}
+som regelæssigt identificerer lagersegmenter, som ikke længere er i brug, og stiller dem til rådighed igen.
+Dette forenkler programmeringen i Java betydeligt, men kan også have meget negative effekter på tidsforbruget.
+Metoder, som afhjælper dette fænomen, ligger uden for bogens emner.
+Java tillader parameteriserede klasser i form af generiske typer.
+Antagelser implementeres som kommandoen \Id{assert}.
+
+Pakken \Id{java}.\Id{util} og datastrukturbiblioteket JDSL~\cite{JDSL}
+\index{JDSL}
+indeholder fremragende implementationer af mange datastrukturer og algoritmer.
+
+\subsection{Python}
+\index{Python}
+
+Pythons abstraktionsniveau er endnu højere en Javas; på nogle punkter ligger syntaksen meget tæt på vores pseudokode, på andre punkter er sproget næsten for langt fra von Neumann-arkitekturen til at en oversættelse bliver meningsfuld.
+Som pædagogisk værktøj for at forstå koncepterne i denne bog, virker sproget ypperligt; vil man derimod skrive højtoptimerede programmer med fokus på effektivitet, gør man klogt i at vælge et andet sprog.
+
+På samme måde som Java tillader Python heller ingen udtrykkelig lagerforvaltning, og oprydningsarbejdet sker i baggrundnen og uden for programmørens kontrol, med de samme fordele og ulemper.
+Pythons typesystem er dynamisk, så parameterising af klasser med $\Of$ giver ikke meget mening.
+Antagelser implementeres med \Id{assert}.
+
+Mest bemærkelsesværdigt er det måske, at Python ikke stiller rækker til rådighed, men direkte bruger en liste-abstraktion, som vi først vil møde i kapitel~\ref{sec: sequence}.
+Læseren aftale med sig selv, at fx udtrykket »$A$ = [0] * $N$« skaber en række af heltal af længde $N$, initialiseret til $0$, for at oversætte pseudokoden til fungerende python.
+Men i virkeligheden er $A$ en pythonliste med langt mere magtfulde operationer.
+Listeoperatiorne i moderne pythonfortolker er selvfølgeligt selv baseret på meget effektive implementationer af operationer på rækker, skrevet i C, men dette abstraktionsniveau er altså ikke eksponeret til programmøren.
+Modulet \Id{arrays} stiller dog »rigtige« rækker af vsse grundtyper til rådighed.
+Typen \Id{Set} i vores pseudokode er på de anden side del sproget, og udtrykkene \Id{None} og \Id{float('inf')} kan bruges som vores $\bot$ og $\infty$.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Historiske anmærkninger og videre resultater}
+\llabel{s:further}
+
+Definitionen af registermaskinen til algoritmeanalyse blev foreslået af Shep\-herd\-son og Sturgis~\cite{Shepherdson-Sturgis}.
+Modellen begrænser størrelsen af de tal, der kan gemmes en i enkelt lagercelle, til logaritmisk mange bit.
+Uden denne indskrænkning opstår der uønskede konsekvenser, fordi modellen bliver alt for kraftig; fx kollapser kompleksitetsklasserne $\classP$ og PSpace~\cite{Hartmanis-Simon}.
+En meget detaljeret abstrakt maskinmodel er beskrevet af Knuth~\cite{Knu99}.
+
+Invarianter som koncept i programsemantik blev introduceret af Floyd~\cite{Floyd:meaning},
+\index{Floyd, R. W.} 
+og yderligere systematiseret af Hoare~\cite{Hoare:Axioms,Hoare:Data}.
+\index{Hoare, C. A. R.} 
+Bogen~\cite{GKP94}
+\index{Knuth, D.}
+\index{Graham, R. L.}
+\index{Patashnik, O.}
+indeholder en meget omfattende gemmengang af arbejdet med summer
+\index{sum} og rekursionsligninger
+\index{rekursionsligning}
+og mange andre emner i »tællende« kombinatorik, som kommer til anvendelse i algoritmeanalysen.
+
+Bøger om oversætterkonstruktion 
+\index{oversætter}
+(fx \cite{compiler,Wilhelm-Maurer})
+\index{Wilhelm, R.}
+\index{Mauer, D.}
+forklarer detaljerne ved oversættelsen af højniveauprogrammeringssprog
+\index{programmeringssprog} 
+til maskinkode.
+
+\index{udførelsestid|sieheauch{algoritmeanalyse}}%
+\index{algoritmeanalyse|sieheauch{udførelsestid}}%
+\index{kompleksitet|sieheauch{udførelsestid}}%
+\index{input|siehe{instans}}

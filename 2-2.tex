@@ -1,0 +1,274 @@
+\section{Maskinmodellen}
+\llabel{s:model}
+
+\begin{wrapfigure}{r}{4cm}
+\begin{center}
+\includegraphics[width=3cm]{img/portre.pdf}
+\end{center}
+\caption{\llabel{fig:john}John von Neumann, ${}^*\,$28{.}12{.}1903 i Budapest,
+$\dag\,$8{.}2{.}1957 i Washington, DC.}
+\end{wrapfigure}
+
+\index{maskinmodel|textbf}%
+\index{model|textbf}%     
+År 1946 foreslog John von Neumann  
+(fig.~\lref{fig:john})
+\index{von Neumann@von Neumann, J.}%
+\index{von Neumann-maskine|sieheunter{maskinmodel}}
+\index{maskinmodel!von Neumann}    
+en enkel, men magtfuld beregningsarkitektur~\cite{Neu45}.
+Den tids begrænsede hardwaremuligheder førte ham til en elegant model, som indskrænkede sig til det væsentlige; ellers havde realiseringen ikke været mulig.
+I årene efter 1945 har hardwareteknologien godtnok videreudviklet sig dramatisk, men von Neumanns programmeringsmodel
+\index{programmeringsmodel|siehe{maskinmodel}},
+er så elegant og kraftfuld, at den den dag i dag udgør grundlaget for en stor del af programmeringen.
+Normal virker de programmer, som er udviklet i von Neumann-modellen også i nutidens meget mere komplekse hardware.
+
+Til analyse af algoritmer benytter man en variant av von Neumann-maskinen, som hedder \emph{registermaskinen} eller ram (\emph{random access machine}),
+\index{ram|sieheunter{maskinmodel}}%
+\index{registermaskine|sieheunter{maskinmodel}}%
+\index{maskinmodel!ram|textbf} 
+\index{maskinmodel!registermaskine|textbf}%
+en maskine med vilkårlig lageradgang).
+Denne model blev foreslået i 1963 af Shepherdson
+\index{Shepherdson, J.} og Sturgis~\cite{Shepherdson-Sturgis}. 
+\index{Sturgis, H.}
+Det drejer det sig om en \emph{sekventiel} regner
+\index{maskinmodel!sekventiel} 
+med uniformt lager, dvs. at der findes bare én centralenhed (CPU),
+\index{cpu}
+og hver lageradgang koster samme tid.
+Lageret består af uendeligt mange lagerceller $S[0]$, $S[1]$, $S[2]$, $\ldots$, hvoraf kun et endeligt antal er i brug til enhver tid.
+Derudover råder registermaskinen over et lille, konstant antal \emph{registre} $R_1,\ldots, R_k$.
+\index{register|textbf}
+
+Lagercellerne og registrene
+\index{lagercelle}
+\index{celle}
+har plads til »små« heltal, som også kaldes (\emph{maskin})-\emph{ord}.
+\index{maskinmodel!ordmodel}
+\index{ord|siehe{maskinord}}
+\index{maskinord}
+%TODO: maskineord? maskinemodel
+I vores overvejelser om heltalsaritmetik i kap.~\ref{ch:amuse:} gik vi ud fra, at »lille« betyder »etcifret«.
+Det er dog mere fornuftigt og bekvemt at antage, at definitionen af »lille« afhænger af inputstørrelsen.
+Vores standardantagelse skal være, at et tal kan gemmes i en lagercelle, hvis dets størrelse er begrænset af et polynomium i inputstørrelsen.
+Binærrepræsentationen af disse tal behøver et antal bit, der er logaritmisk i inputstørrelsen.
+Denne antagelse er fornuftig, fordi vi altid kan opdele indholdet af en lagercelle i logaritmisk mange celler, som kun kan gemme en enkelt bit, uden at tid- eller pladsbehovet øges med mere end en logaritmisk faktor.
+Idet registre bruges til at adressere lagerceller, vil vi forlange, at hver adresse, der forekommer i vores beregninger, finder plads i et register.
+Hertil rækker det med en polynomiel begrænsning af størrelsen.
+
+På den anden side er antagelsen om en logaritmisk grænse på bitlængden af de gemte tal også nødvendig:
+Hvis man tillod, at en lagercelle kunne gemme tal af vilkårlig størrelse, ville det i mange tilfælde lede til algoritmer med absurd lille tidsforbrug.
+Fx ville man men $n$ på hinanden følgende kvadreringer af tallet $2$ (som fylder $2$ bit) skabe et tal med $2^n$ bit
+Man begynder med $2=2^1$, kvadrerer en gang for at få $2^2=4$, kvadrer igen for at få $16=2^{2\cdot 2}$, osv. 
+Efter $n$ kvadreringer opnår man tallet $2^{2^n}$.
+
+Vores model tillader en bestemt, ubegrænset form  for parallelisme:
+enkle operationer på logaritmisk mange bit kan gennemføres i konstant tid.
+
+En registermaskinen kan udføre et (maskin)program.
+\index{maskinprogram|textbf} 
+Sådan et \emph{program}
+\index{program|textbf}
+udgøres af en liste af maskinkommandoer,
+\index{maskinkommando|siehe{kommando}}
+\index{kommando|textbf}
+nummereret fra $1$ til et tal $l$.
+Indgangene i listen hedder \emph{linjer}
+\index{programlinje|textbf} 
+i programmet.
+Programmet står i programlageret.
+Vores registermaskine kan udføre følgende maskinkommandoer:
+\begin{itemize}
+  \item $R_i\Is S[R_j]$ \emph{læser}
+    \index{læsekommando|textbf} 
+    indholdet af den lagercelle, hvis indeks står i register $R_j$, ind i register $R_j$.
+  \item $S[R_j]\Is R_i$ \emph{skriver}
+    \index{skrivekommando|textbf}
+    indholdet af register $R_i$ ind i den lagercelle, hvis indeks står i register $R_j$.
+  \item $R_i := R_j\odot R_h$ udfører en binær operation $\odot$ på indholdet af $R_j$ og $R_h$ og gemmer resultatet i register $R_i$.
+    Der er en række muligheder for, hvad  »$\odot$« kan være.
+    De \emph{aritmetiske}
+    \index{aritmetik}
+    operationer er som sædvanligt $+$, $-$ og $*$; disse fortolker registerindholdet som heltal.
+    Operationerne $\div$ og $\mod$,
+    \index{div@{\bf div}|textbf}
+    \index{mod@{\bf mod}|textbf}
+    \index{rest (ved heltalsdivision)|textbf}
+    ligeledes på heltal, giver kvotienten hhv. resten ved heltalsdivision.
+    \emph{Sammenligningsoperationerne}
+   \index{sammenligning|textbf}%
+   \index{mindre end ($<$)|textbf}%
+   \index{lig med ($=$)|textbf}%
+   \index{stxrre@større end ($>$)|textbf}%
+   \index{logiske operationer|textbf}%
+   \index{sandhedsvxrdi@sandhedsværdi|textbf}%
+   \index{eksklusivt eller ($\oplus$)|textbf}%
+   \index{ikke|textbf}%
+   \index{og|textbf}%
+   \index{eller|textbf}%
+   \index{sand@\Id{sand}|textbf}%
+   \index{falsk@\Id{falsk}|textbf}%
+   \index{flydende komma|textbf}% 
+    $\leq$, $<$, $>$ og $\geq$ giver deres sandhedsværdier som resultat, dvs. \emph{sand} ($=1$) og \emph{falsk}  ($=0$).
+    Derudover findes de bitvise operationer $|$ (logisk \emph{eller}), \texttt{\&} (logisk \emph{og}) og $\oplus$ (eksklusiv \emph{eller}). disse fortolker registerindholdet som bitstreng.
+    Operationerne \texttt{»} (højreskift) og \texttt{«} (venstreskift) tolker sit første argument som bitstreng og sit andet som ikkenegativ forskydningsværdi.
+    De logiske operationer $\wedge$ og $\vee$ bearbejder på \emph{sandhedsværdierne} $1$ og $0$.
+    Vi kan også antage, at der findes operationer, som tolker registerindholdet som et tal med flydende komma, dvs. som endelig tilnærmelse af et reelt tal.
+  \item $R_i:=\odot R_j$ udfører en \emph{unær} operation
+    \index{unær operation}
+    på register $R_j$ og gemmer resultatet i register $R_i$.
+    Hertil findes operationerne $-$ (for heltal), $\neg$ (logisk negation af sandhedsværdier) og \texttt{\~} (bitvis negation af bitstrenge).
+  \item $R_i:= C$ tildeler register $R_i$ den \emph{konstante}
+    \index{konstant|textbf} 
+    værdi $C$.
+  \item  \texttt{JZ} $k, R_i$ fortsætter beregningen på programlinje $k$, hvis register $R_i$ indeholder $0$ (\emph{forgrening}
+    \index{forgrening}
+    eller \emph{betinget hop}),
+    \index{betinget hop}
+    ellers fortsættes der på næste programlinje.\footnote{%
+      Hopmålet $k$ kan, hvis det er nødvendigt, også være angivet som indhold $S[R_j]$ af en lagercelle.}
+    \item \texttt{J} $k$ fortsætter beregningen på programlinje $k$ (\emph{ubetinget hop}).
+      \index{ubetinget hop}
+\end{itemize}
+
+Et program af denne slags udføres skridt for skridt på givet input.
+\index{beregningsmodel}
+Input står i begyndelsen i lagercellerne $S[1]$, $\ldots$, $S[R_1]$, udførelsen begynder på programlinje $1$.
+Med undtagelse af forgreningerne \text{JZ} og \text{J} følges udførelsen af en programlinje altid af udførelsen af den næste programlinje.
+Udførelsen af programmet ender, hvis den skal udføre en linje, hvis nummer ligger uden for området $\{1,\ldots,l\}$.
+
+Vi bestemmer tidsforbruget for at udføre et program på givet input på den enklest tænkelige måde:
+\emph{Det tager præcis en tidsenhed at udføre en maskinkommando}.
+\index{tidsenhed}
+Et programs totale \emph{udførelsestid} 
+\index{udførelsestid|textbf}
+er summen af alle udførte kommandoer.
+\index{kommando}
+
+Det vigtigt at klargøre, at registermaskinen er en abstraktion; man må ikke forveksle modellen med en virkelig beregner.
+Især har ægte elektroniske beregner
+\index{beregner!virkelig}
+et endeligt lager og et fast antal bit per register og lagercelle (fx 32 eller 64).
+\index{register}
+\index{maskinord}
+I modsætning hertil vokser (»skalerer«) ordlængde og lagerstørrelse i en registermaskine med inputstørrelsen.
+Man kan betrage dette som en abstraktion af den historiske udvikling: 
+mikroprocessorer har i løbet af tiden haft maskinord af længde 4, 8, 16, 32 og 64 bit
+Med ord af længde 64 kan man adressere et lager af størrelse $2^{64}$.
+På grund af prisen for dagens lagermedier begrænses størrelsen af lageret i dag derfor af omkostningerne og ikke af længden af adresserne.
+Interessant nok var dette også sandt ved indførelsen af 32-bit ord!
+
+Vores model for beregningskompleksitet
+\index{beregningskompleksitet}
+\index{kompleksitet}
+er groft forenklet på den måde, at moderne processorer prøver at gennemføre mange operationer samtidigt.
+\index{parallelbehandling}
+I hvilket omfang dette fører til en tidsbesparelse, afhænger af faktorer som dataafhængighed
+\index{dataafhængighed}
+mellem påhinandenfølgende operationer.
+Derfor er det ikke muligt at knytte en fast omkostning til hver operation.
+Denne effekt gør sig ikke mindst gældende ved lageradgang.
+\index{lageradgang}
+I værste fald kan lageradgangen bruge mange hundrede gange så lang tid som det bedste fald!
+Dette hænger sammen med at moderne processorer prøver at holde hyppigt benyttet data i \emph{skyggelageret},
+\index{skyggelager}
+hvilket er en forholdsvis lille, hurtig lagerenhed som ligger tæt forbundet til processoren.
+Hvilken tidsforbedring opnås af skyggelageret afhænger stærkt af maskinarkitekturen, programmet og det konkrete input.
+
+Vi ville kunne forsøge at udvikle en mere nøjagtig omkostningsmodel,
+\index{maskinemodel!nøjagtig}
+\index{maskinemodel!kompleks}
+\index{maskinemodel!enkel}
+men det skulle være at skyde over målet.
+Resultatet er en megen kompleks model, som er vanskelig at arbejde med.
+Selv en vellykket analyse leder til monstrøse formler, som afhænger af mange parametre og som desuden skulle ændres ved hver ny generation af processorer.
+Selvom informationen i sådan en formel ville være meget præcis, ville den være ganske ubrugelig allerede i kraft af sin kompleksitet.
+Derfor går vi til den andet yderpunkt ved at eliminere samtlige modelparametre og blot antage, at hver maskinkommando tager én tidsenhed.
+Det leder til, at konstante faktorer ikke spiller nogen rolle i vores model -- endnu en grund til at for det meste holde sig til asymptotisk
+\index{asymptotisk}
+analyse af algoritmer.
+Som udligning finder der i hvert kapitel et afsnit om implementationsaspekter, i hvilket vi diskuterer implementationsvarianter og afvejninger
+\index{afvejning}
+som afhængigheder mellem behovet af forskellige resurser som tid og lagerplads.
+
+\subsection{Baggrundslager}
+\index{maskinmodel!baggrundslager}
+\index{baggrundslager|sieheauch{maskinmodel}}%
+\index{maskinmodel!fjernlager}
+\index{fjernlager|sieheauch{maskinmodel}} 
+Den mest dramatiske forskel mellem registermaskinen og en virkelig regnemaskine er lagerstrukturen:
+regnemaskinens uniforme lager er en utilstrækkelig beskrivelse af den virkelige maskines komplekse lagerhierarki.
+I afsnit ~\ref{ch:sort:s:external}, \ref{ch:pq:s:external} og~\ref{ch:search:s:implementation} skal vi betrage algoritmer, som er skræddersyede til store datamængder, som skal holdes i det langsomme baggrundslager som fx på et eksternt hårddrev.
+For at undersøge den slags algoritmer benytter vi \emph{baggrundslagermodellen}.
+
+Yderlagermodellen ligner registermaskinen, men adskiller sig i lagerstrukturen.
+Det (hurtige) indre lager
+\index{hurtigt lager}
+\index{indre lager}
+\index{M@$M$ (størrelsen af det hurtige lager)}
+(sommetider kaldt »hovedlageret«) består af kun $M$ ord; det (langsomme) ydre lager (sommetider kaldt »baggrundslageret«) har ubegrænset størrelse.
+Der findes en \emph{blokflytnings\-operation},
+\index{blokflytning}
+\index{B@$B$ (blokstørrelse)}
+\index{blok|siehe{lagerblok}}
+\index{lagerblok|textbf},
+som flytter $B$ på hinanden følgende lagerceller mellem det langsomme og det hurtige lager.
+\index{hurtigt lager}
+\index{langsomt lager}
+Hvis yderlageret fx er et hårddrev,
+\index{hxrddrev@hårddrev}
+vil $M$ betegne størrelsen af hovedlageret og $B$ betegne blokstørrelsen for dataoverførsel mellem hovedlager og hårddrevet, som repræsenterer et godt kompromis mellem den store ventetid (latens)
+\index{latens}
+%TODO latenstid? ventetid?
+og den store båndbredde
+\index{båndbredde}
+ved overførslen fra et lagermedium til det andet.
+I skrivende stund er $M= 2$~Gbyte og $B=2$~MByte realistiske værdier.
+En blokflytning varer omtrent 10~ms, hvilket svarer til $2\cdot 10^7$ klokcykler
+\index{klokcykler}
+% TODO klokcykel
+i en 2~GHz-processor.
+Med andre fastlæggelser for parametrene $M$ og $B$ kan vi modellere den mindre forskel mellem maskinens skyggelager og hovedlageret.
+
+\subsection{Parallelbehandling}
+\index{parallelbehandling|textbf}
+\index{maskinmodel!parallel|textbf}
+
+I moderne regnemaskiner findes mange slags parallelbehandling.
+Mange processorer råder over \emph{SIMD}-registre
+\index{SIMD|textbf}
+\index{register}
+med en bredde mellem 128 og 256 bit, som muliggør parallel udførelse af en kommando på en hel række dataobjekter (SIMD står for \emph{single instruction, multiple data}: enkel operation -- multiple data).
+
+\emph{Simultan flertråding}
+\index{flertråding}
+\index{tråd}
+gør det muligt for processer at bedre udnytte deres resurser ved at flere tråde (delprocesser) udføres samtidigt på en processorkerne.
+\index{processorkerne}
+\index{kerne}
+Sågar mobile enheder
+\index{mobil enhed}
+indeholder ofte flerkerneprocessorer,
+\index{flerkerneprocessor|textbf}
+som kan udføre programmer uafhængigt af hinanden, og de fleste værtsmaskiner har flere af den slags flerkerneprocessorer, som har adgang til et \emph{fælles lager}.
+\index{lager!fælles|textbf}
+
+Koprocessorer, 
+\index{koprocessor}
+især dem, der bruges i computergrafik,
+\index{computergrafik}
+\index{grafikprocessor}
+indeholder endnu flere parallelt arbejdende komponenter på en og samme chip.
+Højpræstationsregnere
+\index{højpræstationsregner}
+\index{vært}
+består af flere værtssystemer, som er sammenkoblet i et eget hurtigt netværk.
+\index{netværk}
+Endeligt findes muligheden for at ganske løst sammenkoble al slags computere i et netværk (internettet, radionetværk, osv.), som herved danner et \emph{fordelt system}, 
+\index{fordelt system}
+i hvilken millioner af knuder arbejder sammen.
+Det er klart, at ingen simpel model rækker til at beskrive parallelle programmer, som kører på så mange forskellige niveauer af parallelitet
+I denne bog vil vi derfor indskrænke os til af og til (og uden formel argumentation) at forklare, hvorfor en bestemt sekventiel algoritme er mere eller mindre velegnet til at blive omarbejdet til parallel udførelse.
+For eksempel ville man kunne bruge SIMD-instruktioner til algoritmerne for aritmetik for lange heltal
+\index{aritmetik} i kapitel~\ref{ch:amuse:}.

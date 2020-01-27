@@ -1,0 +1,875 @@
+\chapter{Minimale spændetræer}
+\renewcommand{\labelprefix}{ch:mst}
+\llabel{}
+\vspace*{-4.5cm}
+\begin{flushright}
+%\includegraphics[width=3.5cm]{gtraverse/Altstadt.ps}
+  \includegraphics[width=5.5cm]{img/1280px-Svendborgsund_Bridge-view_towards_Taasinge_island.jpg}
+\end{flushright}
+%\vspace*{1cm}
+
+\aufmacher{\noindent Det sydfynske øhav skal omsider gøres landfast.
+Den totale udgift for alle de nødvendige broer skal gerne holdes så lavt som muligt.
+Direkte forbindelser mellem øerne er ikke påkrævede, bare hver ø kan nås fra hver af de andre.
+\index{broforbindelser}
+Du har en liste over mulige broforbindelser mellem par af øer og deres forventede omkostning. 
+Hvilke projekter sætter du i værk?}
+
+\noindent
+Mere generelt ønsker vi at løse følgende problem.
+Givet en sammenhængende urettet graf $G=(V, E)$ med positive reelle kantvægte $c \colon E\rightarrow \RR_+$.  
+Et \emph{minimalt spændetræ} (\emph{mst})
+\index{graf!minimalt spændetræ|siehe{mst}}
+\index{graf!mst|siehe{mst}}%
+\index{minimalt spændetræ|siehe{mst}}
+\index{mst|textbf}
+\index{minimal spændeskov|siehe{mst}}
+\index{graf!spændeskov}
+\index{graf!spændetræ}
+af $G$ er en mængde $T\subseteq E$ af kanter med egenskaben, at grafen $(V,T)$ er et træ med mindst mulig total vægt  $c(T)\Is\sum_{e\in T}c(e)$.
+Som i sidste kapitel bruger vi begreberne »vægt« og »omkostning« i flæng.
+I vores eksempel repræsenterer hver knude en  ø, kanterne er de mulige broprojekter og deres vægt er omkostningen ved at bygge den tilsvarende bro.
+I hele kapitlet er $G$ både sammenhængende og urettet.
+
+\index{netværk|sieheauch{graf}}%
+Minimale spændetræer er måske den enkleste udgave af en vigtig familie af grafproblemer, som opstår i forbindelse med \emph{netværksstruktur}.
+\index{netværk!struktur}
+\index{graf!netværksstruktur}
+Minimale spændetræer er et så grundlæggende koncept, at de dukker op i mange andre sammenhænge,
+fx klyngedannelse,
+\index{mst!anvendelse}
+\index{klyngedannelse}
+\index{mst!klyngedannelse}
+undvigelse af flaskehalse ved ruteplanlægning
+\index{korteste veje!flaskehals}
+\index{flaskehals (korteste veje)}
+og approksimationsalgoritmer for beregningsmæssigt svære problemer.
+\index{approksimationsalgoritme}
+Det ser vi nærmere på i afsnit~\lref{s:applications} og \lref{s:further}.
+En anden god grund til at betragte  minimale spændetræer er, at at dette problem tillader algoritmer, som er enkle, elegante og hurtige.
+I afsnit~\lref{s:generic} skal vi udlede to enkle men grundlæggende egenskaber ved mst’er, som danner fundamentet for de fleste mst-algoritmer. 
+Jarník og Prims algoritme går ud fra en enkelt startknude og bygger et mst ved gentagen udvidelse af et enkelt træ, den beskrives i afsnit~\lref{s:prim}.
+Kruskals algoritme bygger samtidigt flere træer i dele af grafen, som ikke umiddelbart har noget med hinanden at gøre, og smelter dem sammen til stadigt større træer.
+Denne algoritme ser vi nærmere på  i afsnit~\lref{s:kruskal}.
+For en effektiv implementation af Kruskals algoritme har man brug for en datastruktur, som opretholder en klassedeling af en mængde af elementer (dvs.\ en opdeling i disjunkte delmængder) under to operationer:
+»afgør, om to elementer tilhører samme delmængde« og »forén to delmængder«.
+Forén-og-find-datastrukturen beskrives i afsnit~\lref{s:unionfind}.
+Den har mange andre anvendelser ved siden af minimale spændetræer.
+
+\begin{exerc}
+  Hvis den givne graf $G$ ikke er sammenhængende, kan man spørge efter en 
+  \emph{minimal spændeskov} -- en kantmængde, som beskriver et mst for hver sammenhængskomponent af $G$.
+  Beskriv en metode til at finde minimale spændeskove med en vilkårlig mst-algoritme, men \emph{uden} at begynde med at finde sammenhængskomponenterne i $G$.
+  \emph{Vink}: Tilføj $n-1$ ekstra kanter.
+\end{exerc}
+
+\begin{exerc}[Opspændende kantmængder] 
+  En kantmængde $T\subseteq E$ i en sammenhængende graf $G=(V,E)$ er \emph{opspændende}, hvis $(V,T)$ er sammenhængende. 
+  Er en opspændende kantmængde med minimal vægt altid et træ?
+  Er den altid et træ, dersom kantvægtene er positive?
+\end{exerc}
+
+\begin{exerc}
+  Reducér problemet at finde et spændetræ med \emph{maksimal} total vægt 
+\index{mst!maksimalt spændetræ}
+  til mst-problemet.
+\end{exerc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Snit- og kredsegenskaberne}
+\llabel{s:generic}
+
+\begin{figure}[tb]
+  \[
+  \begin{tikzpicture}[scale = .3]
+    \tikzstyle{vertex} = [circle, draw, fill, inner sep = 1.5];
+    \node (u)  at (0,0)  [vertex, label = above:$u$] {};
+    \node (v) at (6,0) [vertex, label = above:$v$] {};
+    \node (u_)  at (0,-6)  [vertex, label = below:$u'$] {};
+    \node (v_) at (6,-6) [vertex, label = below:$v'$] {};
+    \foreach \y in {2,3,4}
+    {
+    \node (\y)    at (0,-\y) [vertex] {};
+    \node (\y-R)  at (6,-\y)  [vertex] {};
+    \draw (\y) -- (\y-R);
+    }
+    \draw (u) to node [above] {$e$} (v);
+    \draw [very thick, callout] (u_) to node [below] {$e'$} (v_);
+    \draw [very thick, callout, bend right] (u) to node [left] {$p$} (2);
+    \draw [very thick, callout, bend right] (2) to node [left] {$p$} (u_);
+    \draw [very thick,  callout,bend left] (v) to node [right] {$p$} (v_);
+    \node at (3, 2.5) {$E_S$};
+    \node at (0, 2.5) {$S$};
+    \node at (6, 2.5) {$V\setminus S$};
+    \begin{scope}[on background layer]
+      \node[draw, inner sep=0pt,ellipse,fit=(u) (u_), minimum width = 4em] {}; 
+      \node[draw, inner sep=0pt,ellipse,fit=(v) (v_) , minimum width = 4em] {};
+  \end{scope}
+  \end{tikzpicture}
+  \qquad
+  \begin{tikzpicture}[scale = .3]
+    \tikzstyle{vertex} = [circle, draw, fill, inner sep = 1.5];
+    \node (u)  at (0,0)  [vertex, label = above:$u$] {};
+    \node (v) at (3,0) [vertex, label = above:$v$] {};
+    \node (u_)  at (-4,-2)  [vertex, label = left:$u'$] {};
+    \node (v_) at (7,-2) [vertex, label = right:$v'$] {};
+    \draw [very thick, callout] (u) to node [above] {$e$} (v);
+    \draw [very thick, callout] (u_) to node [below] {$e'$} (v_);
+    \draw [very thick, callout, bend right] (u) to node [above left] {$C$} (u_);
+    \draw [very thick,  callout,bend left] (v) to node [above right] {$C$} (v_);
+    \node at (-1, 2.5) {$T_u$};
+    \node at (5, 2.5) {$T_v$};
+    \begin{scope}[on background layer]
+    \node at (-4,0) [draw,
+            regular polygon, regular polygon sides=3, shape border rotate=30,
+	    minimum width = 8em] {}; 
+    \node at (7,0) [draw,
+            regular polygon, regular polygon sides=3, shape border rotate=-30,
+	    minimum width = 8em] {}; 
+  \end{scope}
+  \end{tikzpicture}
+\]
+\caption{\llabel{f:cut-and-cycle}
+  Snit- og kredsegenskaberne.
+  Billedet \emph{til venstre} illustrerer beviset for snit\-egenskaben.
+  Kanten $e$ har minimal vægt blandt kanterne i $E_S$, dvs.\ kanterne, som har et endepunkt $S$ og et endepunkt i $V \setminus S$.
+  Vejen $p$ er den entydigt bestemte  vej i mst’et, som forbinder $e$s endpunkter $u$ og $v$.
+  Vejen $p$ må indeholde en kant $e'\in E_S$.
+  Billedet \emph{til højre} illustrerer beviset for kredsegenskaben. 
+  Her er $C$ en kreds i $G$, kanten $e= \{u,v\}$ er en kant på $C$ med maksimal vægt og $T$ er et mst, som indeholder $e$.
+  Komponenterne af $T\setminus\{e\}$ er $T_u$ og $T_v$, kanten $e'$ ligger på kredsen $C$ og  forbinder $T_u$ og $T_v$.}
+\end{figure}
+
+Vi skal etablere to enkle lemmaer.
+Det ene tillader os at medtage kanter til et voksende mst, det andet tillader os at udelukke kanter fra at komme i betragtning.
+Vi har brug for begrebet grafsnit.
+Et \emph{snit}
+\index{graf!snit} 
+\index{snit|siehe{graf!snit}} 
+i en sammenhængende graf $G$ er en klassedeling $(S,V\setminus S)$ af knudemængden $V$ i to ikke-tomme dele $S$ og $V\setminus S$.
+Snittet definerer en mængde $E_S=\{\,\{u,v\}\in E\colon u\in S, v\in V\setminus S\,\}$ af \emph{snitkanter}, som går mellem $S$ og $V\setminus S$. 
+\index{snitkant} 
+Beviserne for de næste to lemmaer er illustrerede i figur~\lref{f:cut-and-cycle}.  
+
+\begin{lemma}[Snitegenskab]
+  \llabel{lem:cutproperty}
+  \index{mst!snitegenskab|textbf}
+  Lad $(S,V \setminus S)$ være et snit med snitkantsmængde $E_S$ og lad $e \in E_S$ være en kant med minimal vægt i $E_S$. 
+  Antag, at $T'$ er en kantmængde, som er indeholdt i et mst og ikke indeholder nogen kant fra $E_S$.
+  Da er også $T' \cup \{e\}$ indeholdt i et mst. 
+\end{lemma}
+\begin{proof} 
+  Betragt et mst $T$ i $G$ med $T' \subseteq T$.
+  Lad $e$s endepunkter være $u\in S$ og $v\in V\setminus S$.
+  Idet $T$ er et spændetræ, eksisterer der i $T$ en (entydigt bestemt) vej $p$ fra $u$ til $v$. 
+  Denne vej må indeholde en kant $e'=\{u',v'\}$ med $u'\in S$ og $v'\in V\setminus S$. 
+  (Det er ikke udelukket, at $e=e'$.)
+  Ifølge antagelsen gælder $e' \notin T'$. 
+  Betragt nu kantmængden $T''$ givet ved $T''= (T\setminus \{e'\})\cup \{e\}$.
+  Denne danner ligeledes et spændetræ, idet fjernelsen af $e'$ fra $T$ danner to deltræer, som af $e$ igen samles til ét træ.
+  Idet $c(e)$ er minimal i $E_S$, har vi $c(e)\leq c(e')$, og derfor $c(T'')\leq c(T)$. 
+  Spændetræet $T''$ er altså minimalt og derfor ligeledes et mst.
+  Det er klart, at $T' \cup \{e\} \subseteq T''$. 
+\index{udskiftningsargument}
+\end{proof}
+
+\begin{lemma}[Kredsegenskab]
+  \llabel{lem:cycle}
+  \index{mst!kredsegenskab}
+  Lad $C$ være en simpel kreds i $G$, og lad $e$ være en kant på $C$ med maksimal vægt.
+  Betragt grafen $G'=(V,E\setminus\{e\})$.
+  Hvert mst i $G'$ er også et mst i $G$.
+\end{lemma}
+\begin{proof}
+  Betragt et mst $T$ i $G$.
+  Hvis $e$ ikke tilhører $T$, så har alle mst’er i $G'$ samme vægt som $T$.
+  Antag altså $e =\set{u,v} \in T$.
+  Hvis vi fjerner $e$ fra $T$, opstår to deltræer $T_u$ og $T_v$ med $u$ i $T_u$ og $v$ i $T_v$.
+  Idet $C$ er en kreds, eksisterer en kant $e'=\set{u',v'}$ med $e'\neq e$ på $C$
+  med $u'$ i $T_u$ og $v'$ i $T_v$.
+  Mængden $T'$ givet ved $T'=(T\setminus\set{e})\cup\set{e'}$ er et spændetræ i $G'$, hvis vægt $c(T') = c(T) - c(e) + c(e')$ ikke er større end $c(T)$.
+  Derfor har alle mst’er i $G'$ samme vægt som $T$.   
+\end{proof}
+
+Snitegenskaben leder til en enkel og generel grådig algoritme
+\index{algoritmekonstruktion!grådig!mst}
+for mst-konstruktion.
+Begynd med en tom kantmængde $T'=\emptyset$.
+Så længe $T'$ ikke er sammenhængende, gentager man følgende skridt:
+Vælg et snit $(S,V\setminus S)$ under den forudsætning, at ingen kant fra $T'$ forbinder begge sider af snittet, og udvid $T'$ med en snitkant af minimal vægt.
+Når $(V,T')$ er blevet sammenhængende, er $T'$ et mst.
+
+Forskellige metoder til valg af snittet i denne generelle tilgang  leder til forskellige veldefinerede algoritmer.
+I de følgende afsnit diskuterer vi to tilgange i detaljer; i afsnit~\lref{s:further} skitseres en tredje. 
+Desuden skal vi gøre os klart, hvordan man finder en kant af minimal vægt på snittet.
+
+Kredsegenskaben fører ligeledes til en enkel strategi for at finde et mst.
+Begynd med $E'=E$.
+Gentag følgende skridt så længe $E'$ ikke er kredsfri:
+Find en kreds $C$ i $E'$ og fjern fra $E'$ en kant fra $C$ med maksimal vægt.
+Når $E'$ er blevet kredsfri, er $E'$ et mst. 
+I modsætning til snitegenskaben er det dog ikke lykkedes nogen at konkretisere denne tilgang til en effektiv mst-algoritme, så vi skal ikke forfølge denne idé videre.
+
+\begin{exerc}
+  \index{mst!entydighed}
+  Vis, at en graf har præcis ét mst, hvis alle kantvægte er forskellige.
+  Vis endvidere, at mst’et i så fald er det samme som for grafen, hvor hver kantvægt er erstattet med kantens rangordning blandt kantvægtene.
+\end{exerc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Jarník og Prims algoritme}
+\llabel{s:prim}%
+\index{Jarnik og Prims algoritme@Jarník og Prims algoritme|sieheunter{mst}}%
+\index{mst!Jarnik og Prims algoritme@Jarník og Prims algoritme|textbf}%
+\index{Prims algoritme|siehe{mst, Jarník og Prims algoritme}}%
+\index{algoritmekonstruktion!grådig!Jarnik og Prims algoritme@Jarník og Prims algoritme}
+
+Jarník og Prims algoritme (kort »JP-algoritmen«) 
+\cite{Jar30,Pri57,Dij59}
+\index{Prim@Prim, R. C.}
+\index{Jarnik@Jarn\'{\i}k, V.}
+\index{Dijkstra, E. W.} 
+for minimale spændetræer ligner meget Dijkstras algoritme for korteste veje.\footnote{
+  Dijkstra publicerede algoritmen i sin grundlæggende 1959-artikel \cite{Dij59} om korteste veje.
+  Idet Prim havde publiceret samme algoritme to år tidligere, kaldes den ofte for »Prims algoritme«.
+  Algoritmen optræder dog meget tidligere i en artikel af Jarník fra 1930 \cite{Jar30}.}
+JP-algoritmen begynder med en (vilkårlig) startknude $s$, opfattet som træ bestående af en enkelt knude og tom  kantmængde.
+Nu opbygges et mst ved at tilføje en knude ad gangen.
+Lad $S \not = V$ være mængden af knuder, som hidtil er føjet til træet.
+Da danner $(S, V\setminus S)$ et snit. 
+Vælg en kant $e=\set{v,u}$ med $v\in S$ og $u\in V\setminus S$ og minimal vægt blandt disse kanter og føj $u$ til $S$ og $e$ til træets kantmængde. 
+Udfordringen er at bestemme kanten $e$ på en effektiv måde.
+Algoritmen gemmer hertil i en prioritetskø for hver knude $w\in V\setminus S$ en hosliggende kant $\{v,w\}$ med minimal vægt, som forbinder $S$ med $w$.
+Kantens vægt skrives i rækkeindgangen $d[w]$;
+knuden $v$ skrives i rækkeindgangen $\Id{forælder}[w]$. 
+En indgang $u$ i $Q$ med minimal $d$-værdi leverer nu den ønskede kant som $\{\Id{forælder}[u],u\}$. 
+Når knuden $u$ føjes til $S$, undersøges de hos $v$ liggende kanter for at afgøre, om de danner bedre forbindelser til knuderne i $V\setminus S$. 
+I figur~\lref{jpexample} vises JP-algoritmens fremgangsmåde ved hjælp af et eksempel; i figur~\lref{alg:jpmst} vises pseudokoden.
+Når knuden $u$ føjes til $S$, og en hos $u$ liggende kant $\{u,w\}$ bliver undersøgt, skal man kunne afgøre, om $w$ tilhører $S$ eller ej. 
+Man kunne gemme denne information i en knudeindiceret række af booleske værdier.
+% TODO orig Bitvektor nie definiert
+Hvis alle kantvægte er positive, kan man i stedet bruge $d$-rækken:
+For knude $v$ gælder $v \in S$ hvis $d[v]=0$, og $v\notin S$ hvis $d[v] > 0$.
+
+\begin{figure}[tb]
+  \[
+  \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+    \draw [callout, very thick] (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw (b) to node [below, near end] {$3$} (c);
+    \draw (b) to node [right] {$2$} (d);
+    \draw (c) to node [below] {$4$} (d);
+    \draw [dashed, callout] (-.25,-.5) -- (.5,.25);
+  \end{tikzpicture}
+  \quad
+  \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+    \draw [callout, very thick] (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw [callout, very thick] (b) to node [below, near end] {$3$} (c);
+    \draw (b) to node [right] {$2$} (d);
+    \draw (c) to node [below] {$4$} (d);
+    \draw [dashed, callout] (.75,-1.25) -- (.75,.25);
+  \end{tikzpicture}
+  \quad
+  \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+    \draw [callout, very thick] (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw [callout, very thick] (b) to node [below, near end] {$3$} (c);
+    \draw [callout, very thick] (b) to node [right] {$2$} (d);
+    \draw (c) to node [below] {$4$} (d);
+    \draw [dashed, callout] (.5,-1.25) -- (1.25,-.5);
+  \end{tikzpicture}
+\]
+\caption{\llabel{jpexample}
+  Tre snit (vist som stiplede linjer) svarende til skridtene i Jarník og Prims algoritme med  $a$ som den første knude. 
+  Kanterne, som føjes til mst’et, er $\{a,c\}$, $\{c,b\}$ og $\{b,d\}$.}
+\end{figure}
+
+%
+\begin{buchalgorithmpos}{b}{alg:jpmst}{Jarník og Prims mst-algoritme.
+Vi antager, at kantvægtene er positive.}
+  \Function \Id{JPmst} $\colon$ \Id{Mængde} \Of \Id{Kant}\+\\
+  \DeclareInit{$d$}{\Id{Knuderække}$[1..n]$ \Of
+$\RR \cup\{\infty\}$}{$\seq{\infty,\ldots,\infty}$}    \comment{$d[u]$ indeholder mindste vægt}\\
+                 \comment{af kant mellem $S$ og $u$}\\
+  \Declare{\Id{forælder}}{\Id{Knuderække} \Of \Id{KnudeId}}\comment{$\{\Id{forælder}[u],u\}$ er letteste kant mellem $S$ og $u$}\\
+  \Declare{$Q$}{\Id{KnudePK}}\comment{bruger $d[\cdot]$ som prioritet}\\
+  $Q$.\Id{tilføj}$(s)$ for vilkårligt $s\in V$\\
+  \While $Q\neq\emptyset$ \Do\+\\
+    $u\Is Q.\Id{fjernMindste}$\\
+    $d[u]\Is 0$ \comment{$d[u] = 0$ betyder $u \in S$}\\
+    \Foreach kant $e=\{u,w\}\in E$ \Do\+\\
+      \If $c(e)<d[w]$ \Then\+\comment{$c(e) < d[w]$ medfører $d[w] > 0$ og dermed $w \not\in S$}\\
+        $d[w]\Is c(e)$\\
+	$\Id{forælder}[w]\Is u$\\
+	$\If w\in Q \Then Q.\Id{sænkNøgle}(w) \Else Q.\Id{tilføj}(w)$\-\-\\
+    \Invariant $\forall w\in Q\colon d[w]=\min\setGilt{c(\{v,w\})}{\{v,w\}\in E
+\wedge v \in S}$\-\\ 
+  \Return $\setGilt{\set{\Id{forælder}[v],v}}{v\in V\setminus\set{s}}$  
+\end{buchalgorithmpos}
+
+Dette trick sparer lagerplads og en sammenligning i den indre løkke.
+Læg mærke til, at $c(e) < d[w]$ kun kan gælde, hvis $d[w] > 0$ og dermed $w \not\in S$ gælder, og $e$ udgør en bedre forbindelse fra $w$ til $S$.
+Betingelsen »$\If w\in Q$« prøver man nemmest ved at undersøge, om den gamle værdi af $d[w]$ (som man skal huske at gemme, inden man overskriver den) er lig med $\infty$.
+Den eneste væsentlige forskel til Dijkstras algoritme ligger i, at nøglerne i prioritetskøen er kantvægte i stedet for vejlængder.
+Analysen for Dijkstras algoritme overføres direkte til JP-algoritmen, så vi kan opnå tid $O(n\log n + m)$ ved brug af fibonaccihobe.
+
+\begin{exerc}
+  Dijkstras Algoritmen algoritme for korteste veje kan nøjes med en monoton prioritetskø.
+  Vis, at det \emph{ikke} er nok for JP-algoritmen.
+\end{exerc}
+
+\begin{exerc}[Gennemsnitsanalyse af JP-algoritmen]
+  \llabel{ex:average}
+  Antag, at $G$s kanter er valgt tilfældigt fra $\{1,\ldots, m\}$. 
+  Vis, at det forventede antal \Id{sænkNøgle}-operationer, som udføres i løbet af JP-algoritmen, er begrænset af  $O(n \log (m/n))$. \index{algoritmeanalyse!gennemsnit} 
+\emph{Vink}: Den efterspurgte analyse minder meget om analysen af Dijkstras algoritme i sætning~\ref{ch:spath:thm:avgdijkstra}.
+\end{exerc}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Kruskals algoritme}
+\llabel{s:kruskal}%
+\index{algoritmekonstruktion!grådig!Kruskals algoritme}
+
+Jarník og Prims algoritme er nok den bedste generelle fremgangsmåde for mst-problemet.
+Alligevel vil vi præsentere et alternativ, nemlig Kruskals algoritme~\cite{Kruskal},
+\index{Kruskal, J.}
+som også har visse fordele.
+Især kan den undvære en raffineret repræsentation af grafen -- Kruskals algoritme kan bruges, selv når grafen er givet som kantfølge.
+\index{graf!kantfølge}
+%TODO kantliste -> kantfølge
+Udførelsestiden for tynde  grafer med $m=O(n)$ tåler sammenligning med  JP-algoritmen. 
+%
+\begin{buchalgorithmpos}{b}{alg:kruskalmst}{Kruskals mst-algoritme}
+  \Funct{KruskalMst}{$V, E, c$}{\Id{Mængde} \Of \Id{Kant}}\+\\
+  $T\Is \emptyset$\\
+    $\Foreach \{u,v\}\in E$ i rækkefølge af stigende vægt \Do\+\\
+    \If  $u$ og $v$ ligger i forskellige træer i $T$ \Then\+\\
+      $T\Is T\cup\{\{u,v\}\}$\comment{forén to træer}\-\\
+		\Invariant $T$ er en skov, som er indeholdt i et mst\-\\
+  \Return $T$
+\end{buchalgorithmpos}
+
+%
+\begin{figure}[b]
+  \[
+  \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+    \draw  (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw (b) to node [below, near end] {$3$} (c);
+    \draw [callout, very thick,densely dashed] (b) to node [right] {$2$} (d);
+    \draw (c) to node [below] {$4$} (d);
+    \draw [densely dashed, callout] (1.25,-.5) -- (.5,.25);
+  \end{tikzpicture}
+  \quad
+  \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+    \draw  (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw [callout, very thick,densely dashed] (b) to node [below, near end] {$3$} (c);
+    \draw [callout, very thick] (b) to node [right] {$2$} (d);
+    \draw (c) to node [below] {$4$} (d);
+    \draw [densely dashed, callout] (.75,-1.25) -- (.75,.25);
+  \end{tikzpicture}
+  \quad
+  \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+    \draw (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw [callout, very thick] (b) to node [below, near end] {$3$} (c);
+    \draw [callout, very thick] (b) to node [right] {$2$} (d);
+    \draw [densely dashed] (c) to node [below] {$4$} (d);
+  \end{tikzpicture}
+  \quad
+    \begin{tikzpicture}[scale = 1.5]
+   \tikzstyle{vertex} = [circle, fill, inner sep = 1.5pt];
+    \node (a) at (0,0) [vertex, label = above left: $a$] {};
+    \node (b) at (1,0) [vertex, label = above right: $b$] {};
+    \node (c) at (0,-1) [vertex, label = below left: $c$] {};
+    \node (d) at (1,-1) [vertex, label = below right: $d$] {};
+    \draw (a) to node [above] {$7$} (b);
+      \draw [callout, very thick, densely dashed] (a) to node [left]  {$6$} (c);
+    \draw (a) to node [above, near start] {$9$} (d);
+    \draw [callout, very thick] (b) to node [below, near end] {$3$} (c);
+    \draw [callout, very thick] (b) to node [right] {$2$} (d);
+    \draw [densely dashed] (c) to node [below] {$4$} (d);
+    \draw [densely dashed, callout] (-.25,-.5) -- (.5,.25);
+  \end{tikzpicture}
+\]
+\caption{\llabel{kruskalexample}
+Kruskals algoritme bruger i dette eksempel snitegenskaben to gange for at konstatere, at det findes et mst indeholdende kanterne $\{b,d\}$ og $\{b,c\}$.
+\index{mst!snitegenskab}
+Hernæst forkastes kanten $\set{c,d}$, fordi dens to endepunkter ligger i samme træ, nemlig træet med knudemængde $\{b,c,d\}$.
+Til sidst medtages kanten $\{a,c\}$ i mst’et, baseret på snitegenskaben ved snittet $(\{a\},\{b,c,d\})$.}
+\end{figure}
+
+Pseudokoden i figur~\lref{alg:kruskalmst} er yderst kompakt.
+Algoritmen betragter $G$s kanter i rækkefølge af voksende vægt og vedligeholder en kredsfri kantdelmængde $T$, dvs. en skov, som er tom fra starten.
+Algoritmen opretholder invarianten, at $T$ kan udvides til et mst.
+Når en kant $e$ bliver betragtet, bliver den enten medtaget i mængden $T$ eller forkastet.
+Beslutningen træffes på grundlag af invarianten og snitegenskaben.
+\index{mst!snitegenskab}
+Ifølge invarianten ved vi, at $T$ kan udvides til et mst.
+Der er to tilfælde.
+Hvis endepunkterne af $e$ tilhører samme sammenhængskomponent af $(V,T)$, forbliver $T$ uforandret, så invarianten gælder stadig.
+Hvis endepunkterne $u$ og $v$ af $e$ ligger i forskellige sammenhængskomponenter af $(V,T)$, betragter vi snittet $(S_u,V\setminus S_u)$, hvor $S_u$ er sammenhængskomponenten af $u$ i $(V,T)$.
+Ingen af $T$s kanter krydser dette snit; kanten $e$ forbinder $S_u$ med $V\setminus S_u$ og er den letteste snitkant.
+(Det er fordi kanterne blev betragtet i rækkefølge af stigende vægt.
+Hvis der skulle være en snitkant $e'$ med $c(e') < c(e)$ så havde den allerede været betragtet tidligere og medtaget i $T$.)
+Ifølge snitegenskaben er også $T\cup\{e\}$ indeholdt i et mst.
+Vi kan altså føje $e$ til $T$ og bevare invarianten.
+I figur~\lref{kruskalexample} er forløbet af Kruskals algoritme vist ved eksempel.
+
+Vi mangler at overbevise os om, at $T$ til sidst selv er et mst.
+Ifølge invarianten er $T$ indeholdt i et mst.
+Antag modsætningsvist, at $(V,T)$ er usammenhængende.
+Så findes en kant $e\in E$, som forbinder to komponenter af $(V,T)$. 
+Men algoritmen må have betragtet denne kant undervejs i løbet, og må da have føjet den til $T$.
+Men så er de to komponenter sammenhængende, hvilket er absurd.
+Derfor er $(V,T)$ sammenhængende til sidst og derfor et mst.
+
+Implementationer af Kruskals algoritme har brug for at hurtigt kunne afgøre, om en givet kant forbinder to komponenter af $(V,T)$.
+I næste afsnit skal vi se en så effektiv datastruktur for dette problem, af vi kan bortse fra dens udførelsestid i analysen.
+Den dominerende omkostning for Kruskals algoritme bliver den indeledende sortering af kantvægtene, som kan gøres i tid $O(m\log m)$ med en effektiv sammenligningsbaseret sorteringsalgoritme.
+Den konstante faktor, som skjuler sig bag store-$O$-notationen er ganske lille, så for tynde grafer med $m=O(n)$ kan Kruskals algoritme slå JP-algoritmen og dens udførelsestid på $O(m+n\log n)$. 
+
+%----------------------------------------------------------------------
+
+\begin{exerc}[Mst for datastrømme]
+  \index{mst!datastrømalgoritme}
+  \index{datastrømalgoritme}
+  Antag, at grafens kanter kun bliver vist en gang (fx over en netværksforbindelse), og at lageret er for lille til at gemme dem allesammen. 
+  Kanterne bliver \emph{ikke} nødvendigvis vist i rækkefølge af voksende vægt.
+  \begin{enumerate}[(a)]
+    \item Skitser en algoritme, som under disse antagelser beregner et mst i plads $O(n)$.
+\item
+  Forbedr algoritmen således, at den kører i tid $O(m\log n)$.
+  \emph{Vink}: Behandl kanterne i stakke af størrelse $O(n)$.
+      (Et alternativ er at bruge datastrukturen \emph{dynamisk træ} af Sleator og Tarjan ~\cite{SleTar83}.)
+  \index{Sleator, D.} 
+  \index{Tarjan, R. E.} 
+  \index{dynamisk træ}
+  \index{træ!dynamisk}
+\end{enumerate}
+\end{exerc}
+
+\section{Forén-og-find}
+\llabel{s:unionfind}%
+\index{forén-og-find}
+\index{invariant!datastruktur-}
+
+En \emph{klassedeling} af en mængde $M$ er en familie $M_1,\ldots, M_k$ af disjunkte delmængder af $M$, som sammen \emph{dækker} $M$, dvs.\ at der gælder $M_i\cap M_j=\emptyset$ for alle $i\neq j$ og $M=M_1\cup \cdots\cup M_k$. 
+En delmængde $M_i$ kaldes sommetider en \emph{klasse} i klassedelingen.
+For eksempel leder skoven $T$ i Kruskals algoritme til en klassedeling af knudemængden $V$.
+Klassedelingens klasser er sammenhængskomponenterne i $(V,T)$.
+Der kan forekomme komponenter, som kun består af en enkelt knude.
+Især består klassedelingen i begyndelsen udelukkende af den slags etpunkts\-mængder.
+Kruskals algoritme udfører nu to operationer på denne klassedeling:
+Den afgør, om to elementer hører til samme delmængde (dvs.\ at kunderne hører til samme deltræ), og forener to delmængder til én (nemlig når der tilføjes en kant til $T$).
+
+Forén-og-find-datastrukturen repræsenterer en klassedeling af mængden $\{1,\ldots,n\}$ på en måde, så begge operationer kan gennemføres effektivt.
+I hver klasse udnævnes et af elementerne til klassens \emph{repræsentant}, som også bruges som klassens navn.
+Valget af repræsentant gøres af algoritmen, ikke af brugeren.
+I begyndelsen udgør hvert element $v\in\{1,\ldots,n\}$ en klasse for sig;
+ repræsentanten for klassen $\{v\}$ er dermed $v$ selv.
+Funktionen $\Id{find}(v)$ returnerer repræsentanten for den klasse, som indeholder $v$.
+For at afgøre, om to elementer tilhører samme klasse, bestemmer man deres repræsentanter og sammenligner dem.
+Operationen $\Id{forén}(r,s)$, anvendt på repræsentanter af forskellige%
+\footnote{I nogle fremstillinger kan $\Id{forén}$ bruges med vilkårlige elementer som argument.
+Så bliver operationen på repræsentanter typisk kaldt »$\Id{hægt}$«.
+}
+klasser, forener disse klasser til en ny og bestemmer en ny repræsentant.
+
+For at implementere Kruskals algoritme ved hjælp af forén-og-find-datastrukturen, behøver man kun små ændringer til proceduren i fig.~\lref{alg:kruskalmst}.
+I begyndelsen kaldes klassens konstruktør, som gør hver knude $v$ til sin egen klasse.
+Vi behøver bare at erstatte $\iif$-kommandoen med følgende:
+
+\begin{quote}
+\begin{tabbing}
+  $r := \Id{find}(u); s := \Id{find}(v);$\\
+  $\iif r\neq s \tthen T:= T\cup \{\{u,v\}\}; \Id{forén}(r,s);$
+\end{tabbing}
+\end{quote}
+
+\begin{figure}[tb]
+  \begin{tabbing}
+    ~~~~\=~~~~\= \kill
+    $\Class \Id{Forén-og-find}(n\colon \NN)$\\
+    \>$\Id{forælder} = \langle 1,\ldots, n\rangle\colon\Array[1..n]\Of [1.. n]$ 
+    \tikz[remember picture] \node (init) {};\\
+    \>$\Id{rang} =\langle 0,\ldots, 0\rangle\colon \Array [1..n]\Of [0..\log n]$\\
+    \\
+    $\Function \Id{find}(v\colon 1..n)\colon 1..n$\\
+    \>$\iif \Id{forælder}[v] = v\tthen\return v$\\
+    \> $\eelse$ \=$v':= \Id{find}(\Id{forælder}[v])$
+    \tikz[remember picture] \node (pathcompr) {};\\
+    \> \> $\Id{forælder}[v]:=v'$\\
+    \> \> $\return v'$\\
+    \\
+    $\Procedure \Id{forén}(r,s\colon 1..n)$\\
+    \> $\Assert r, s \text{ repræsentanter af forskellige klasser}$
+    \tikz[remember picture] \node (margin) {}; \\
+    \> $\iif\Id{rang}[r]< \Id{rang}[s]\tthen \Id{forælder}[r]:= s$
+    \tikz[remember picture] \node (different) {};\\
+    \> $\eelse$ \=$\Id{forælder}[s]:=r$\\
+    \>\>$\iif \Id{rang}[r] =   \Id{rang}[s]\tthen \Id{rang}[r]++$
+    \tikz[remember picture] \node (same) {};
+  \end{tabbing}
+
+  \tikzset{
+    vertex/.style = {circle, fill, inner sep = 1.5pt},
+    weight/.style = {font=\small, midway, auto, inner sep = 1pt, circle},
+    selfloop/.style = {loop above, looseness = 20},
+    >=stealth'}
+  \begin{tikzpicture}[scale = .5, remember picture, overlay, 
+    show background rectangle, framed,
+    shift = (margin|-init), callout, anchor = east] 
+    \node (1) at (0,0) [vertex, label = below:$1$, label= right:$0$] {};
+    \node (dots) at (2,0) {$\cdots$};
+    \node (n) at (3,0) [vertex, label = below:$n$, label = right:$0$] {};
+    \draw [->] (1) edge [selfloop] (1); 
+    \draw [->] (n) edge [selfloop] (n); 
+  \end{tikzpicture}
+     % 
+  \begin{tikzpicture}[scale = .5, remember picture, overlay, shift = (margin|-pathcompr), , callout] 
+    \node (v) at (0,-3) [vertex, label = left:$v$] {};
+    \node (fv) at (0,-2) [vertex, label = left:\emph{forælder}$(v)$] {};
+    \node (dots) at (0,-1) [inner sep = 2pt] {:};
+    \node (v') at (0,0) [vertex, label = left:$v'$] {};
+    \draw [->] (v) -- (fv); 
+    \draw [->] (fv) -- (dots); 
+    \draw [->] (dots) -- (v'); 
+    \draw [->] (v') edge [selfloop] (v'); 
+    \begin{scope}[xshift = 2cm]
+      \node (v) at (0,-3) [vertex] {};
+      \node (fv) at (0,-2) [vertex] {};
+      \node (dots) at (0,-1) [inner sep = 2pt]{:};
+      \node (v') at (0,0) [vertex] {};
+      \draw [->] (v) edge[bend left, in = 120] (v'); 
+      \draw [->] (fv) edge[bend left] (v'); 
+      \draw [->] (dots) -- (v'); 
+      \draw [->] (v') edge [selfloop] (v'); 
+    \end{scope}
+  \end{tikzpicture}
+%
+  \begin{tikzpicture}[scale =.5, remember picture, overlay, shift = (margin|-different), callout]
+    \node (r) at (0,0) [vertex, label = left:$r$, label = right: $2$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \draw [->] (r) edge [selfloop] (r);
+    \node (s) at (2, 0) [vertex, label = left:$s$, label = right: $3$] {};
+    \draw (s) -- +(.75,-.75) -- +(-.75,-.75) -- (s);
+    \draw [->] (s) edge [selfloop] (s);
+    \begin{scope}[xshift = 5cm]
+    \node (r) at (0,-.25) [vertex, label = left:$r$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \node (s) at (2, 0) [vertex, label = above left:$s$, label = right: $3$] {};
+    \draw (s) -- +(.7,-.7) -- +(-.7,-.7) -- (s);
+    \draw [->] (s) edge [selfloop] (s);
+      \draw [->] (r) -- (s);
+    \end{scope}
+  \end{tikzpicture}
+%
+  \begin{tikzpicture}[scale =.5, remember picture, overlay, shift = (margin|-same), callout]
+    \node (r) at (0,0) [vertex, label = left:$r$, label = right: $2$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \draw [->] (r) edge [selfloop] (r);
+    \node (s) at (2, 0) [vertex, label = left:$s$, label = right: $2$] {};
+    \draw (s) -- +(.5,-.5) -- +(-.5,-.5) -- (s);
+    \draw [->] (s) edge [selfloop] (s);
+    \begin{scope}[xshift = 5cm]
+    \node (r) at (0,0) [vertex, label = left:$r$, label = above right:$3$] {};
+    \draw (r) -- +(.5,-.5) -- +(-.5,-.5) -- (r);
+    \draw [->] (r) edge [selfloop] (r);
+    \node (s) at (2, .-.25) [vertex, label = above :$s$] {};
+    \draw (s) -- +(.5,-.5) -- +(-.5,-.5) -- (s);
+    \draw [->] (s) -- (r);
+    \end{scope}
+  \end{tikzpicture}
+  \caption{
+    \llabel{alg:unionfind}
+    En effektiv forén-og-find-datastruktur til forvaltning af en klassedeling af mængden $\{1,\ldots,n\}$.}
+\end{figure}
+
+Forén-og-find-datastrukturen kan realiseres på følgende måde.
+Hver klasse repræsenteres som et rodfæstet træ, hvor roden tjener som repræsentant.
+Forgængeren til elementet $v$ i træet gemmes i indgangen $\Id{forælder}[v]$ i rækken $\Id{forælder}[1..n]$.
+For rodknuder $r$ gælder $\Id{forælder}[r]=r$, hvilket svarer til en løkke ved roden.
+ 
+For at implementere operationen \emph{find}$(v)$ følger vi forælderpegere fra $v$, til vi når en løkke.
+Denne løkke sidder ved $v$s repræsentant.
+Implementationen af $\Id{forén}(u,v)$ er lignende enkel.
+Vi gør den ene repræsentant til den andens forælder.
+Den sidstnævnte mister herved sin rolle som repræsentant; førstnævnte tjener som repræsentant for den nyskabte klasse.
+Den proces, vi har beskrevet indtil nu, leder til en realisering af forén-og-find-datastrukturen, som er korrekt, men ineffektiv.
+Ineffektiviten skyldes, at $\Id{forælder}$-pegerne kan danne lange kæder, som skal gennemløbes gentagne gange for hver \emph{find}-operation.
+I værste fald skal vi bruge lineær tid for hver \emph{find}-operation.
+
+På grund af dette problem er der foretaget to forbedringer i algoritmen i fig.~\lref{alg:unionfind}.
+Den første forbedring forhindrer, at træerne bliver for dybe.
+Hertil gemmes for hver repræsentant et naturligt tal, kaldt repræsentantens \emph{rang}.
+I begyndelsen, hvor hvert element er sin egen repræsentant, er rangen $0$.
+Når $\Id{forén}$-operationen udføres på to repræsentanter af forskellig rang, gøres repræsentanten med den lavere rang til den andens barn.
+Når rangene er ens, kan den nye repræsentant vælges vilkårligt, men vi øger den nye repræsentants rang med $1$.
+Denne første forbedring hedder \emph{forening efter rang}.
+
+\begin{exerc}
+  Antag, at \emph{find}-operationen ikke forandrer træstrukturen (eller at operationen ikke forekommer.)
+  Vis, at rangen af en repræsentant er lig med dybden af dets undertræ.
+\end{exerc}
+
+Den anden forbedring hedder \emph{vejforkortning}.
+Den sikrer, at en kæde af forælderpegere aldrig gennemløbes to gange.
+Hertil ændrer vi ved hver udførelse af $\Id{find}(v)$ alle de besøgte knuders forælderpegere til at pege på repræsentanten for $v$s klasse.
+I fig.~\lref{alg:unionfind} er denne regel formuleret som en rekursiv procedure.
+Proceduren gennemløber først vejen fra $v$ til dens repræsentant og benytter så rekursionsstakken for påny at gennemløbe samme vej til $v$ i modsat retning.
+Mens rekursionsstakken afstakkes, ændres forælderpegerne.
+Alternativt kan vejen også gennemløbes to gange i samme retning.
+Ved første gennemløb bestemmes repræsentanten; ved andet gennemløb ændres forælderpegerne.
+
+\begin{exerc}
+  Beskriv en ikke-rekursiv implementation af \emph{find}.
+\end{exerc}
+
+\begin{thm}
+  \llabel{union:find:log:depth} 
+  Med forening efter rang har alle træer dybde højst $\log n$.
+\end{thm}
+
+\begin{proof}
+  Vi viser først sætningen uden brug af vejforkortning.
+  Det betyder, at \emph{find}-operationen ikke ændrer datastrukturen.
+  I så fald er rangen af en repræsentant altid lig med dybden af dens undertræ (opg.~11.8).
+  Vi kan altså nøjes med at begrænse rangen af hver rod med $\log n$.
+  Hertil vil vi vise (ved induktion), at et træ, hvis rod har rang $k$, indeholder mindst $2^k$ knuder.
+  For $k=0$ gælder udsagnet klart.
+  Det eneste tidspunkt, hvor rangen af en rod forandres, er når en $\Id{forén}$-operation øger den fra $k-1$ til $k$.
+  I så fald har den fået et nyt barn, som selv var repræsentant med rang $k-1$.
+  Ifølge induktionshypotesen indeholdt rodens og det nye barns træer inden operationen hver mindst $2^{k-1}$ knuder.
+  Efter operationen har det nye træ derfor mindst $2^{k-1} + 2^{k-1} = 2^k$ knuder, og vi har bevist påstanden.
+  Vi konkluderer, at den største rang er højst $\log n$, idet der kun er $n$ knuder i det hele.
+
+  Beviset gælder stadig, når vi tilføjer forbedringen »vejforkortning«, idet vejforkortning aldrig gør et træ dybere.
+\end{proof}
+
+Kombinationen af strategierne vejforkortning og forening efter rang gør forén-og-find-datastrukturen overordentligt effektiv.
+Hver operations amortiserede omkostning er nærmest konstant.
+
+\begin{thm}
+  \llabel{thm:union--find} 
+  Forén-og-find-datastrukturen i fig.~\lref{alg:unionfind} udfører $m$ find- og $n-1$ forén\-operationer i tid $O(m\alpha(m,n))$, hvor
+\[ 
+  \alpha(m,n) = \min\{\,i\geq 1\colon A(i,\lceil m/n\rceil)\geq \log n\,\}\,,
+\]
+  med
+  \begin{align*}
+    A(1,j)&= 2^j,&\text{for } j\geq 1\,,\\
+    A(i,1)&= A(i-1,2),&\text{for } i\geq 2\,,\\
+    A(i,j)&=A(i-1,A(i,j-1)) \qquad &\text{for } i\geq 2,j\geq 2\,.
+  \end{align*}
+\end{thm}
+
+Det er ikke umiddelbart let at se, hvad disse formler skulle betyde.
+Funktionen%
+\footnote{Bogstavet $A$ henviser til logikeren W. Ackermann, som sent i 1920rne som den første angav en lignende funktion.}
+$A$ vokser ekstremt hurtigt.
+Der gælder $A(1,j)=2^j$ for $j\geq 1$, endvidere $A(2,1)=A(1,2)=2^2=4$, $A(2,2)=A(1,A(2,1))=2^4= 16$, $A(2,3)=A(1,A(2,2)) = 2^{16}$,
+$A(2,4)=2^{2^{16}}$, 
+$A(2,5)=2^{2^{2^{16}}}$, 
+$A(3,1)=A(2,2)=16$,
+$A(3,2)=A(2,A(3,1))=A(2,16)$, og så videre.
+
+\begin{exerc}
+ Anslå værdien af $A(5,1)$.
+\end{exerc}
+
+For alle praktisk tænkbare
+\footnote{Ovs. anm.: Man skal holde sig for øje, at antallet af elementarpartikler i universet anslås til at være mindre end $10^{100}$.}
+værdier $n$ gælder $\alpha(m,n)\leq 5$, og forening efter rang og vejforkortning garanterer tilsammen i alt væsentligt konstant amortiseret tid for hver operation.
+Beviset for sætning~\lref{thm:union--find} går ud over denne lærebogs rammer.
+Vi henviser læseren til~\cite{Tarjan:union-find,Seidel:union-find}.
+\index{Seidel, R.}\index{Tarjan, R. E.}
+Her skal vi i stedet vise en svagere udgave, hvis udsagn for praktiske formål er lige så stærkt.
+Hertil definerer vi talfølgen $T_k, k\geq 0$ ved induktion: 
+$T_0=1$ og $T_k= 2^{T_{k-1}}$ for $k\geq 1$.
+Tallet $T_k$ kan altså fremstilles som tårn af $2$-potenser $2^{2^{\vdots^2}}$ af højde $k$.
+Man ser, at der for $k\geq 2$ gælder ligningen $T_k = A(2,k-1)$.
+De første værdier for denne meget hurtig voksende talfølge ser sådan ud:
+
+\medskip
+\begin{tabular}{l|lllllllc}
+  $k$  & 0 & 1 & 2 & 3 & 4 & 5 & 6 & $\cdots$ \\\midrule
+  $T_k$ & 1 & 2 & 4 & 16 & 65536 & $2^{65536}$ & $2^{2^{65536}}$ & $\cdots$
+\end{tabular}
+\medskip
+
+For $x>0$ definerer vi nu $\log^* x$ som $\min\{\,x\colon T_k\geq x\,\}$.
+%(TODO: uses $\mid$)
+Det er samtidig det mindste tal $k\geq 0$, hvis $k$-foldige logaritme  $\log (\log (\cdots\log x)\cdots))$ er højst $1$.
+Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for alle $x\leq 10^{19729}(<2^{65536})$.
+
+\begin{thm}
+  \llabel{thm:union:find:logstar} 
+  Forén-og-find-datastrukturen med forening efter rang og vejforkortning udfører $m$ find- og $(n-1)$ forén-operationer i tid $O((m+n)\log^* n)$.
+\end{thm}
+
+\begin{proof}
+  (Beviset går tilbage til \cite{HopUll73}.)
+  \index{Hopcroft, J.}
+  \index{Ullman, J. D.}
+  Vi betragter en vilkårlig følge af $m$ $\Id{find}$- og $n-1$ $\Id{forén}$-operationer, med udgangspunkt i initialiseringen for mængden $\{1,\ldots,n\}$.
+  Idet $\Id{forén}$ tager konstant tid, kan vi indskrænke os til analysen af $\Id{find}$.
+
+  Hidtil har kun rodknuderne haft tildelt en rang.
+  Disse range kan vokse i løbet af operationsfølgen.
+  Nu  definerer vi for hver knude $v$ dens \emph{sidste rang} $\Id{sr}(v)$ som rangen af $v$ i det øjeblik, da den for første gang gøres til barn af en anden knude.
+  Skulle $v$ stadig være en rod til sidst, sætter vi $\emph{sr}(v)$ til $v$s endelige rang.
+  Vi gør følgende observationer:
+  \begin{enumerate}[(i)]
+    \item Langs hver vej i træerne er $\Id{sr}$-værdierne skarpt voksende nedefra og op.
+    \item Når en knude $v$ får sin slutrang $h$, indeholder $v$s undertræ mindst $2^h$ knuder.
+    \item Der er højst $n/2^h$ knuder med slutrang $h$.
+  \end{enumerate}
+  \emph{Bevis} for observationerne:
+  (i) Ved induktion i operationerne vil vi vise, at der altid gælder $\Id{sr}(v)<\Id{sr}(u)$, når $v$ er barn til $u$.
+  I begyndelsen er alle range $0$, og ingen knude er barn til en anden.
+  I det øjeblik, hvor $v$ med gøres til barn af rodknuden $u$ ved en forening, gælder efter operationen at $\Id{rang}(v)<\Id{rang}(u)$ ifølge algoritmen og $\Id{sr}(v)=\Id{rang}(v)$ ifølge definitionen af $\Id{sr}$.
+  Idet der for alle rodknuder gælder $\Id{rang}(u)\leq \Id{sr}(u)$, har vi $\Id{sr}(u)<\Id{sr}(v)$.
+  En \emph{find}-operation ændrer ikke ved denne egenskab, da den kun kan gøre $v$ til barn af en af sine aner, som ved induktion har endnu højere slutrang.
+
+  (ii)
+  I beviset for sætning~\lref{union:find:log:depth} så vi, at en rod af rang $h$ indeholder mindst $2^h$ knuder i sit undertræ. 
+  % (TODO orig confused)
+  Det vil sige, at en knude $v$ med slutrang $\Id{sr}(v)= h$ i det øjeblik, hvor den bliver barn til en anden knude, har mindst $2^h$ knuder i sit undertræ.
+  (Bemærk, at $v$ senere kan miste knuder fra sit undertræ på grund af vejforkortning.)
+
+  (iii)
+  Betragt for fast $h$ og hver knude $v$ med slutrang $h$ mængden $M_v$ af knuder i $v$s undertræ i det øjeblik, hvor $v$ bliver gjort til barn af en anden knude $u$ (hhv. til sidst, hvis $v$ da stadig er en rod).
+  Vi påstår at mængderne $M_v$ er disjunkte.
+  (Heraf følger påstanden, fordi (ii) medfører, at hver mængde $M_v$ indeholder mindst $2^h$ elementer, og der er $n$ elementer i det hele.)
+  Ifølge (i) gælder $\Id{sr}(u)>h$.
+  Betragt nu $w\in M_v$.
+  På grund af foreninger kan $w$ få nye aner i det videre forløb.
+  Men i det øjeblik, hvor $v'$ bliver sådan en ny ane, må $v'$ være rod i et undertræ som også indeholder $u$; ifølge (i) har vi altså $\Id{sr}(v')>\Id{sr}(u)>h$.
+  Derfor kan $w$ aldrig tilhøre undertræet til nogen anden knude med slutrang $h$.
+  %(TODO still confused.)
+
+\medskip
+  Knuderne med $\Id{sr}$-værdi større end $0$ inddeles nu i \emph{ranggrupper} $G_0,G_1,\ldots$.
+  Ranggruppe $G_k$ indeholder alle knuder med slutrang i $\{T_{k-1}+1,\ldots, T_k\}$, hvor vi tolker $T_{-1}$ som $0$.
+  For eksempel indeholder $G_4$ alle knuder med slutrang i intervallet $\{17,\ldots, 65536\}$.
+  Da ifølge sætning~\lref{union:find:log:depth} ingen rang kan blive større end $\log n$, kan vi allerede nu ane, at der for problemstørrelser af $n$, som måtte forekomme i praksis, aldrig vil være en knude i ranggruppe $G_5$ eller højere. 
+  For at være nøjagtig betragter man følgende:
+  Når en knude $v$ ligger i ranggruppe $G_k$ for $k\geq 1$, så gælder 
+  \( T_{k-1}<\Id{sr}(v)\leq \log n\).
+  Heraf følger, at 
+  \( T_k = 2^{k-1} < 2^{\Id{sr}(v)} \leq n\),
+  hvoraf $k < \log^* n$.
+  % (TODO confused)
+  Antallet af ikketomme ranggrupper er altså begrænset af $\log^* n$.
+
+  Vi analyserer nu omkostningen af \emph{find}-operationen.
+  Vi anslår omkostningen for $\emph{find}(v)$ som antallet $r$ af knuder  på vejen $v=v_1,\ldots ,v_{r-1},v_r = s$ fra $v$ til træets rod $s$.
+  (Denne værdi er proportional med operationens tidsforbrug, inklusive vejforkortningens pegerændringer.)
+  I bund og grund fordeler vi omkostningerne på knuderne $v_i$ langs vejen, med omkostning 1 per knude.
+  Vi undtager dog følgende knuder, hvis omkostning vi direkte tilskriver \emph{find}$(v)$-operationen.
+  \begin{enumerate}[(a)]
+    \item omkostningen for knuder $v$ med $\Id{sr}(v)=0$ (da må gælde, at $v$ er et blad).
+    \item omkostningen for knuder $v_i$ med $\Id{sr}(v_i)>0$ og hvis forælder $v_{i+1}$ tilhører en højere ranggruppe.
+    \item omkostningen for rodknuden $v_r$ og dens umiddelbare efterfølger $v_{r-1}$.
+  \end{enumerate}
+  Fordi vi fra (i) har, at rangen langs vejen er voksende, og der ikke er mere end $\log^*n$ ikketomme ranggrupper, kan der ikke findes mere end $(\log^*n)-1$ knuder, der er omfattet af (b).
+  Sammen med de højst 3 knuder, der er omfattet af (a) og (c), er altså totalt højst $2+ \log^*n$ knuders omkostning tilskrevet \emph{find}$(v)$.
+  Sammenlagt over alle $m$ \emph{find}-operationer giver det en omkostning på $m(2+ \log^*n)$.
+
+  Det står tilbage at tage hånd om de omkostninger, det er blevet tildelt knuderne.
+  Betragt en knude $v$ i ranggruppe $G_k$.
+  Når $v$ tildeles omkostningen 1 ved en \emph{find}-operation, har $v$ en forælder $u$ (som tilhører $G_k$ pga. (b)), som ikke er roden $s$ pga. (c).
+  Derfor får $v$ ved vejforkortningen $s$ som ny forælder.
+  Ved betragtning (i) gælder $\Id{sr}(u)<\Id{sr}(s)$.
+  Det betyder, at når $v$ tildeles omkostningen 1, får den en ny forælder af højere slutrang.
+  Efter højst $T_k$ af disse hændelser må $v$ have fået en forælder i en højere ranggruppe, og herefter tildeles ikke flere omkostninger til $v$.
+  Knuden $v$ tildeles altså højst omkostning $T_k$.
+  Summeret over alle knuder  i ranggruppen $G_k$ bliver den totale omkostning ikke mere end $|G_k|\cdot T_k$.
+
+  For at vurdere $|G_k|\cdot T_k$ betragter vi knuderne i $G_k$.
+  Deres mulige slutrange er $T_{k-1}+1,\ldots, T_k$.
+  Ifølge betragtning (iii) findes der højst $n/2^h$ knuder med slutrang $h$.
+  Derfor har vi
+  \[ |G_k| \leq \sum_{h=T_{k-1}+1}{T_k} \frac{n}{2^h} <
+  \frac{n}{2^{T_{k-1}}} = \frac{n}{T_k}\,,\]
+  ifølge definitionen af $T_k$.
+  Dette giver $|G_k|\cdot T_k< n$.
+  Det betyder at den totale omkostning af alle knuder i ranggruppe $k$ er højst $n$.
+  Vi har allerede indset, at der ikke er flere end $\log^*n $ ikketomme ranggrupper.
+  Derfor er omkostningen for samtlige knuder begrænset af $n\log^*n$.
+
+  Til sidst adderer vi omkostningerne, som er tildelt operationerne og knuderne, og får $m(2+\log^*n) + n\log^* n = O((m+n)\log^*n)$, som ønsket.
+\end{proof}
+
+\section{Anvendelser}
+\llabel{s:applications}
+
+\emph{Udeladt}
+
+\section{Implementationsaspekter}
+\llabel{s:implementation}
+
+
+\emph{Dele udeladt}
+
+Forén-og-find-datastrukturen kan implementeres på en mere pladsbesparende måde ved at observere, at kun repræsentanter har en rang og kun ikke-repræsentanter har en forgænger.
+Vi kan altså undgå rækken \Id{rang} i figur~\lref{alg:unionfind};
+i stedet sætter vi for rodknude $r$ med rang $g$ indgangen $\Id{forælder}[r]=n+1+g$.
+I stedet for to rækker kan vi derfor nøjes med én række, hvis værdier ligger i  $\{1,\ldots, n+1+\lceil \log n\rceil\}$.
+
+
+\section{Historiske anmærkninger og videre resultater}
+\llabel{s:further} 
+
+\emph{Udeladt}
+
+
+
+
+
+
+
+
+
