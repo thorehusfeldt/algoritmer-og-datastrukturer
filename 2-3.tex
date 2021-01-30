@@ -291,7 +291,7 @@ Brugen af linjeindlejring giver oversætteren rige muligheder for alskens optime
     $R_{\it arg} \Is \Id{RS}[R_r - 1]$ &
     \comment{indlæs $n$ til register $R_{\it arg}$}\\
   34314
-  &\texttt{HN\ 34321}, $R_{{\it arg}}$ 
+  &\texttt{HN\ 34323}, $R_{{\it arg}}$ 
     &\comment{hop til \Then-grenen, hvis $n=0$}\\
   34315
     &$\Id{RS}[R_r] \Is$ \texttt{34319} & 
@@ -348,7 +348,7 @@ Brugen af linjeindlejring giver oversætteren rige muligheder for alskens optime
       4\\
       \texttt{34319}\\
       5\\
-      \texttt{34319}\\
+      \texttt{25436}\\
     };
     \foreach \i in {1,...,7} 
       \draw (m-\i-1.south east) -- (m-\i-1.south west);
@@ -356,7 +356,8 @@ Brugen af linjeindlejring giver oversætteren rige muligheder for alskens optime
     \draw (m-1-1.north west) -- (m-7-1.south west);
     \node [minimum width = 1pt, left of = m-1-1]  {$R_r\rightarrow$};
   \end{tikzpicture}
-\caption{\llabel{fig:recursionstack} Rekursionsstakken for kaldet $\Id{factorial}(5)$, når rekursionen er nået til kaldet $\Id{factorial}(3)$.}
+\caption{\llabel{fig:recursionstack} Rekursionsstakken for kaldet $\Id{factorial}(5)$, når rekursionen er nået til kaldet $\Id{factorial}(3)$ 
+  Nederst ligger returadressen til den kaldende kode.}
 \end{figure}
 
 \emph{Funktioner} minder meget om procedurer, bortset fra at de deres $\Return$-anvisning også skal returnere en værdi. 
@@ -388,8 +389,7 @@ Læg mærke til, at rekursion med denne metode ikke længere er et problem, ford
 Figur~\lref{fig:recursionstack} viser rekursionsstakkens indhold
 \index{rekursionsstak}
 for et kald af $\Id{factorial}(5)$ i det øjeblik, hvor rekursionen er nået til kaldet af $\Id{factorial}(3)$.
-Markeringen $\mathtt{efterKald}$ står for nummeret på den programlinje, som følger efter kaldet $\Id{factorial}(5)$. 
-Adressen $\mathtt{aRecCall}$ er defineret i fig.~\lref{alg:factorial}.
+Værdien $\mathtt{25436}$ nederst i stakken står for nummeret på den programlinje, som følger efter kaldet $\Id{factorial}(5)$. 
 \index{oversættelse!procedurekald}
 \index{oversættelse!funktionskald}
 \index{oversættelse!rekursion}

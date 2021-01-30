@@ -173,7 +173,10 @@ Dette repræsenterer en tom liste som begyndelsestilstand.
   \tikzset{ 
     lnode/.style={rectangle split, rectangle split parts=3, draw}, 
     >=stealth'}
-  \begin{tikzpicture}[remember picture, shift = (lnode), scale = .8]
+  \begin{tikzpicture}[
+     % remember picture,
+     % shift = (lnode),
+      scale = .8]
     \node (1) [lnode, minimum width = 1cm] at (0,0) 
     { $e_1$ \nodepart{two} $\bullet$ \nodepart{three} $\bullet$};
     \node (dummy) [dashed,lnode, minimum width = 1cm] at (-2,0) 
@@ -404,7 +407,7 @@ udtages en ny knude fra \emph{friListe}, indgangen $e$ gemmes i knuden, og knude
   Diskutér en alternativ implementation af klassen $\List$, som undgår brugen af en attrapknude.
   I stedet gemmer man i listeobjektet pegere på den første og den sidste knude i listen.
   Forgængeren til den første knude og efterfølgeren til den sidste knude er nulpegere.
-  Grænsefladen og de asymptotiske udførelsestider bør forblive uændrede.
+  Grænsefladen og de asymptotiske kørselstider bør forblive uændrede.
   Nævn mindst en fordel og en ulempe ved denne implementation i sammenligning med den i teksten beskrevne implementation.
 \end{exerc}
 
@@ -450,8 +453,8 @@ Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet
     \index{liste!lagerhåndtering|textbf}
     Angiv en implementation af funktionen $\Id{sikrFriListe}$, som kaldes fra $\Id{indsætEfter}$, som angivet i figur~\llabel{alg:dlist2}.
     Funktionen skal sikre, at $\Id{friListe}$ ikke er tom, og i modsat fald tilføje nye knuder.
-    Fordi den kan have en negativ indvirkning på udførelsestiden at kalde den af programmeringssproget til rådighed stillede grundoperation $\Allocate$ for hver knude separat, bør funktionen stille knuder til rådighed i større »portioner«.
-    Udførelsestiden for $\Id{sikrFriListe}$ i værste fald bør være uafhængig af portionernes størrelse.
+    Fordi den kan have en negativ indvirkning på kørselstiden at kalde den af programmeringssproget til rådighed stillede grundoperation $\Allocate$ for hver knude separat, bør funktionen stille knuder til rådighed i større »portioner«.
+    Kørselstiden for $\Id{sikrFriListe}$ i værste fald bør være uafhængig af portionernes størrelse.
     \emph{Vink:} 
     Benyt ved siden af $\Id{friListe}$ en lille række af ubenyttede (og endnu ikke initialiserede) knuder.
   \end{exerc}
@@ -464,13 +467,13 @@ Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet
     Beskriv en mere generel algoritme for rotationen
     $\langle a, \ldots, b,c,\ldots, d\rangle \mapsto \langle c,\ldots, d, a,\ldots, b\rangle$,
     givet et greb om $b$. 
-    Udførelsestiden bør igen være konstant.
+    Kørselstiden bør igen være konstant.
   \end{exerc}
 
   \begin{exerc}
     Funktionen $\Id{findNæste}$ kører på grund af anvendelsen af en vogterknude hurtigere, end hvis vi i hvert  løkkegennemløb skulle teste, om vi er nået til den sidste knude i listen.
-    Men hvor stor er gevinsten i udførelsestid?
-    Hvilken relativ forskel i udførelsestid ville du forvente i følgende situationer? 
+    Men hvor stor er gevinsten i kørselstid?
+    Hvilken relativ forskel i kørselstid ville du forvente i følgende situationer? 
     (a) I en kort liste med $100$ indgange gennemføres mange søgninger;
     (b) i en lang liste med fx $10\,000\,000$ indgange gennemføres en enkelt søgning.
     Hvorfor afhænger den relative hastighedsforskel af listelængden?
@@ -493,7 +496,7 @@ Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet
  Vedligeholdelsen af listelængden
 \index{liste!længde}
  kræver tilsvarende ændringer i implementationen af de andre listeoperationer.
- Et større problem end de udvidede grænseflader er dog, at vi ikke længere kan garantere konstante udførelsestider.
+ Et større problem end de udvidede grænseflader er dog, at vi ikke længere kan garantere konstante kørselstider.
  Hertil skulle operationer som fx splejsning, der flytter hele listeafsnit, jo også have bruge for at kende til listeafsnittets størrelse.
  Den næste opgave beskriver et muligt kompromis.
 
@@ -1057,7 +1060,7 @@ Dog skal det siges, at rækker mere effektivt udnytter moderne lagerarkitektur, 
 \end{tabular}
   \caption{
     \llabel{tab:operations}
-    Udførelsestider for operationer på følger med $n$ indgange.
+    Kørselstider for operationer på følger med $n$ indgange.
     Det er underforstået, at hver tidsangivelse er omgivet af »$O(\cdot)$«.
     $\Id{Liste}$ står for dobbelthægtet liste, $\Id{EListe}$ står for enkelthægtet liste,
     $\Id{URække}$ står for ubegrænset række, $\Id{CListe}$ står for cyklisk række.
@@ -1097,7 +1100,7 @@ På grund af disse raffinementer findes der egentlig ingen grund til at bruge $C
 En yderligere fordel ved datatypen $\Id{vector}$ er, at dens instanser automatisk tilintetgøres, når de tilsvarende variables gyldighedsområde bliver forladt.
 I løbet af fejlfindingsfasen kan man desuden skifte over til varianter, som ved hver rækkeadgang foretager en kontrol af indeksgrænser.
 
-Der findes yderligere nogle aspekter at tage hensyn til, når man ofte har at gøre med voksende om krympende rækker og vil opnå særligt gode udførelsestider.
+Der findes yderligere nogle aspekter at tage hensyn til, når man ofte har at gøre med voksende om krympende rækker og vil opnå særligt gode kørselstider.
 I løbet af forstørrelsen og formindskningen skal klassen $\Id{vector}$ flytte indgange fra en række til en anden, hvortil den benytter konstruktøren $\Id{Copy}$ fra klassen $\Id{Element}$.
 I de fleste tilfælde vil det være meget tidseffektivt at kalde den maskinnære grundoperation $\Id{memcpy}$, som kopierer en nærmere betegnet blok af på hinanden følgende bytes.
 \index{C++!memcpy@\Id{memcpy}}

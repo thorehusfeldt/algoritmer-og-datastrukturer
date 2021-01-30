@@ -28,13 +28,13 @@ I afsnit~\lref{ss:scc} skal vi møde en enkel og effektiv algoritme for stærke 
 \index{graf!ssk|siehe{graf, stærk sammenhængskomponenten}} 
 Beregningen af stærke sammenhængskomponenter og mange andre grundlæggende problemer kan reduceres til en systematisk gennemløb af grafen, som besøger hver kan præcis én gang.
 Vi betragter de to vigtigste gennemløgsstrategier:
-\emph{bredde-først-søgning} (bfs)
+\emph{bredde først-søgning} (bfs)
 \index{graf!bfs}
-\index{graf!bredde-først-søgning|siehe{bfs}}
+\index{graf!bredde først-søgning|siehe{bfs}}
 i afsnit~\lref{s:bfs} og
-\emph{dybde-først-søgning} (dfs)
+\emph{dybde først-søgning} (dfs)
 \index{graf!dfs}
-\index{graf!dybde-først-søgning|siehe{dfs}}
+\index{graf!dybde først-søgning|siehe{dfs}}
 i afsnit~\lref{s:dfs}.
 Begge strategier konstruerer rettede skove og inddeler kanterne i fire klasser:
 \index{kante!træ-|textbf}
@@ -85,11 +85,11 @@ Knuden $s$ danner træets rod.}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Bredde-først-søgning}
+\section{Bredde først-søgning}
 \llabel{s:bfs}
 
 En enkel metode til at besøge alle knuder (og kanter), som kan nås fra en startknude $s$, er
-\emph{bredde-først-søgning} (bfs).
+\emph{bredde først-søgning} (bfs).
 \index{graf!bfs|textbf}
 Bfs besøger grafen \emph{lag for lag}.
 \index{graf!lag}
@@ -98,14 +98,14 @@ Naboerne (eller efterfølgerne i en rettet graf) til $s$ udgør lag~$1$.
 Generelt udgøres lag~$i+1$ af de knuder, som har en nabo (i en rettet graf: forgænger) i lag~$i$ men ingen nabo (eller forgænger) i lagene~$0$ op til $i-1$.
 Når $v$ tilhører lag~$i$, siger vi også, at $v$ har \emph{dybde}~$i$, og at $v$ har \emph{afstand}~$i$ fra $s$.
 
-\begin{buchalgorithmpos}{}{alg:bfs}{Bredde-først-søgning fra knude $s$.}
-\Funct{bfs}{\Declare{$s$}{\Id{KnudeId}}}{$($\Id{Knuderække} \Of $\intint{1}{n})\times($\Id{Knuderække} \Of \Id{KnudeId}$)$}\+\\
-  \DeclareInit{$d$}{\Id{Knuderække} \Of \Id{KnudeId}}{$\seq{\infty,\ldots,\infty}$}\RRem{Afstand fra roden}\\
+\begin{buchalgorithmpos}{}{alg:bfs}{Bredde først-søgning fra knude $s$.}
+\Funct{bfs}{\Declare{$s$}{\Id{KnudeId}}}{$(\Id{Knuderække} \Of 0..n)\times(\Id{Knuderække} \Of \Id{KnudeId})$}\+\\
+  \DeclareInit{$d$}{$\Id{Knuderække} \Of 0..n$}{$\seq{\infty,\ldots,\infty}$}\RRem{Afstand fra roden}\\
   \DeclareInit{\Id{forælder}}{\Id{Knuderække} \Of \Id{KnudeId}}{$\seq{\bot,\ldots,\bot}$}\\
   $d[s]\Is 0$\\
   \Id{forælder}$[s]\Is s$\RRem{Løkke: signalerer »rod«}\\
-  \DeclareInit{$Q$}{\Id{Set} \Of \Id{KnudeId}}{$\seq{s}$}\RRem{aktuelt lag i bfs-træet}\\
-  \DeclareInit{$Q'$}{\Id{Set} \Of \Id{KnudeId}}{$\seq{\,}$}\RRem{næste lag i bfs-træet}\\
+  \DeclareInit{$Q$}{\Id{Mængde} \Of \Id{KnudeId}}{$\{s\}$}\RRem{aktuelt lag i bfs-træet}\\
+  \DeclareInit{$Q'$}{\Id{Mængde} \Of \Id{KnudeId}}{$\emptyset$}\RRem{næste lag i bfs-træet}\\
   \ForFromWhile{\ell}{0}{Q\neq\seq{\,}}\RRem{Besøg lag for lag}\+\\
     \Invariant {\rm $Q$ indeholder alle knuder med afstand $\ell$ fra $s$}\\
 %    \Invariant following forælder pointers yields a 
@@ -116,7 +116,7 @@ Når $v$ tilhører lag~$i$, siger vi også, at $v$ har \emph{dybde}~$i$, og at $
           $Q'\Is Q'\cup\set{v}$\RRem{Gem den til næste lag}\\
           $d[v]\Is \ell + 1$\\
           \Id{forælder}$[v]\Is u$\RRem{Aktualiser bfs-træet}\-\-\-\\
-    $(Q,Q')\Is (Q',\seq{\,})$\RRem{Skift til næste lag}\-\\
+    $(Q,Q')\Is (Q',\emptyset)$\RRem{Skift til næste lag}\-\\
   \Return $(d,\Id{forælder})$\RRem{Bfs-træet er nu $\setGilt{(v,w)}{w\in V, v=\Id{forælder}[w]}$}
 \end{buchalgorithmpos}
 
@@ -194,20 +194,20 @@ I figur~\lref{fig:bfs} vises et eksempel på et bfs-træ med tilsvarende forlæn
     \end{scope}
   \end{tikzpicture}
 \caption{\llabel{fig:bfs}
-Eksempel på klassifikationen af kanter ved bredde-først-søgning (\emph{venstre}, med lag) og dybde-først-søgning (\emph{højre}) i træ-, forlæns-, baglæns- og tværkanter.
+Eksempel på klassifikationen af kanter ved bredde først-søgning (\emph{venstre}, med lag) og dybde først-søgning (\emph{højre}) i træ-, forlæns-, baglæns- og tværkanter.
 (Ved bfs opstår aldrig forlænskanter; selve algoritmen skelner ikke mellem baglæns- og tværkanter.)  
 Bfs besøger knuderne i rækkefølge $s$, $b$, $c$, $d$, $e$, $f$, $g$; dfs besøger dem som  
 $s$, $b$, $e$, $g$, $f$, $c$, $d$.}
 \end{figure}
 
-Bredde-først-søgning har den nyttige egenskab, at dens trækanter danner de korteste veje (med hensyn til antal kanter) fra roden $s$ til knuderne i træet.
+Bredde først-søgning har den nyttige egenskab, at dens trækanter danner de korteste veje (med hensyn til antal kanter) fra roden $s$ til knuderne i træet.
 Den slags veje kan man fx bruge til at finde togforbindelser, hvor den rejsende skal skifte tog mindst ofte, og veje i kommunikationsnetværk som minimerer antal mellemstationer (også kaldet »hop«).
 En sådan korteste vej fra $s$ til $v$ kan man finde ved at følge forgængerreferencer fra $v$ gentagne gange.
 
 
 
 \begin{exerc}
-  Vis, at der efter bredde-først-søgningen i $G$ gælder $d[v] \le d[u]+1$ for hver kant $(u,v)$ 
+  Vis, at der efter bredde først-søgningen i $G$ gælder $d[v] \le d[u]+1$ for hver kant $(u,v)$ 
   Især kan der ikke findes forlænskanter.
   Konkluder herfra, det minimale antal kanter på en vej fra $s$ til $v$ er $d[v]=d(v)$.  
 \end{exerc}
@@ -222,21 +222,21 @@ En sådan korteste vej fra $s$ til $v$ kan man finde ved at følge forgængerref
 \begin{exerc}
   Bfs-træer er sædvandligvis ikke entydigt bestemte af grafens struktur.
   Især har vi ikke lagt os fast på, i hvilken rækkefølge vi vil behandle knuderne i det aktuelle lag.
-  Tegn bfs-træet, som opstår i grafen i figur~\protect\lref{fig:bfs} ved bredde-først-søgning fra $s$, når knude $d$ behandles før knude $b$.
+  Tegn bfs-træet, som opstår i grafen i figur~\protect\lref{fig:bfs} ved bredde først-søgning fra $s$, når knude $d$ behandles før knude $b$.
 \end{exerc}
 
 
-\begin{exerc}[Kø-baseret bredde-først-søgning]\llabel{ex:FIFO:BFS}
-  Forklar, hvordan bredde-først-søgning kan implementeres med en enkelt kø 
+\begin{exerc}[Kø-baseret bredde først-søgning]\llabel{ex:FIFO:BFS}
+  Forklar, hvordan bredde først-søgning kan implementeres med en enkelt kø 
   \index{kø}\index{fifo-liste|siehe{kø}}
   bestående af de knuder, hvis udkanter endnu er blevet undersøgt.
   Vis, at den resulterende algoritme og den figur~\lref{alg:bfs} viste algoritme leverer samme bfs-træ, når den senere algoritme gemmenløber mængden $Q$ og opbygger mængden $Q'$ i en passende rækkefølge. 
-  Sammenlign den kø-baserede udgave af bredde-først-søgning med Dijkstras algoritme fra afsnit~\ref{ch:spath:s:Dijkstra} og Jarn\'\i k-Prims algoritme fra afsnit~\ref{ch:mst:s:prim}.
+  Sammenlign den kø-baserede udgave af bredde først-søgning med Dijkstras algoritme fra afsnit~\ref{ch:spath:s:Dijkstra} og Jarn\'\i k-Prims algoritme fra afsnit~\ref{ch:mst:s:prim}.
   Hvad har de til fælles?
   Hvad er de væsentlige forskelle?
 \end{exerc}
 
-\begin{exerc}[Bredde-først-søgning med konkret grafrepræsentation]
+\begin{exerc}[Bredde først-søgning med konkret grafrepræsentation]
   Giv en præcis beskrivelse af bfs-algoritmen under antagelse af, at grafen er repræsenteret som naborække fra afsnit~\ref{ch:grepresent:ss:adjarray}.
   Algoritmen skal bruge tid $O(n+m)$.
 \end{exerc}
@@ -246,11 +246,11 @@ En sådan korteste vej fra $s$ til $v$ kan man finde ved at følge forgængerref
   \llabel{ex:cc}
   Betragt en urettet graf.
   \begin{enumerate}[(a)]
-    \item Giv en detaljeret forklaring af bredde-først-søgning for urettede grafer i tid $O(n+m)$.
+    \item Giv en detaljeret forklaring af bredde først-søgning for urettede grafer i tid $O(n+m)$.
       Hertil er det bekvemt at bruge grafens dobbelrettede udgave.
       Når kanten $(u,v)$ er blevet betragtet fra  knude $u$, skal derefter dens modsatrettede kant $(v,u)$ ignoreres fra $v$.
       Vis, at der ikke kan opstå baglænskanter.
-    \item Gør rede for, hvordan man kan modificere bredde-først-søgning til at  beregne en spændeskov 
+    \item Gør rede for, hvordan man kan modificere bredde først-søgning til at  beregne en spændeskov 
       \index{graf!spændeskov}
       \index{graf!spændetræ} 
       (se kapitel~\ref{ch:mst:}) i tid $O(n+m)$. 
@@ -272,22 +272,22 @@ En sådan korteste vej fra $s$ til $v$ kan man finde ved at følge forgængerref
   \emph{Vink}: 
   Udfør $\Id{bfs}(v)$  for hver knude $v$ for at identificere de knuder, som kan nås fra $v$.
   Helst bør rækkerne $d$ og $\Id{forælder}$ ikke initaliseres påny ved hvert af disse kald.
-  Hvad er algoritmens udførelsestid?
+  Hvad er algoritmens kørselstid?
 \end{exerc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Dybde-først-søgning}
+\section{Dybde først-søgning}
 \llabel{s:dfs}%
 \index{graf!dfs|textbf}
 \index{algoritmedesign!rekursion}
 
-Man kan opfatte bredde-først-søgning som en forsigtig, konservativ strategi for grafgennemløb, som grundigt undersøger kendte ting inden den vover sig ud i ukendt territorium.
-I så henseende er \emph{dybde-først-søgning} (dfs) lige modsat:
+Man kan opfatte bredde først-søgning som en forsigtig, konservativ strategi for grafgennemløb, som grundigt undersøger kendte ting inden den vover sig ud i ukendt territorium.
+I så henseende er \emph{dybde først-søgning} (dfs) lige modsat:
 Når dfs støder på en ny knude, leder den umiddelbart videre i resten af grafen med denne knude som udgangspunkt.
 Den vender ikke tilbage, inden alle andre muligheder er udtømte.
-Sammenlignet med de pænt lagdelte træer, som skabes af bredde-først-søgning, skaber dybde-først-søgning træer, som er ubalancerede og underligt formede.
-Alligevel gør kombinationen af stadigt fremadrettet søgning og datamatens perfekte hukommelse dybde-først-søgning til en overordentlig nyttig strategi.
-I figur~\lref{alg:dfs} er vist et generelt skema til algoritmer baseret på dybde-først-søgning. 
+Sammenlignet med de pænt lagdelte træer, som skabes af bredde først-søgning, skaber dybde først-søgning træer, som er ubalancerede og underligt formede.
+Alligevel gør kombinationen af stadigt fremadrettet søgning og datamatens perfekte hukommelse dybde først-søgning til en overordentlig nyttig strategi.
+I figur~\lref{alg:dfs} er vist et generelt skema til algoritmer baseret på dybde først-søgning. 
 Ud fra skemaet kan vi breskrive specifikke algoritmer ved at erstatte pladsholderne 
 \Id{initialiser},
 \index{graf!DFS!initialiser@\Id{initialiser}}
@@ -302,7 +302,7 @@ og
 \index{graf!dfs!vendTilbage@\Id{vendTilbage}}
 med passende kodestumper.
  
-Dybde-først-søgning gør brug af knudemarkeringer.
+Dybde først-søgning gør brug af knudemarkeringer.
 I begyndelsen er alle knuder umarkerede.
 \index{knude!markeret}
 En knude $v$ markeres som \emph{aktiv},
@@ -311,7 +311,7 @@ når først opdages og søgningen fra $v$ begynder.
 Senere, når denne søgning er afsluttet, markeres $v$ som \emph{færdig},
 \index{knude!færdig}
 hvorefter markeringen aldrig ændres mere.
-Hovedløkken i dybde-først-søgning leder efter en umarkeret knude $s$ og kalder \Id{dfs}$(s,s)$, for at gennemsøge grafen fra $s$ og opbygge et træ med $s$ som rod.
+Hovedløkken i dybde først-søgning leder efter en umarkeret knude $s$ og kalder \Id{dfs}$(s,s)$, for at gennemsøge grafen fra $s$ og opbygge et træ med $s$ som rod.
 Det rekursive kald \Id{dfs}$(u,v)$ mønstrer alle $v$s udgående kanter $(v,w)$ og afgør, om der rekursivt skal foretages en søgning fra $w$.
 Første komponent $u$ i argumentet $(u,v)$ angiver, at $v$ blev opdaget via dens indgående kant $(u,v)$.
 For rodknuden $s$ misbruger vi første argumentposition ved at sætte $s$ selv som »attrap-argument«.
@@ -335,10 +335,10 @@ Til sidst i dfs-kaldet for knude $v$ udføres proceduren \Id{vendTilbage} med ar
 Disse aktioner kan være forskellige, afhængigt af, om $v$ udgør en rodknude (i hvilket fald $u=v$) eller ej ($u\neq v$). 
 Endeligt markeres $v$ som \emph{færdig}, og kaldet returnerer. 
 
-\begin{buchalgorithmpos}{t}{alg:dfs}{Et algoritmeskema for dybde-først-søgning i en rettet graf $G=(V,E)$. 
+\begin{buchalgorithmpos}{t}{alg:dfs}{Et algoritmeskema for dybde først-søgning i en rettet graf $G=(V,E)$. 
   Vi siger, at kaldet $\Id{dfs}(*,v)$ \emph{udforsker} knuden $v$.
   Denne udforskning er gennemført med kaldets afslutning.}%
-{\bf Dybde-først-søgning i en rettet graf $G = (V,E)$}\\
+{\bf Dybde først-søgning i en rettet graf $G = (V,E)$}\\
 Fjern samlige knudemarkeringer\\
   \Id{initialiser}\\
 \Foreach $s\in V$ \Do\+\\
@@ -359,7 +359,7 @@ Fjern samlige knudemarkeringer\\
     \Return
 \end{buchalgorithmpos}
 
-På hvert tidspunkt under udførelsen af dybde-først-søgningen i figur figur~\lref{alg:dfs} er et eller flere aktive kald af proceduren \Id{dfs} i gang.
+På hvert tidspunkt under udførelsen af dybde først-søgningen i figur figur~\lref{alg:dfs} er et eller flere aktive kald af proceduren \Id{dfs} i gang.
 Nærmere betegnet findes der knuder $v_1$, $\ldots$, $v_k$ sådan at den næste kant, der skal behandles, udgår fra $v_k$, og at de aktive kald netop er $\Id{dfs}(v_1,v_1)$, $\Id{dfs}(v_1,v_2)$, $\ldots$, $\Id{dfs}(v_{k-1},v_k)$.
 I denne situation er netop knuderne $v_1$, $\ldots$, $v_k$ markerede som \emph{aktiv}, og rekursionsstakken 
 \index{Rekursionsstack} indeholder følgen
@@ -375,7 +375,7 @@ De nåede knuder er altså lig med de aktive og de færdige knuder.
 %concise formulation. 
 
 \begin{exerc}
-  Giv en ikke-rekursive formulering af dybde-først-søgning.
+  Giv en ikke-rekursive formulering af dybde først-søgning.
   Der findes to mulige fremgangsmåder:
   Man kan opretholde en 
   \index{stak}
@@ -387,8 +387,8 @@ De nåede knuder er altså lig med de aktive og de færdige knuder.
 
 \subsection{Dfs-numre, sluttider og topologisk sortering}
 \llabel{ss:numbering}
-Dybde-først-søgning har mange former og anvendelser.
-I dette afsnit vil vi bruge dybde-først-søgning for at nummerere knuderne på to forskellige måder.
+Dybde først-søgning har mange former og anvendelser.
+I dette afsnit vil vi bruge dybde først-søgning for at nummerere knuderne på to forskellige måder.
 \index{knude!\Id{slutnummer}@\Id{\Id{slutnummer}}}
 \index{knude!slutnummer}
 Som sidegevist får vi en metode til at afgøre, om en graf er kredsfri.
@@ -406,7 +406,7 @@ Dette realiseres ved følgende valg af underprogrammer:
 \medskip
 
 \begin{tabular}{ll}
-  \Id{initialiser}: & \DeclareInit{\Id{dfsPos}}{$\intint{1}{n}$}{$1$};\quad\DeclareInit{\Id{slutPos}}{$\intint{1}{n}$}{$1$}\\
+  \Id{initialiser}: & \DeclareInit{\Id{dfsPos}}{$1..n$}{$1$};\quad\DeclareInit{\Id{slutPos}}{$1..n$}{$1$}\\
 $\Id{rodfæst}(s)$: & $\Id{dfsNr}[s]\Is \Id{dfsPos}\Increment$\\
 $\Id{følgTrækant}(v,w)$:\quad & $\Id{dfsNr}[w] \Is \Id{dfsPos}\Increment$\\
 $\Id{vendTilbage}(u,v)$: & $\Id{slutNr}[v]\Is\Id{slutPos}\Increment$
@@ -418,7 +418,7 @@ Dfs-nummereringens ordning er så nyttig, at vi ophøjer den til en ordningsrel
 Vi definerer altså for vilkårlige knuder $u$ og  $v$:
 \[ u\prec v \;\;\Leftrightarrow\;\; \Id{dfsNr}[u]<\Id{dfsNr}[v]\,.\]
 %
-Vi skal nu se, at nummereringerne $\Id{dfsNr}$ og $\Id{slutNr}$ indkoder vigtig information over forløbet af  dybde-først-søgningen.
+Vi skal nu se, at nummereringerne $\Id{dfsNr}$ og $\Id{slutNr}$ indkoder vigtig information over forløbet af  dybde først-søgningen.
 Først skal vi vise, at dfs-numrene langs hver vej i dfs-træet er voksende, og derefter, at man kan klassificere kanterne ud fra disse numre.
 Under forløbet kan numrene også bruges til at inkode knudemarerkingerne. 
 Vi udvider hertil $\Id{initialiser}$ således, at indgangene i rækkerne $\Id{dfsNr}$ og $\Id{slutNr}$ alle initialiseres til 0..
@@ -486,7 +486,7 @@ Resultaterne af ovenstående analyse sammenfattes i følgende lemma.
 \end{lemma}
 
 \begin{exerc} 
-  Modificer dybde-først-søgning, så den markerer hver kant med dens type, når den behandles. 
+  Modificer dybde først-søgning, så den markerer hver kant med dens type, når den behandles. 
 \end{exerc}
 
 Slutnumrene kan bruges til at afgøre, om en rettet graf er acyklisk.
@@ -497,7 +497,7 @@ Slutnumrene kan bruges til at afgøre, om en rettet graf er acyklisk.
   Følgende er ækvivalente:
   \begin{enumerate}[(i)]
     \item $G$ er acyklisk.
-    \item Dybde-først-søgning på $G$ skaber ingen baglænskanter.
+    \item Dybde først-søgning på $G$ skaber ingen baglænskanter.
     \item
       \label{item: dag iii} 
       For hver kant $(v,w)$ i $G$ gælder $\Id{slutNr}[v] > \Id{slutNr}[w]$.
@@ -506,7 +506,7 @@ Slutnumrene kan bruges til at afgøre, om en rettet graf er acyklisk.
 
 \begin{proof} 
   Hver baglænskant forløber antiparallelt til en vej af trækanter, så de tilsammen danner en kreds.
-  Derfor kan dybde-først-søgning på acykliske grafer aldrig skabe en baglænskant.
+  Derfor kan dybde først-søgning på acykliske grafer aldrig skabe en baglænskant.
   Fra tabel~\lref{t:classes} aflæser vi, at alle kanter bortset fra baglænskanter er rettede fra en knude med større slutnummer til en knude med mindre slutnummer.
   Antag nu, at \ref{item: dag iii} gælder.
   Da er slutnumrene langs hver vej skarpt faldende, så ingen vej kan danne en kreds, og $G$ er acyklisk.
@@ -546,9 +546,9 @@ Fx skal vi i afsnit ~\ref{ch:spath:s:acyclic} møde en hurtig og enkel algoritme
 
 \begin{exerc}
   \llabel{ex:undirected:no:cross}
-  Ved dybde-først-søgning i urettede grafer er det oplagt at undersøge en urettet kant $\{v,w\}$ bare i én retning.
+  Ved dybde først-søgning i urettede grafer er det oplagt at undersøge en urettet kant $\{v,w\}$ bare i én retning.
   Dette gør man ved at »slukke for« kanten $(w,v)$ i nabolisten til $w$, når $(v,w)$ besøges fra $v$.  
-  Vis, at der hverken forekommer forlæns- eller tværkanter ved dybde-først-søgning i urettede grafer. 
+  Vis, at der hverken forekommer forlæns- eller tværkanter ved dybde først-søgning i urettede grafer. 
   \index{kante!tvær-}
 \end{exerc}
 

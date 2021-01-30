@@ -118,10 +118,10 @@ Bibliotekseksemplet indeholder allerede en af de mulige udveje:
 der tillades at stille de bestilte bøger til forskellige brugere i samme hylde.
 Det fører selvfølgeligt til, at man skal gennemse hele hylden, for at finde en bestemt bestilling. 
 En mere generel form for denne idé fører til
-\emph{kædehakning}.
-\index{hakning!kæde-}
+\emph{separat kobling}.
+\index{hakning!separat kobling}
 På hver plads i  tabellen gemmes en \emph{mængde} af indgange, hvor en mængde implementeres som enkelthægtet liste.
-I afsnit~\lref{s:chaining} analyseres kædehakning, hvor vi gør nogle ret optimistiske (og derfor urealistiske) antagelser om hakkefunktionens opførsel.
+I afsnit~\lref{s:chaining} analyseres separat kobling, hvor vi gør nogle ret optimistiske (og derfor urealistiske) antagelser om hakkefunktionens opførsel.
 I denne model opnår vi konstant forventet tid for alle tre ordbogsoperationer.
 
 Vi kan holde hakketabellens struktur (men ikke dens analyse!) enkel ved at gå tilbage til den oprindelige idé om at gemme alle indgange i selve tabellen.
@@ -160,36 +160,36 @@ En god hakkefunktion skaber uorden og undgår derved kollisioner.
 \end{exerc}
 
 \begin{exerc}[Gennemløb af hakketabel]
-  Beskriv en implementation af \Id{foralle}-operationen, både for kædehakning og for hakning med åben adressering og lineær probering.
-  Hvad er udførelsestiden for din løsning?
+  Beskriv en implementation af \Id{foralle}-operationen, både for separat kobling og for hakning med åben adressering og lineær probering.
+  Hvad er kørselstiden for din løsning?
 \end{exerc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Kædehakning}
+\section{Separat kobling}
 \llabel{s:chaining}
-\index{hakning!kæde-|textbf}
-\index{kædehakning|siehe{hakning}}
+\index{hakning!separat kobling|textbf}
+\index{separat kobling|siehe{hakning}}
 
 Hægtet hakning gør brug af en række (kaldt »tabellen«) $t[0..m-1]$ af følger,  som kan organiseres som enkelthægtede lister \index{liste} (se figur.~\lref{fig:chain}).
 Ideen er, at indgang $e$ befinder sig i følgen $t[h(e)]$.
 Operationerne for den associative række lader sig implementere let:
 For at \emph{finde} en indgang med nøgle $x$
-\index{hakning!kæde-!find@\Id{find}|textbf}
+\index{hakning!separat kobling!find@\Id{find}|textbf}
 gennemgår vi følgen $t[h(x)]$; 
 hvis vi herved støder på en indgang $e$ med $\Id{nøgle}(e)=x$, returnerer vi den, i modsat fald returnerer vi værdien $\bot$.
 For at \emph{fjerne} en indgang med nøgle $x$
-\index{hakning!kæde-!fjern@\Id{fjern}|textbf},
+\index{hakning!separat kobling!fjern@\Id{fjern}|textbf},
 gennemgår vi 
 % TODO gennemse, gennemløbe
 ligeledes følgen $t[h(x)]$;
 hvis vi herved støder på en indgang $e$ med $\Id{nøgle}(e)=x$, fjerner vi den fra følgen.
 For at \emph{indsætte} en indgang $e$
-\index{hakning!kæde-!indsæt@\Id{indsæt}|textbf}
+\index{hakning!separat kobling!indsæt@\Id{indsæt}|textbf}
 gennemgår vi ligeledes følgen;
 hvis vi herved støder på en indgang $e'$ med $\Id{nøgle}(e')=\Id{nøgle}(e)=x$,
 erstattes denne med $e$; ellers tilføjes $e$ på en vilkårlig plads i listen.
 Operationen $\Id{opbyg}(\set{e_1,\ldots,e_n})$ realiseres som $n$ indsætninger, hvor vi kan bortse fra at gennemgå den pågældende følge.
-Derfor har hver operation udførelsestid $O(n)$. 
+Derfor har hver operation kørselstid $O(n)$. 
    
 \begin{figure}
   \begin{tikzpicture}[scale = .35, yscale = -1]
@@ -252,7 +252,7 @@ Derfor har hver operation udførelsestid $O(n)$.
   \end{tikzpicture}
 \caption{
   \llabel{fig:chain} 
-  Kædehakning.
+  Separat kobling.
   Vi benytter en række $t$ af følger.
   I eksemplet indeholder datastrukturen en mængde af ord (korte engelske synonymer af »\emph{hash}«), som er gemt med en hakkefunktion, som afbilder et ord til dets sidste bogstavs position i alfabetet, dvs. til en værdi i  $\{0,\ldots, 25\}$.
   Åbenbart er dette ikke nogen særlig god hakkefunktion.}    
@@ -261,13 +261,13 @@ Derfor har hver operation udførelsestid $O(n)$.
 Pladsbehovet for hele datastrukturen er $O(n+m)$.
 For at søge efter, indsætte eller fjerne en indang med nøgle $x$ , skal vi gennemsøge følgen $t[h(x)]$.
 I værste fald, fx når \Id{find} søger efter en ikke-eksisterende nøgle, skal hele følgen gennemgås.
-Når det går rigtig galt og hakkefunktionen afbilder samtlige indgange til den samme tabelindgang, er udførelsestiden $\Theta(n)$. 
-I værste fald opfører kædehakning sig altså ikke bedre end lineære lister.
+Når det går rigtig galt og hakkefunktionen afbilder samtlige indgange til den samme tabelindgang, er kørselstiden $\Theta(n)$. 
+I værste fald opfører separat kobling sig altså ikke bedre end lineære lister.
 
 Findes der hakkefunktioner, som leder til, at alle følger er korte?
 Svaret er klart »nej«.
 En hakkefunktion afbilder mængden af nøgler til værdimængden $\{0,\ldots, m-1\}$, hvorfor der for hver hakkefunktion må findes $N/m$ nøgler, der alle havner på samme plads i tabellen.
-I de fleste anvendelser gælder $n < N/m$, og i så fald kan kædehakning degenerere til lineær søgning.
+I de fleste anvendelser gælder $n < N/m$, og i så fald kan separat kobling degenerere til lineær søgning.
 Vi betragter her tre muligheder for at håndtere denne opførsel.
 Den første tilgang er gennemsnitsanalyse,
 \index{algoritmeanalyse!gennemsnit}, 
@@ -291,8 +291,8 @@ Vi vil nu vise, at der for hver fast mængde $S$ af $n$ indgange gælder, at ope
 
 \index{hakning!urealistisk analyse}
 \begin{thm}\llabel{thm:chaining}
-Hvis kædehakning bruges til at gemme $n$ indgange i en hakketabel med $m$ tabelpladser, og hakkefunktionen er valgt tilfældigt fra $H$,
-så har operationerne \Id{indsæt}, \Id{fjern} og \Id{find} forventet udførelsestid $O(1+n/m)$. 
+Hvis separat kobling bruges til at gemme $n$ indgange i en hakketabel med $m$ tabelpladser, og hakkefunktionen er valgt tilfældigt fra $H$,
+så har operationerne \Id{indsæt}, \Id{fjern} og \Id{find} forventet kørselstid $O(1+n/m)$. 
 \end{thm}
 % TODO made clear what the expectation is over
 \begin{proof} 
@@ -300,9 +300,9 @@ så har operationerne \Id{indsæt}, \Id{fjern} og \Id{find} forventet udførelse
 \index{linearitet af forventningsværdi}
 som beskrevet i afsnit~\ref{app:notation:s:prob}. 
 Lad $h$ være en tilfældigt valgt funktion fra $H$.
-  Vi betragter udførelsestiden for en operation \Id{indsæt}, \Id{fjern} eller \Id{find} for en fast nøgle $x$. 
+  Vi betragter kørselstiden for en operation \Id{indsæt}, \Id{fjern} eller \Id{find} for en fast nøgle $x$. 
   Hver af disse operationer behøver konstant tid samt tiden for at gennemsøge følgen $t[h(x)]$.
-  De forventede udførelsestid er derfor $O(1+E[X])$, hvor den stokastiske variabel $X$ angiver længden af følgen $t[h(x)]$.
+  De forventede kørselstid er derfor $O(1+E[X])$, hvor den stokastiske variabel $X$ angiver længden af følgen $t[h(x)]$.
   Lad $S$ med $|S|=n$ være mængden af indgange, som er gemt i tabellen. 
   Betragt for hver indgang $e\in S$ den stokastiske \emph{indikatorvariabel} $X_e$, som angiver, om $h$ afbilder $e$ til samme tabelplads som $x$:
   \[ X_e=\begin{cases}
@@ -324,18 +324,18 @@ Lad $h$ være en tilfældigt valgt funktion fra $H$.
   I begge tilfælde er sætningen bevist.
 \end{proof}  
 
-Vi kan opnå lineært pladsbehov og forventet konstant udførelsestid for alle tre operationer ved at sikre, at der gælder $m=\Theta(n)$. 
+Vi kan opnå lineært pladsbehov og forventet konstant kørselstid for alle tre operationer ved at sikre, at der gælder $m=\Theta(n)$. 
 Til dette formål kan vi lade tabellens større tilpasse sig $n$, som beskrevet i afsnit~\ref{ch:sequence:s:array} om ubegrænsede rækker.
 
 \begin{exerc}[Ubegrænsede hakketabeller]\llabel{ex:dynamic}
-  Forklar, hvordan man med kædehakning kan sikre, at der altid gælder $m =  \Theta(n)$.
+  Forklar, hvordan man med separat kobling kan sikre, at der altid gælder $m =  \Theta(n)$.
   Du kan gå ud fra en hakkefunktion $h'\colon\Id{Nøgle}\rightarrow\NN$.
   Sæt $h(x)=h'(x)\bmod m$ og tilpas tabelstørrelsen til $n$. 
 \end{exerc}
 
 
 \begin{exerc}[Ubenyttet lagerplads]\llabel{ex:waste}
-  Kædehakning spilder plads i den forstand, at nogle tabelpladser forbliver ubenyttede.
+  Separat kobling spilder plads i den forstand, at nogle tabelpladser forbliver ubenyttede.
   Beregn det forventede antal tomme tabelpladser under antagelse af, at hakkefunktionen er tilfældig.
   \emph{Vink}: 
   Definer de stokatiske indikatorvariabler $Y_0$, $\ldots$, $Y_{m-1}$,
@@ -345,7 +345,7 @@ med  $Y_i=1$ hvis $t[i]$ er tom.
 
 \begin{exerc}[Gennemsnitstilfælde]
   \llabel{ex:average}
-  \index{hakning!kæde-!gennemsnitstilfælde} 
+  \index{hakning!separat kobling!gennemsnitstilfælde} 
   Antag, at hakkefunktionen afbilder mængden af mulige nøgler uniformt over tabellen, dvs. $\left|\{\, x\in\Key\colon h(x)=i\}\right|\leq \ceil{N/m}$ for alle $i\in\{0,\ldots,m-1\}$.
   Antag desuden, at at vi har gemt en tilfældig mængde af nøgler i tabellen, dvs. at mængden af nøgler i $S$ er en tilfældig $n$-delmængde af $\Key$.
   Vis, at der gælder for hver tabelplads $i$, at det forventede antal indgange, der afbildes til $i$, er højst $\ceil{N/m} \cdot n/N\approx n/m$.
@@ -361,12 +361,12 @@ med  $Y_i=1$ hvis $t[i]$ er tom.
 \llabel{s:probing}
 \index{hakning!lineær probering}
 
-Kædehakning kaldes også \emph{åben hakning},
+Separat kobling kaldes også \emph{åben hakning},
 \index{hakning!åben|textbf}
 \index{hakning!lukket|textbf}
 fordi der til kollisionshåndtering bruges lagerplads uden for den egentlige tabel, fx i form af lister.
 Derimod taler man om \emph{lukket} hakning, hvis samtlige ingange gemmes på selve tabelpladserne.
-Ved at slække kravet om at gemme indgang $e$ på plads $t[h(e)]$, opstår fleksibilitet -- også kaldet »åben adressering« --, der gør det muligt helt at undgå at bruge en sekundær datastruktur.
+Ved at slække kravet om at gemme indgang $e$ på plads $t[h(e)]$, opstår fleksibilitet -- også kaldt »åben adressering« --, der gør det muligt helt at undgå at bruge en sekundær datastruktur.
 Der findes mange undersøgelser af metoder for \emph{åben adressering} \cite{Pet57}\index{Peterson, W. W.}, jf.~\cite[kap.~3.3]{GonBY1991}.
 Vi vil nøjes med at se på den enkleste metode, som kaldes \emph{lineær probering}.
 Ubenyttede tabelpladser frå en særlig indgang $\bot$.
@@ -528,7 +528,7 @@ Figur~\lref{fig:probing} viser et eksempel.
   (Bemærkning: Der kan opstå problemer, når man forsøger at kombinere enkle universelle hakkeklasser med lineær probering, jf. afsnit~\lref{s:further}.)
 \end{exerc}
 
-\section{Sammenligning af kædehakning og lineær probering}
+\section{Sammenligning af separat kobling og lineær probering}
 \llabel{s:versus}
 \index{ingeniørssaspekter}%
 % TODO algorihtm engineering?
@@ -537,7 +537,7 @@ Hvilken er bedre?
 Det spørgsmål kan vi ikke besvare på baggrund af en teoretisk analyse, fordi svaret afhænger af anvendelsessituationen og af mange tekniske parametre.
 Vi skal her nævne nogle kvalitative askpekter og skitsere nogle eksperimentelle resultater.
 
-En af fordelene ved kædehakning er »referenceintegritet«,
+En af fordelene ved separat kobling er »referenceintegritet«,
 \index{referenceintegritet}
 \index{integritet!reference-|siehe{referenceintegritet}}
 hvilket betyder, at en indangs lagerposition ikke ændrer sig, efter den er blevet indrettet.
@@ -548,8 +548,8 @@ I modsætning hertil vil fjernelser ved lineær probering flytte indgange; absol
 Fordelen ved lineær probering er, at hver adgang til tabellen arbejder med et sammenhængende lagersegment.
 Moderne processorers lagerarkitektur er optimeret for dette adgangsmønster, mens de er langsomme til at følge pegere ved gennemløb af en lineær liste, som ikke får plads i gemmelageret.
 Et problem ved lineær probering er, at søgetiderne vokser hurtigt, når antal indgange nærmer sig tabelstørrelsen, og at tabellen kan flyde over.
-Ved kædehakning forekommer ingen sådanne abrupte overgange -- de forventede søgetider forbliver små, selv når nøgleantallet overstiger tabelstørrelsen.
-På den anden side skal kædehakning bruge lagerplads til pegerne, som man ved lineær probering ville kunne have brugt til en større tabel.
+Ved separat kobling forekommer ingen sådanne abrupte overgange -- de forventede søgetider forbliver små, selv når nøgleantallet overstiger tabelstørrelsen.
+På den anden side skal separat kobling bruge lagerplads til pegerne, som man ved lineær probering ville kunne have brugt til en større tabel.
 En retfærdig sammenligning må derfor tage hensyn til hele lagerforbruget og ikke bare tabelstørrelsen.
 
 Vi har implementeret begge metoder og gennemført udførlige eksperimenter.
@@ -557,11 +557,11 @@ Resultatet var, at begge metoder opfører sig nogenlunde lige godt, hvis de har 
 Forskellene er så små, at konklusionerne afhænger af implementationsdetaljer, specielle egenskaber ved oversætteren, operativsystemet og den benyttede regner.
 Derfor nævner vi her ingen eksakte resultater.
 
-Vi fandt dog implementationen af kædehakning vanskeligere.
+Vi fandt dog implementationen af separat kobling vanskeligere.
 For at kunne konkurrere med lineær probering, skal alle forbedringer i afsnit~\lref{s:implementation} gennemføres.
-Kædehakning bliver meget langsommere, hvis man sløser med implementationen eller organiserer lagerstyringen dårligt.
+Separat kobling bliver meget langsommere, hvis man sløser med implementationen eller organiserer lagerstyringen dårligt.
 
-Med hensyn til matematiske argumenter skal man nævne, at udsagn i stil med sætning~\lref{thm:universal} \emph{kun} gælder for kombinationen af kædehakning og $c$-universelle klasser og ikke for lineær probering med $c$-universelle klasser.
+Med hensyn til matematiske argumenter skal man nævne, at udsagn i stil med sætning~\lref{thm:universal} \emph{kun} gælder for kombinationen af separat kobling og $c$-universelle klasser og ikke for lineær probering med $c$-universelle klasser.
 For at opnå lineær søgetid har lineær probering brug for hakkefunktioner med stærkere sandsynlighedsegenskaber, eller antage fuld tilfældighed.
 (Se hertil afsnit~\lref{s:further}.) 
 

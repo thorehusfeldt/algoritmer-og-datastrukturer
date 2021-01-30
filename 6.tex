@@ -63,7 +63,7 @@ Vis, hvordan man implementerer en (størrelsesbegrænset) prioritetskø
 \index{prioritetskø!naiv}
 som række.
 Når køen maksimale størrelse er $w$, bruges en række af størrelse $w$; de faktisk eksisterende indgange i prioritetskøen indtager rækkens første $n$ pladser.
-Sammenling udførelsestiderne for operationerne af to varianter af denne implementation:
+Sammenling kørselstiderne for operationerne af to varianter af denne implementation:
 den ene holder rækkens elementer i sorteret orden, den anden holder elementerne usorteret.
 \end{exerc}
 
@@ -71,7 +71,7 @@ den ene holder rækkens elementer i sorteret orden, den anden holder elementerne
 Vis, hvordan man implementerer en  adresserbar prioritetskø
 som dobbelthægtet liste.
 Hver listeknude repræsenterer en indgang i prioritetskøen. 
-Sammenling udførelsestiderne for operationerne af to varianter af denne implementation:
+Sammenling kørselstiderne for operationerne af to varianter af denne implementation:
 den ene holder listens elementer i sorteret orden, den anden holder elementerne usorteret.
 implementieren kann. 
 \end{exerc}
@@ -504,7 +504,7 @@ Lad os sige at »kun $h[j]$  er måske for lille«, når $h$ enten selv er en ho
 Vis: 
 (a) Antagelserne i algoritmen etabler dens korrekthed.
 Hertil skal man vise, at hvis kun $h[j]$ måske er for lille, så er enten $h$ en hob eller ombytningen $\Id{ombyt}(h[j],h[\floor{j/2}])$ medfører, at kun $h[\floor{j/2}]$ måske er for lille.
-(b) \Id{sigtOp}$(n)$ har udførelsestid $O(\log n)$.
+(b) \Id{sigtOp}$(n)$ har kørselstid $O(\log n)$.
 (Dette medfører samme grænse for \Id{tilføj}.)  
 \end{exerc}
 
@@ -595,7 +595,7 @@ Hertil bruges følgende to procedurer:
 
 \begin{enumerate}[(a)]
 \item Vis, at både \Id{opbygHobBaglæns} og \Id{opbygHobRekursivt}$(1)$ etablerer hobreglen.
-\item Implementer begge algoritmer effektivt og sammenlign deres udførelsestider for tilfældige tal  som nøgler og $n\in\{\,10^i\colon 2\leq i\leq 8\}$.
+\item Implementer begge algoritmer effektivt og sammenlign deres kørselstider for tilfældige tal  som nøgler og $n\in\{\,10^i\colon 2\leq i\leq 8\}$.
 Det kommer meget an på, hvor effektiv implementationen af \Id{opbygHobRekursivt} bliver.
 For små undertræer kan det være meningsfuld at »udrede« rekursionen for små undertræer, dvs. at erstatte den med direkte opdeling i forskellige tilfælde.
 \item (*) For store $n$ udgøres forskellen mellem de to algoritmer hovedsageligt af de effekter, som lagerhierarkiet 
@@ -614,13 +614,13 @@ Konstruktionen af en tom hob og funktionen \Id{mindste} tager konstant tid, oper
 \end{thm}
 \begin{proof} 
 Det implicitte binærtræ, som svarer til en hob med $n$ indgange, har dybde $k = \floor{\log n}$.
-Operationerne \Id{tilføj} og \Id{fjernMindste} gennemløber en del af vejen fra roden til et blad og har derform logaritmisk udførelsestid.
+Operationerne \Id{tilføj} og \Id{fjernMindste} gennemløber en del af vejen fra roden til et blad og har derform logaritmisk kørselstid.
 Operationenen \Id{mindste} rapporterer indholdet af roden, hvilket tager konstant tid.
 Konstruktionen af en tom hob kræver blot allokering af en række, hvilket tager konstant tid.
 Uanset hvilken af de to procedurer for \Id{opbyg} man bruger:
 Operationen \Id{sigtNed} kaldes højst en gang for de hver af de højst $2^l$ knuder på dybde $l$. 
 Et sådant kald tager tid $O(k- l)$. 
-Den totale udførelsestid for  \Id{opbyg} er derfor asymptotisk begrænset af
+Den totale kørselstid for  \Id{opbyg} er derfor asymptotisk begrænset af
 \[
 	 \sum_{l=0}^{k-1} 2^l (k - l) =
 	 2^k \sum_{l=0}^{k-1} \frac{k - l}{2^{k - l}} \leq
@@ -650,7 +650,7 @@ Der findes en løsning, som klarer sig med to ekstra pegere per indgang.
 \end{exerc}
 
 \begin{exerc}[Massetilføjelse]\index{prioritetskø!binærhob!massetilføjelse}
-Konstruer en algoritme, som tillader tilføjelsen af $k$ nye indgange til en binærhob med $n$ indgange, og som har udførelsestid $O(k+\log n)$.
+Konstruer en algoritme, som tillader tilføjelsen af $k$ nye indgange til en binærhob med $n$ indgange, og som har kørselstid $O(k+\log n)$.
 \emph{Vink}: Gennemgå hoben nedefra og op, som ved hobopbygning.
 \end{exerc}
 

@@ -95,11 +95,13 @@ Metoden kan fremstilles grafisk som på følgende måde:
 Her er $c_0,\ldots,c_n$ følgen af menter, og $s = (s_n\ldots\,s_0)$ den resulterende sum. 
 Der gælder $c_0 = 0$, $c_{i+1}\cdot B + s_i  = a_i + b_i + c_i$ for $0 \le i < n$ og $s_n = c_n$. 
 Som program kan vi skrive algoritmen på følgende måde:
-\begin{indentedcode}
+\begin{quote}
+\begin{code}
 \DeclareInit{$c$}{\Id{Ciffer}}{$0$}\RRem{Variabel for menten}\\
 \ForFromTo{i}{0}{n-1} {\rm adder $a_i$, $b_i$, $c$ for at danne $s_i$ og den nye mente $c$}\\
 $s_n\Is c$
-\end{indentedcode}
+\end{code}
+\end{quote}
 
 Algoritmen bruger en elementaroperation per position og derfor $n$ elementaroperationer i det hele.
 
@@ -176,10 +178,12 @@ p_{n-1,n} & \ldots & p_{n-1,3} & p_{n-1,2} & p_{n-1,1} & p_{n-1,0} \\ \hline
 Beskrivelsen i pseudokode er vældig kompakt.
 Vi initialiserer produktet $p$  til 0  og lægger delprodukterne $a \cdot b_j \cdot B^j$ til $p$ et efter et for $j\in \{0,\ldots, n-1\}$:
 
-\begin{indentedcode}
+\begin{quote}
+  \begin{code}
 \DeclareInit{$p$}{$\mathbf N$}{$0$}\\
 \ForFromTo{j}{0}{n-1} $p\Is p + a \cdot b_j \cdot B^j$
-\end{indentedcode}
+  \end{code}
+\end{quote}
 
 \index{algoritmenanalyse!sum}%
 Nu skal vi bestemme, hvor mange elementaroperationer skolemetoden bruger.

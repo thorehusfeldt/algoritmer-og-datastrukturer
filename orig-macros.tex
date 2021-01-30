@@ -15,20 +15,9 @@
 \newenvironment{buchalgorithm}[2]{\begin{buchalgorithmpos}{htbp}{#1}{#2}}%
 {\end{buchalgorithmpos}}
 
-\newenvironment{code}{\noindent%
-\begin{tabbing}%
-\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
-\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
-\kill}{\end{tabbing}}
-
-\newenvironment{indentedcode}{\noindent%
-\begin{tabbing}%
-\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
-\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=%
-\kill\+\kill}{\end{tabbing}}
-
+\newcommand{\tabstops}{\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\hspace{1.5em}\=\kill}
+\newenvironment{code}{\begin{tabbing}\tabstops}{\end{tabbing}}
 
 \newcommand{\aufmacher}[1]{{\it #1\par\noindent\vspace*{1mm}}}
 
-\newcommand{\intint}[2]{{#1}..{#2}}
 \newcommand{\RRem}[1]{\qquad\comment{#1}}

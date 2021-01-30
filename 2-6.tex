@@ -8,27 +8,27 @@
 
 Vi kan sammenfatte de hidtil betragtede principper for algoritmeanalyse på følgende måde.
 Vi abstraherer bort fra  komplikationerne i en virkelig datamat ved at betragte registermaskinen.
-I denne model måles udførelsestid ved at tælle antallet af udførte kommandoer.
+I denne model måles kørselsstid ved at tælle antallet af udførte kommandoer.
 Vi forenkler analysen yderligere ved at inddele problemer efter instans\-størrelse og fokusere på værstefald.
 Den asympotiske notation gør det muligt at ignorere konstante faktorer og lavere\-ordens termer.
 Dette grovkornige perspektiv tillader os også at betragte øvre grænser
-\index{zzvre@øvre grænse|siehe{udførelsestid, værstefald}}
-for udførelsestiden i stedet for eksakte vurderinger, så længe det asymptotiske resultater forbliver uændret.
-Samlet leder disse forenklinger til, at vi kan analysere udførelsestiden af pseudokode direkte, dvs.\ uden at behøve at oversætte programmet til maskinsprog.
+\index{zzvre@øvre grænse|siehe{kørselstid, værstefald}}
+for kørselstiden i stedet for eksakte vurderinger, så længe det asymptotiske resultater forbliver uændret.
+Samlet leder disse forenklinger til, at vi kan analysere kørselstiden af pseudokode direkte, dvs.\ uden at behøve at oversætte programmet til maskinsprog.
 
 Vi skal nu præsentere et sæt enkle regler for analyse af pseudokode.
 \index{algoritmeanalyse}
-\index{udførelsestid} 
-Lad $T_n(I)$ være den maksimale udførelsestid for en programstump $I$ på instanser af størrelse~$n$.
+\index{kørselstid} 
+Lad $T_n(I)$ være den maksimale kørselstid for en programstump $I$ på instanser af størrelse~$n$.
 \index{instansstørrelse}
 \index{stzrrelse@størrelse!instans-} 
-For udførelsestiden af større programmer gælder da følgende:
+For kørselstiden af større programmer gælder da følgende:
 \begin{itemize}
 \item For på hinanden følgende kommandoer: $T_n(I; J)\le T_n(I)+T_n(J)$.
 \item For betingede kommandoer: $T_n(\text{\If $C$ \Then $I$ \Else $J$})=
   T_n(C)+\max\set{T_n(I),T_n(J)}$.
 \item For løkker: $T_n(\text{\Repeat $I$ \Until $C$})=\sum_{i=1}^{k(n)} T_n'(I,C,i)$, hvor $k(n)$ angiver det maksimale antal løkkegennemløb på instanser af størrelse $n$, og 
-$T_n'(I,C,i)$ er udførelsestiden for det $i$te gennemløb af løkken, inklusive betingelsen $C$.
+$T_n'(I,C,i)$ er kørselstiden for det $i$te gennemløb af løkken, inklusive betingelsen $C$.
 \end{itemize}
 Underprogrammer betragtes i afsnit~\lref{s:recurrences}.
 Bland reglerne foroven er det kun løkkereglen, der kan give anledning til vanskeligheder, idet man skal vurdere summer.
@@ -37,7 +37,7 @@ Bland reglerne foroven er det kun løkkereglen, der kan give anledning til vansk
 
 \index{algoritmeanalyse!sum|textbf}%
 Vi viser nu nogle grundlæggende teknikker til evaluering af summer.
-Summer dukker op i forbindelse med analyse af løkker samt ved analysen af gennemsnitlige og forventede udførelsestider.
+Summer dukker op i forbindelse med analyse af løkker samt ved analysen af gennemsnitlige og forventede kørselstider.
 
 For eksempel består algoritmen \Id{indsættelsessortering},
 \index{sortering!indsættelses-}
@@ -52,9 +52,9 @@ Derfor er det samlede antal gennemløb gennem den indre løkke højst
  =\sum_{i=1}^{n-1} i 
  =\frac{n(n-1)}{2} = O(n^2)\,,\]
 hvor den anden ligning følger af (\ref{app:notation:eq:sumi}).
-Idet et enkelt gennemløb af den indre løkke kræver tid $O(1)$, bliver udførelsestid i værste fald $\Theta(n^2)$.
+Idet et enkelt gennemløb af den indre løkke kræver tid $O(1)$, bliver kørselstid i værste fald $\Theta(n^2)$.
 Alle indlejrede løkker, hvis antal iterationer er let at bestemme, kan analyseres på en tilsvarende måde:
-man arbejder »indfra og ud«, og prøver at finde et estimat for udførelsestiden af den aktuelle »indre løkke« som et lukket udtryk.
+man arbejder »indfra og ud«, og prøver at finde et estimat for kørselstiden af den aktuelle »indre løkke« som et lukket udtryk.
 Med simple omformninger som
 $\sum_i ca_i=c\sum_ia_i$,
 $\sum_i(a_i + b_i)=\sum_i a_i + \sum_i b_i$ eller
@@ -75,7 +75,7 @@ For eksempel kan vi i stedet for at udregne summen foroven eksakt, begrænse den
 \index{algoritmeanalyse!rekursion}
 \index{rekursion|sieheauchunter{algoritmekonstruktion; algoritmeanalyse}}%
 I vores regler for algoritmeanalyse har vi hidtil ikke bekymret os om kald til underprogrammer.
-Ikke-rekursive underprogrammer er lette at håndtere, fordi vi kan analysere underprogrammet for sig og sætte den resulterende grænse ind i udtryk for udførelsestiden for det kaldende program.
+Ikke-rekursive underprogrammer er lette at håndtere, fordi vi kan analysere underprogrammet for sig og sætte den resulterende grænse ind i udtryk for kørselstiden for det kaldende program.
 Men når vi bruger denne fremgangsmåde på rekursive underprogrammer, fører den ikke til en lukket formel, men til en rekursionsligning.
 
 I den rekursive udgave af skolemetoden for multiplikation 
@@ -437,7 +437,7 @@ Vis, at $C(n) = O(n\log n)$.
 \end{exerc}
 
 \begin{exerc}
-  Angiv en del-og-hersk-algoritme, hvis udførelsestid er givet af rekursionsligningen
+  Angiv en del-og-hersk-algoritme, hvis kørselstid er givet af rekursionsligningen
   $T(1)=a$ og \[
     T(n)=\ceil{\sqrt{n}\,\,}\cdot T\left(\left\lceil\frac{n}{\ceil{\sqrt{n}\,\,}}\right\rceil\right)  + cn\quad \text{for }n>1\,.\]
   Vis, at $T(n)=O(n\log\log n)$.
@@ -457,7 +457,7 @@ For at analysere et større program, betragter vi i første omgang de enkelte de
 Ved kombinationsskridtet benyttes summer og rekursionsligninger.
 
 Vi skal dog også bruge en helt anden fremgångsmåde, som man kunne kalde »semantisk«.
-Hertil associerer vi dele af programmets udførelse til dele af en kombinatorisk struktur og argumenter siden i termen af denne struktur.
+Hertil associerer vi dele af programmets kørsel til dele af en kombinatorisk struktur og argumenter siden i termen af denne struktur.
 For eksempel kan vi observere, at en bestemt programstump udføres højst én gang per kant i en graf, og at derfor den samlede omkostning svarer til antallet af kanter i grafen.
 Eller vi kan observere, at udføreslsen af en vis del af programmet fordobler størrelsen af en vis struktur;
 hvis man derudover ved, at strukturens størrelse begynder med 1 og ender som højst $n$ i slutningen af programmet, kan den pågældende del af programmet højst udføres $\log n$ gange.
@@ -467,7 +467,7 @@ hvis man derudover ved, at strukturens størrelse begynder med 1 og ender som h�
 
 
 \index{algoritmeanalyse!gennnemsnit|textbf}
-\index{udførelsestid!gennnemsnit}%
+\index{kørselstid!gennnemsnit}%
 I denne afsnit præsenterer vi gennemsnitsanalysen af algoritmer.
 Vi gør dette ved hjælp af tre eksempler af voksende kompleksitet. 
 Vi går ud fra, at læseren er fortrolig med sandsynlighedsregningens grundlæggende begreber, fx udfaldsrum, middelværdi, indikatorvariabel og middelværdiens linearitet.
@@ -785,12 +785,12 @@ Algoritmer uden den slags tilfældige tildelinger kaldes
 \index{algoritmekonstruktion!deterministisk|textbf}
 \index{deterministisk algoritme|sieheunter{algoritmekonstruktion}}. 
 
-Udførelsestiden for en randomiseret algoritme afhænger af dens tilfældige valg.
-Dermed er udførelsestiden for instans $i$ ikke længere et tal, men en stokastisk variabel, som afhænger af algoritmens tilfældige valg.
-Vi kan undgå at lade udførelsestiden afhænge af de tilfældige valg ved at udstyre maskinen med et »stopur«.
-I begyndelsen af programudførelsen sætter vi stopuret til værdien $T(n)$, hvor $n$ angiver størrelsen af instansen.
-Under udførelsen tæller vi uret ned skridt for skridt, og standser efter $T(n)$ skridt.
-Skulle programmet standses »i utide« på denne måde, kommer det ikke til at producere sit sædvanlige svar og udførelsen bedømmes som mislykket. 
+Kørselstiden for en randomiseret algoritme afhænger af dens tilfældige valg.
+Dermed er kørselstiden for instans $i$ ikke længere et tal, men en stokastisk variabel, som afhænger af algoritmens tilfældige valg.
+Vi kan undgå at lade kørselstiden afhænge af de tilfældige valg ved at udstyre maskinen med et »stopur«.
+I begyndelsen af programkørslen sætter vi stopuret til værdien $T(n)$, hvor $n$ angiver størrelsen af instansen.
+Under kørslen tæller vi uret ned skridt for skridt, og standser efter $T(n)$ skridt.
+Skulle programmet standses »i utide« på denne måde, kommer det ikke til at producere sit sædvanlige svar og kørslen bedømmes som mislykket. 
 
 En randomiseret algoritmes svar kan ligeledes afhænge af de tilfældige valg.
 Man kan naturligvis sætte spørgsmålstegn ved værdien af en algoritme, hvis svar på instans $i$ afhænger af tilfældigheder -- det kan fx være »ja« den ene dag og »nej« den anden.
@@ -854,7 +854,7 @@ højst $10^{-6} \cdot 10^{-6} = 10^{-12}$.
 %TODO confusion in original about "at most" and "less than"
 
 \begin{exerc}
-  Sammenlign udførelsestiden for de to metoder, som opnår fejlsandsynlighed $10^{-12}$.
+  Sammenlign kørselstiden for de to metoder, som opnår fejlsandsynlighed $10^{-12}$.
 \end{exerc}
 
 \begin{exerc} 
@@ -883,24 +883,24 @@ nemlig Las-Vegas-algoritmer%
 og Monte-Carlo-algoritmer.
 \index{algoritmekonstruktion!randomiseret!Monte Carlo|textbf}
 \index{Monte-Carlo-algoritme|sieheunter{algoritmekonstruktion, randomiseret}}
-En \emph{Las-Vegas-algoritme} giver altid det rigtige svar, men dens udførelsestid på input~$i$ er en stokastisk variabel. 
+En \emph{Las-Vegas-algoritme} giver altid det rigtige svar, men dens kørselstid på input~$i$ er en stokastisk variabel. 
 Vores løsning til tv-programmet med Lykke er en Las-Vegas-algoritme, hvis vi fortsætter med at lade den lede efter den rigtige æske;
 men antallet af foreløbige maksima, dvs. antallet af betalte jetoner, er en stokastisk variabel.
-En Monte-Carlo-algoritme har altid den samme udførelsestid, men der findes en positiv sandsynlighed for, at den giver et forkert svar.
+En Monte-Carlo-algoritme har altid den samme kørselstid, men der findes en positiv sandsynlighed for, at den giver et forkert svar.
 Sandsynligheden for et forkert svar er højst $\frac14$.
 Algoritmen, som sammenligner to tal over en telefonforbindelse, er en Monte-Carlo-algoritme. 
 Opgave~\lref{e:decreasing-error-probability} viser, at fejlsandsynligheden for en Monte-Carlo-algoritme kan gøres vilkårlig lille ved gentalse.  
 
 \begin{exerc}
-  Antag, at du har en Las-Vegas-algoritme med forventet udførelsestid $t(n)$. 
+  Antag, at du har en Las-Vegas-algoritme med forventet kørselstid $t(n)$. 
   Lad den køre i $4t(n)$ skridt.
   Skulle den give et svar inden for denne tid, returneres dette svar, ellers returneres en vilkårlig værdi.
   Vis, at den resulterende algoritme er en Monte-Carlo-algoritme.
 \end{exerc}
 
 \begin{exerc}
-  Antag, at du har en Monte-Carlo-algoritme med udførelsestid $m(n)$, som giver det rigtige svar med sandsynlighed mindst $p$, og en deterministisk algoritme, som i tid $v(n)$ kan afgøre, om Monte-Carlo-algoritmens svar er korrekt.
-  Beskriv, hvordan de to algoritmer kan kombineres til et Las-Vegas-algoritme med forventet udførelsestid $(m(n)+v(n))/(1-p)$.
+  Antag, at du har en Monte-Carlo-algoritme med kørselstid $m(n)$, som giver det rigtige svar med sandsynlighed mindst $p$, og en deterministisk algoritme, som i tid $v(n)$ kan afgøre, om Monte-Carlo-algoritmens svar er korrekt.
+  Beskriv, hvordan de to algoritmer kan kombineres til et Las-Vegas-algoritme med forventet kørselstid $(m(n)+v(n))/(1-p)$.
 \end{exerc}
 
 Afslutningsvis vender vi tilbage til Lykkes tv-program.

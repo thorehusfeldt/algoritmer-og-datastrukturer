@@ -77,7 +77,7 @@ Det kan også være nyttigt at tænke på sortering, når man prøver at løse 
 I afsnit~\lref{s:simple} skal vi præsentere nogle enkle sorteringsalgoritmer.
 Deres tidsforbrug er kvadratisk, men de er alligevel brugbare for små problemstørrelser.
 Vi skal også se på nogle maskinnære optimeringer.
-I afsnit~\lref{s:merge} præsenteres \emph{flettesortering}, en enkel del-og-hersk-algoritme, som har udførelsestid $O(n\log n)$.
+I afsnit~\lref{s:merge} præsenteres \emph{flettesortering}, en enkel del-og-hersk-algoritme, som har kørselstid $O(n\log n)$.
 Som vi skal vise i afsnit~\lref{s:lower}, er denne tidsgrænse optimal for alle \emph{sammenligningsbaserede} sorteringsalgoritmer, dvs. algoritmer, so betragter indgangene som »sorte kasser«, som kan tillader parvis sammenligning og flytning.
 \emph{Kviksortering}, som behandles i  afsnit~\lref{s:quick}, beror ligeledes på en del-og-hersk-tilgang.
 Måske er den den mest anvendte sorteringsalgoritme.
@@ -162,13 +162,13 @@ For eksempel,
 Algoritmen kan implementeres sådan, at den kan nøjes med en enkelt række af $n$ indgange og arbejder \emph{på plads},
 \index{sortering!på plads@\emph{på plads}|textbf}
 dvs. at den ud over inputrækken og et konstant antal lagerceller for iterationsvariable o. lign. ikke behøver mere plads.
-Udførelsestiden er kvadratisk.
+Kørselstiden er kvadratisk.
 
 I afsnit~\ref{ch:pq:s:further}
 beskrives en mere raffineret implementation af udvalgssortering, som forvalter inputfølgen som en \emph{prioritetskø}.
 \index{prioritetskø!anvendelse}
 Prioritetskøen gør det muligt at vælge og fjerne en mindste indgang effektivt.
-Det resulterende algoritme har udførelsestid $O(n\log n)$ og er meget brugt.
+Det resulterende algoritme har kørselstid $O(n\log n)$ og er meget brugt.
 Den er effektiv, deterministisk, arbejder på plads, og inputfølgen kan udvides dynamisk
 \index{sortering!dynamisk}
 med nye elementer, så længe disse er større end de allerede udtagne.
@@ -233,7 +233,7 @@ Desuden er input i mange anvendelsesområder i forvejen allerede »næsten sorte
 i disse siutationen er indsættelsessortering hurtig.
 
 \begin{exerc}[Næsten sorteret input]\llabel{ex:almost-sorted}
-  Vis, at indsættelsessortering har udførelsestid $O(n + D)$ med
+  Vis, at indsættelsessortering har kørselstid $O(n + D)$ med
  $D= \sum_i \left|r(e_i)-i\right|$, hvor
   $r(e_i)$ er \emph{rangen}\index{rang (i sorteret orden)} (dvs. positionen) af $e_i$ i det sorterede output.
 \end{exerc}
@@ -242,7 +242,7 @@ i disse siutationen er indsættelsessortering hurtig.
 \index{algoritmeanalyse!gennemsnitligt fald}
   Betragt mængden af alle $n!$ mange input, som består af permutationer af tallene fra 
   $1$ til $n$.
-  Vis, at den gennemsnitlige udførelsestid for indsættelsessortering på disse input er 
+  Vis, at den gennemsnitlige kørselstid for indsættelsessortering på disse input er 
   $\Omega(n^2)$.
   \emph{Vink}:
   Vis, at der i gennemsnit en tredjedel af alle de indgange, der står i den oprindelige rækkes højre tredjedel, skal flyttes til rækkens venstre tredjedel.
@@ -254,11 +254,11 @@ i disse siutationen er indsættelsessortering hurtig.
 \begin{exerc}[indsættelsessortering med få sammenligninger]
   Modificer den indre løkke af den rækkebaserede indsættelsessorteringsalgoritme i fig.~\lref{alg:insert}, så den kun behøver $O(n\log n)$ sammenligninger mellem indgange. 
   \emph{Vink}: Binærsøgning, se afsnit~\ref{ch:intro:s:binary search}.
-  Hvad er udførelsestiden af denne variant?    
+  Hvad er kørselstiden af denne variant?    
 \end{exerc}
 
 \begin{exerc}[Effektiv indsættelsessortering?]
-  Brug datastrukturen for ordnede følger fra kap.~\ref{ch:search:} for at skabe en variant af indsættelsessortering med udførelsestid $O(n\log n)$. 
+  Brug datastrukturen for ordnede følger fra kap.~\ref{ch:search:} for at skabe en variant af indsættelsessortering med kørselstid $O(n\log n)$. 
 \end{exerc}
 
 \begin{exerc}[Formel verifikation]\index{verifikation}
@@ -281,7 +281,7 @@ Processen gentages, indtil alle indgange er vandret over i output.
 I fig.~\lref{alg:mergesort} vises algoritmen i pseudokode, og i fig.~\lref{fig:mergesort} vises et eksempel på en kørsel på konkret input.
 Hvis de indgående følger er (enkelt-)hægtede lister (se afs.~\ref{ch:sequence:ss:slist}), behøves hverken reservation eller frigørelse af listeindgange.
 Hver iteration i den indre løkke af proceduren \Id{flet} fører til én sammenligning af indgange og flytter én ingang til outputfølgen; dette kan gøres i konstant tid.
-Derfor er udførelsestiden for fletning lineær.
+Derfor er kørselstiden for fletning lineær.
 
 \begin{figure}
   \begin{tabbing}
@@ -391,7 +391,7 @@ $\seq{\,}$ &$\seq{\,}$ &  $\seq{1,1,2,2,7,8,8}$ & \\
 Proceduren \Id{flet} anvendt på to følger af samlet længde $n$ udføres i tid $O(n)$ og bruger højst $n-1$ sammenligninger af indgange.
 \end{thm}
 
-For udførelsestiden af flettesortering får vi følgende:
+For kørselstiden af flettesortering får vi følgende:
 
 \begin{thm}\llabel{thm:mergesort}
   Flettesortering af en følge af længde $n$ udføres i tid $O(n\log n)$ og bruger højst $\floor{n\log n}$ sammenligninger af indgange.
@@ -447,7 +447,7 @@ For udførelsestiden af flettesortering får vi følgende:
  For $n=2^k$ gælder $2^k\cdot k - 2^k + 1\le 2^k\cdot k$ åbenbart. 
  For $n<2^k$ indser vi $nk-2^k+1 \le n(k-1) + (n-2^k+1) \le n\log n$.
 
- Grænsen for udførelsestiden etableres med en lignende rekursionsligning
+ Grænsen for kørselstiden etableres med en lignende rekursionsligning
  (jf. opgave~\ref{ch:intro:ex:mergesortrecurrence}).
 \end{proof}
 
@@ -485,7 +485,7 @@ Alligevel er flettesortering ikke det foretrukne metode til at sortere rækker, 
 \begin{exerc}
   Implementer flettesortering for rækker i dit foretrukne imperative programmeringssprog.
   Ved siden af inputrækken bruger man en hjælperække af størrelse $n$; de to rækker skiftes til at indeholde mellemresultater og outputfølgen under opbygning.
-  Afgør eksperimentelt, om  den faktiske udførelsestid bliver bedre ved at skifte fra rekursion til indsættelsessortering for små input.
+  Afgør eksperimentelt, om  den faktiske kørselstid bliver bedre ved at skifte fra rekursion til indsættelsessortering for små input.
   \index{sortering!indsættelses-} 
   I så fald, ved hvilken længde er det bedst at skifte?
 \end{exerc}
@@ -679,7 +679,7 @@ Lad $p$ betegne den valgte spaltenøgle.
 Indgangende inddeles nu efter, om de er større, lig med eller mindre end $p$.
 Disse tre dele af input organiseres som hver sin følge.
 Figur~\lref{alg:quicksort} viser denne ide skematisk, mens figur~\lref{fig:quicksort} viser forløbet på et eksempelinput. 
-Kviksortering har forventet udførelsestid
+Kviksortering har forventet kørselstid
 \index{algoritmekonstruktion!stokastisk!Las Vegas} 
 $O(n\log n)$, hvilket vi skal vise i afsnit~\lref{ss:analysis}.
 I afsnit~\lref{ss:refinements} diskuterer vi forbedringer af implementationen, som gør kviksortering til den i praksis mestbenyttede sorteringsalgoritme.
@@ -751,14 +751,14 @@ delfølgerne $\seq{4,5}$, $\seq{6}$ og $\seq{8,7,9}$.}
 \subsection{Analyse}\llabel{ss:analysis}
 \newcommand{\Cavg}{\overline{C}}
 
-Ved analysen af udførelsestiden af kviksortering på input\-følge
+Ved analysen af kørselstiden af kviksortering på input\-følge
 \index{algoritmeanalyse!stokastisk}%
 \index{algoritmeanalyse!gennemsnit} 
 $s=\seq{e_1,\ldots,e_n}$ koncentrerer vi os på antal gennemførte sammenligninger.
 Herved tæller vi »trevejs-sammenligningen«
 \index{sammenligning!trevejs-}
 af indgange, som resulterer i »mindre end«, »lig med« eller »større end«, som én operation.
-Med udgangspunkt i antal sammenligninger er de andre andre operationers bidrag til den samled  udførelsestid kun konstante faktorer og additive termer.
+Med udgangspunkt i antal sammenligninger er de andre andre operationers bidrag til den samled  kørselstid kun konstante faktorer og additive termer.
 
 Lad $C(n)$ betegne antallet af sammenligninger, som kviksortering gennemfører i væreste fald på nogen inputfølge af længde $n$ og noget valg af spaltenøgle.
 
@@ -778,7 +778,7 @@ Vi begynder med at gøre det nogenlunde plausibelt, at det forventede antal samm
 $O(n \log n)$, og giver derefter et nøjagtig bevis for den præcise grænse $2n\ln n$.
 Vi koncentrerer os på det tilfælde, hvor alle indgange har forskellige nøgler.
 % TODO wtf? nøgler
-I de andre tilfælde er udførelsestiden endnu lavere, fordi en spaltenøgle, som optræder mere end én gang, fører til en længere delfølge $b$ i midten, som ikke skal behandles videre.
+I de andre tilfælde er kørselstiden endnu lavere, fordi en spaltenøgle, som optræder mere end én gang, fører til en længere delfølge $b$ i midten, som ikke skal behandles videre.
 For hver indgang $e_i$ vil vi lade $X_i$ betegne antal sammenligninger mellem $e_i$ og en spaltenøgle. 
 Da er $\sum_i X_i$ det totale antal sammenligninger. 
 Hver gang, $e_i$ sammenlignes med en spaltenøgle, havner det i en strengt kortere delfølge. 
@@ -943,7 +943,7 @@ Idéen bag
 \index{sortering!grundtals-|textbf} 
 er at udtrykke naturlige tal med cifre i området $\{0,\ldots,K-1\}$.
 Så bruges \Id{nøglesorter} én gang per cifferposition. 
-Figur~\lref{alg:LSDsort} viser udgaven af grundtalssortering for nøgler i området $\{0,\ldots, K^d-1\}$, med udførelsestid $O(d(n+K))$.
+Figur~\lref{alg:LSDsort} viser udgaven af grundtalssortering for nøgler i området $\{0,\ldots, K^d-1\}$, med kørselstid $O(d(n+K))$.
 Indgangene sorteres først med hensyn til de lavest betydende ciffer (heraf navnet lbc), hernæst efter den næstlaveste position osv., indtil der til sidst sorteres efter det højest betydende ciffer.
 Metoden kaldes 
 \emph{lbc-grundtalssortering}.
@@ -1006,7 +1006,7 @@ Proceduren \Id{uniformSorter} er meget effektiv på \emph{tilfældige} nøgler.
 \end{thm}
 \begin{proof}
   Vi betragter kun gennemsnitstilfældet, analysen af værste fald er henlagt til en øvelse.
-  Den samlede udførelsestid $T$ udgøres af $O(n)$ operationer for forelingen af nølger i bøtter og sammenføjningen af sorterede lister samt tiden for sortering af de enkelte bøtter.
+  Den samlede kørselstid $T$ udgøres af $O(n)$ operationer for forelingen af nølger i bøtter og sammenføjningen af sorterede lister samt tiden for sortering af de enkelte bøtter.
   Sidstnævnte behøver tid $\sum_{i<n}T_i$, hvor vi skriver $T_i$ for sorteringstiden af bøtte $b[i]$.
  
   Ved linearitet af middelværdien (\ref{app:notation:eq:linearity})

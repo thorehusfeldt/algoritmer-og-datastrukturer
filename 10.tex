@@ -63,7 +63,7 @@ og acykliske grafer.
 Læg mærke til at det meget særlige tilfælde, hvor alle kanter har omkostning~1
 \index{graf!bfs}
 \index{korteste veje!identiske kantomkostninger}
-allerede blev løst i kapitel~\ref{ch:gtraverse:s:bfs} -- bredde-først-træet med rod~$s$  er en kompakt repræsentation af de korteste veje fra $s$ til samtlige andre knuder. 
+allerede blev løst i kapitel~\ref{ch:gtraverse:s:bfs} -- bredde først-træet med rod~$s$  er en kompakt repræsentation af de korteste veje fra $s$ til samtlige andre knuder. 
 I afsnit~\lref{s:concepts} betragter vi indledningsvist nogle grundlæggende begreber, som leder til et fælles grundlag for alle korteste-veje-algoritmer. 
 En systematisk fremgangsmåde skal hjælpe os at holde styr på de mange forskellige korteste-veje-algoritmer.
 Som første eksempel på en hurtig og enkel algoritme for en begrænset problemklasse betragter vi i afsnit~\lref{s:acyclic} en fremgangsmåde for acykliske grafer.
@@ -186,7 +186,7 @@ Anvend opgave~\ref{ex:dynamic} for at vise, at $T$ er et træ.
 Udvid argumentet til det tilfælde, hvor de korteste veje ikke er entydigt bestemte.
 \end{exerc}
 
-Vores strategi for at finde korteste veje fra startknuden $s$ er en generalisering af bredde-først-søgning fra figur~\ref{ch:gtraverse:fig:bfs}.
+Vores strategi for at finde korteste veje fra startknuden $s$ er en generalisering af bredde først-søgning fra figur~\ref{ch:gtraverse:fig:bfs}.
 Vi arbejder med to rækker af typen \Id{Knuderække}, som hedder $d$ og $\Id{forælder}$.
 \index{korteste veje!forælderpeger}
 Her indeholder indgangen $d[v]$ vores nuværende bedste bud på afstanden fra $s$ til $v$, og $\Id{forælder}[v]$ gemmer $v$s forgænger på en vej fra $s$ til $v$, som er den korteste, vi har fundet hidtil.
@@ -205,10 +205,12 @@ Denne proces kaldes at \emph{slække} kanten $e$.
 \index{korteste veje!slækning af kanter|textbf}
 \index{korteste veje!kantslækning|textbf}
 
-\begin{indentedcode}
+\begin{quote}
+\begin{code}
 \Procedure \Id{slæk}$(\Declare{e=(u,v)}{\Id{Edge}})$\+\\
   \If  $d[u] + c(e) < d[v]$ \Then $d[v]\Is d[u] + c(e)$;$\;$ \Id{forælder}$[v]\Is u$
-\end{indentedcode}
+\end{code}
+\end{quote}
 (Regnereglerne for værdien $\infty$ er de oplagte:
 Der gælder $a<\infty$  og  $\infty+a=\infty$ for alle tal $a$, samt $\infty \not< \infty$.)
 
@@ -357,7 +359,7 @@ I en rettet acyklisk graf forekommer ingen rettede kredse og derfor heller ingen
 Desuden har vi konstateret i afsnit~\ref{ch:gtraverse:ss:numbering}k, at knuderne i en sådan graf tillader en topologisk ordning,
 \index{graf!topologisk ordning}
 dvs. at de kan bringes i rækkefølge $\seq{v_1, \ldots, v_n}$, sommetider kaldet en \emph{topologisk sortering}, sådan at $(v_i,v_j) \in E$ altid medfører $i < j$.
-En topologisk sortering kan findes i tid $O(m + n)$ med dybde-først-søgning.
+En topologisk sortering kan findes i tid $O(m + n)$ med dybde først-søgning.
 Læg mærke til, at knuderne langs hver vej i en rettet acyklisk graf står i voksende rækkefølge i den topologiske ordning.
 Ifølge lemma~\lref{lem:criterion} kan vi altså beregne korteste-veje-afstande ved at slække først alle udgående kanter fra $v_1$, derefter alle udgående kanter fra $v_2$, og så videre.
 I figur~\lref{dag} er vist et eksempel.
@@ -771,13 +773,13 @@ Følgende to egenskaber ved negative kredse er centrale:
 
 Disse overvejelser fører til følgende måde at identificere knuder $v$ med $\mu(v)=\infty$ ved at sætte $d[v]=-\infty$.
 I efterbehandlingen prøver for hver kant $e=(u,v)$, om $d[u] + c(e) < d[v]$.
-I så fald kalder vi $v$ for »smittet«, sætter $d[v]\Is -\infty$ og kalder den rekursive procedure $\Id{smit}(v)$, som gennemfører en slags bredde-først-søgning 
-\index{graf!bredde-først-søgning}
+I så fald kalder vi $v$ for »smittet«, sætter $d[v]\Is -\infty$ og kalder den rekursive procedure $\Id{smit}(v)$, som gennemfører en slags bredde først-søgning 
+\index{graf!bredde først-søgning}
 for at sikre, at $d[w]=\infty$ for alle knuder $w$, som kan nås fra $v$.
 
 \begin{exerc}
   Vis, at de knnuder, for hvilke kaldes $\Id{smit}(v)$ udføres en eller flere gange præcis er de knnuder, for hvilke  $\mu(v)=-\infty$, og at hele efterbehandlingen tager tid $O(m)$.
-  \emph{Vink}: Genbrug argumenterne fra dybde-først-søgning.
+  \emph{Vink}: Genbrug argumenterne fra dybde først-søgning.
 \end{exerc}
 
 %Lösung: Es ist klar, dass für jeden Knoten $v$ und jede Kante  $(u,v)$ der 

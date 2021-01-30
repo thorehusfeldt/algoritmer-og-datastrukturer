@@ -502,7 +502,7 @@ Klassedelingens klasser er sammenhængskomponenterne i $(V,T)$.
 Der kan forekomme komponenter, som kun består af en enkelt knude.
 Især består klassedelingen i begyndelsen udelukkende af den slags etpunkts\-mængder.
 Kruskals algoritme udfører nu to operationer på denne klassedeling:
-Den afgør, om to elementer hører til samme delmængde (dvs.\ at kunderne hører til samme deltræ), og forener to delmængder til én (nemlig når der tilføjes en kant til $T$).
+Den afgør, om to elementer hører til samme delmængde (dvs.\ at knuderne hører til samme deltræ), og forener to delmængder til én (nemlig når der tilføjes en kant til $T$).
 
 Forén-og-find-datastrukturen repræsenterer en klassedeling af mængden $\{1,\ldots,n\}$ på en måde, så begge operationer kan gennemføres effektivt.
 I hver klasse udnævnes et af elementerne til klassens \emph{repræsentant}, som også bruges som klassens navn.
@@ -634,7 +634,7 @@ For rodknuder $r$ gælder $\Id{forælder}[r]=r$, hvilket svarer til en løkke ve
  
 For at implementere operationen \emph{find}$(v)$ følger vi forælderpegere fra $v$, til vi når en løkke.
 Denne løkke sidder ved $v$s repræsentant.
-Implementationen af $\Id{forén}(u,v)$ er lignende enkel.
+Implementationen af $\Id{forén}(u,v)$ er lige så nem.
 Vi gør den ene repræsentant til den andens forælder.
 Den sidstnævnte mister herved sin rolle som repræsentant; førstnævnte tjener som repræsentant for den nyskabte klasse.
 Den proces, vi har beskrevet indtil nu, leder til en realisering af forén-og-find-datastrukturen, som er korrekt, men ineffektiv.
@@ -719,7 +719,7 @@ $A(3,2)=A(2,A(3,1))=A(2,16)$, og så videre.
  Anslå værdien af $A(5,1)$.
 \end{exerc}
 
-For alle praktisk tænkbare
+For alle praktisk tænkelige
 \footnote{Ovs. anm.: Man skal holde sig for øje, at antallet af elementarpartikler i universet anslås til at være mindre end $10^{100}$.}
 værdier $n$ gælder $\alpha(m,n)\leq 5$, og forening efter rang og vejforkortning garanterer tilsammen i alt væsentligt konstant amortiseret tid for hver operation.
 Beviset for sætning~\lref{thm:union--find} går ud over denne lærebogs rammer.
@@ -750,7 +750,7 @@ Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for 
 \end{thm}
 
 \begin{proof}
-  (Beviset går tilbage til \cite{HopUll73}.)
+  (Baseret på \cite{HopUll73}.)
   \index{Hopcroft, J.}
   \index{Ullman, J. D.}
   Vi betragter en vilkårlig følge af $m$ $\Id{find}$- og $n-1$ $\Id{forén}$-operationer, med udgangspunkt i initialiseringen for mængden $\{1,\ldots,n\}$.
