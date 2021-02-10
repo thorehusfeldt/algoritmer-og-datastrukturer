@@ -31,7 +31,7 @@ Programmer, som løser problemer inden for kombinatorisk søging,
 \index{kombinatorisk søgning}
 benytter dem ofte for at afgøre, om en bestem konfiguration allere er blevet undersøgt.
 I skakeksemplet, hvor samme stilling jo kan nås ad forskellige træk, bør programmet jo kun vurdere hver enkelt stilling én gang.
-Løsningen består i at gemme vurderingen i en associativ række, indekseret af stillingerne.
+Løsningen består i at gemme vurderingen i en associativ række, indiceret af stillingerne.
 Inden for relationelle databaser gemmer en af de mest benyttede implementationer af \emph{join}-operationen
 \index{database!join@\emph{join}} 
  de indgående relationer i en associativ række.
@@ -97,7 +97,7 @@ I stedet vil vi kigge på løsninger, hvis pladsbehov er $O(n)$.
 \bigskip
 Den grundlæggende idé for at implementere associative rækker som hakketabeller er ganske enkel.
 En \emph{hakkefunktion}\index{hakkefunktion} $h$ afbilder mængden $\Key$ af mulige rækkeindeks til et lille område $\{0,\ldots,m-1\}$ af heltallene.
-Desuden findes en række $t$ indekseret af $\{0,\ldots,m-1\}$, kaldt \emph{hakketabellen}.
+Desuden findes en række $t$ indiceret af $\{0,\ldots,m-1\}$, kaldt \emph{hakketabellen}.
 \index{hakketabel|siehe{hakning}}
 For at holde pladsforbruget nede, bør $m$ omtrent svare til antallet af elementer i $S$.
 Um den Platzbedarf niedrig zu halten, sollte $m$ ungefähr der Anzahl der Elemente von $S$ entsprechen.

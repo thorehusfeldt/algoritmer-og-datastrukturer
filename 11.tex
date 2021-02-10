@@ -53,7 +53,7 @@ Kruskals algoritme bygger samtidigt flere træer i dele af grafen, som ikke umid
 Denne algoritme ser vi nærmere på  i afsnit~\lref{s:kruskal}.
 For en effektiv implementation af Kruskals algoritme har man brug for en datastruktur, som opretholder en klassedeling af en mængde af elementer (dvs.\ en opdeling i disjunkte delmængder) under to operationer:
 »afgør, om to elementer tilhører samme delmængde« og »forén to delmængder«.
-Forén-og-find-datastrukturen beskrives i afsnit~\lref{s:unionfind}.
+Forén og find-datastrukturen beskrives i afsnit~\lref{s:unionfind}.
 Den har mange andre anvendelser ved siden af minimale spændetræer.
 
 \begin{exerc}
@@ -490,9 +490,9 @@ Den konstante faktor, som skjuler sig bag store-$O$-notationen er ganske lille, 
 \end{enumerate}
 \end{exerc}
 
-\section{Forén-og-find}
+\section{Forén og find}
 \llabel{s:unionfind}%
-\index{forén-og-find}
+\index{forén og find}
 \index{invariant!datastruktur-}
 
 En \emph{klassedeling} af en mængde $M$ er en familie $M_1,\ldots, M_k$ af disjunkte delmængder af $M$, som sammen \emph{dækker} $M$, dvs.\ at der gælder $M_i\cap M_j=\emptyset$ for alle $i\neq j$ og $M=M_1\cup \cdots\cup M_k$. 
@@ -504,7 +504,7 @@ Især består klassedelingen i begyndelsen udelukkende af den slags etpunkts\-m�
 Kruskals algoritme udfører nu to operationer på denne klassedeling:
 Den afgør, om to elementer hører til samme delmængde (dvs.\ at knuderne hører til samme deltræ), og forener to delmængder til én (nemlig når der tilføjes en kant til $T$).
 
-Forén-og-find-datastrukturen repræsenterer en klassedeling af mængden $\{1,\ldots,n\}$ på en måde, så begge operationer kan gennemføres effektivt.
+Forén og find-datastrukturen repræsenterer en klassedeling af mængden $\{1,\ldots,n\}$ på en måde, så begge operationer kan gennemføres effektivt.
 I hver klasse udnævnes et af elementerne til klassens \emph{repræsentant}, som også bruges som klassens navn.
 Valget af repræsentant gøres af algoritmen, ikke af brugeren.
 I begyndelsen udgør hvert element $v\in\{1,\ldots,n\}$ en klasse for sig;
@@ -517,7 +517,7 @@ Så bliver operationen på repræsentanter typisk kaldt »$\Id{hægt}$«.
 }
 klasser, forener disse klasser til en ny og bestemmer en ny repræsentant.
 
-For at implementere Kruskals algoritme ved hjælp af forén-og-find-datastrukturen, behøver man kun små ændringer til proceduren i fig.~\lref{alg:kruskalmst}.
+For at implementere Kruskals algoritme ved hjælp af forén og find-datastrukturen, behøver man kun små ændringer til proceduren i fig.~\lref{alg:kruskalmst}.
 I begyndelsen kaldes klassens konstruktør, som gør hver knude $v$ til sin egen klasse.
 Vi behøver bare at erstatte $\iif$-kommandoen med følgende:
 
@@ -531,7 +531,7 @@ Vi behøver bare at erstatte $\iif$-kommandoen med følgende:
 \begin{figure}[tb]
   \begin{tabbing}
     ~~~~\=~~~~\= \kill
-    $\Class \Id{Forén-og-find}(n\colon \NN)$\\
+    $\Class \Id{Forén og find}(n\colon \NN)$\\
     \>$\Id{forælder} = \langle 1,\ldots, n\rangle\colon\Array[1..n]\Of [1.. n]$ 
     \tikz[remember picture] \node (init) {};\\
     \>$\Id{rang} =\langle 0,\ldots, 0\rangle\colon \Array [1..n]\Of [0..\log n]$\\
@@ -624,10 +624,10 @@ Vi behøver bare at erstatte $\iif$-kommandoen med følgende:
   \end{tikzpicture}
   \caption{
     \llabel{alg:unionfind}
-    En effektiv forén-og-find-datastruktur til forvaltning af en klassedeling af mængden $\{1,\ldots,n\}$.}
+    En effektiv forén og find-datastruktur til forvaltning af en klassedeling af mængden $\{1,\ldots,n\}$.}
 \end{figure}
 
-Forén-og-find-datastrukturen kan realiseres på følgende måde.
+Forén og find-datastrukturen kan realiseres på følgende måde.
 Hver klasse repræsenteres som et rodfæstet træ, hvor roden tjener som repræsentant.
 Forgængeren til elementet $v$ i træet gemmes i indgangen $\Id{forælder}[v]$ i rækken $\Id{forælder}[1..n]$.
 For rodknuder $r$ gælder $\Id{forælder}[r]=r$, hvilket svarer til en løkke ved roden.
@@ -637,7 +637,7 @@ Denne løkke sidder ved $v$s repræsentant.
 Implementationen af $\Id{forén}(u,v)$ er lige så nem.
 Vi gør den ene repræsentant til den andens forælder.
 Den sidstnævnte mister herved sin rolle som repræsentant; førstnævnte tjener som repræsentant for den nyskabte klasse.
-Den proces, vi har beskrevet indtil nu, leder til en realisering af forén-og-find-datastrukturen, som er korrekt, men ineffektiv.
+Den proces, vi har beskrevet indtil nu, leder til en realisering af forén og find-datastrukturen, som er korrekt, men ineffektiv.
 Ineffektiviten skyldes, at $\Id{forælder}$-pegerne kan danne lange kæder, som skal gennemløbes gentagne gange for hver \emph{find}-operation.
 I værste fald skal vi bruge lineær tid for hver \emph{find}-operation.
 
@@ -688,12 +688,12 @@ Ved første gennemløb bestemmes repræsentanten; ved andet gennemløb ændres f
   Beviset gælder stadig, når vi tilføjer forbedringen »vejforkortning«, idet vejforkortning aldrig gør et træ dybere.
 \end{proof}
 
-Kombinationen af strategierne vejforkortning og forening efter rang gør forén-og-find-datastrukturen overordentligt effektiv.
+Kombinationen af strategierne vejforkortning og forening efter rang gør forén og find-datastrukturen overordentligt effektiv.
 Hver operations amortiserede omkostning er nærmest konstant.
 
 \begin{thm}
   \llabel{thm:union--find} 
-  Forén-og-find-datastrukturen i fig.~\lref{alg:unionfind} udfører $m$ find- og $n-1$ forén\-operationer i tid $O(m\alpha(m,n))$, hvor
+  Forén og find-datastrukturen i fig.~\lref{alg:unionfind} udfører $m$ find- og $n-1$ forén\-operationer i tid $O(m\alpha(m,n))$, hvor
 \[ 
   \alpha(m,n) = \min\{\,i\geq 1\colon A(i,\lceil m/n\rceil)\geq \log n\,\}\,,
 \]
@@ -746,7 +746,7 @@ Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for 
 
 \begin{thm}
   \llabel{thm:union:find:logstar} 
-  Forén-og-find-datastrukturen med forening efter rang og vejforkortning udfører $m$ find- og $(n-1)$ forén-operationer i tid $O((m+n)\log^* n)$.
+  Forén og find-datastrukturen med forening efter rang og vejforkortning udfører $m$ find- og $(n-1)$ forén-operationer i tid $O((m+n)\log^* n)$.
 \end{thm}
 
 \begin{proof}
@@ -854,7 +854,7 @@ Funktionen $\log ^* x$ vokser ekstremt langsomt, fx gælder $\log^*x\leq 5$ for 
 
 \emph{Dele udeladt}
 
-Forén-og-find-datastrukturen kan implementeres på en mere pladsbesparende måde ved at observere, at kun repræsentanter har en rang og kun ikke-repræsentanter har en forgænger.
+Forén og find-datastrukturen kan implementeres på en mere pladsbesparende måde ved at observere, at kun repræsentanter har en rang og kun ikke-repræsentanter har en forgænger.
 Vi kan altså undgå rækken \Id{rang} i figur~\lref{alg:unionfind};
 i stedet sætter vi for rodknude $r$ med rang $g$ indgangen $\Id{forælder}[r]=n+1+g$.
 I stedet for to rækker kan vi derfor nøjes med én række, hvis værdier ligger i  $\{1,\ldots, n+1+\lceil \log n\rceil\}$.

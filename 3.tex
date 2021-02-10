@@ -44,7 +44,8 @@ Det abstrakte begreb \emph{følge} er meget enkelt og har i første omgang ikke 
 \index{følge}
 \index{liste}
 \index{tabel}
-Matematisk set er den eneste væsentlige egenskab ved følgen $s = \langle e_1,\ldots, e_n\rangle$, at en række af værdier (kaldt \emph{indgange}) er anbragt i en lineær ordning -- i modsætning graferne og træerne, som vi skal betragte i kapitel 7 og 8, som ikke er \emph{lineært} ordnede, og hakketabellerne i kapitel~4, som slet ikke er ordnede.
+Matematisk set er den eneste væsentlige egenskab ved følgen $s = \langle e_1,\ldots, e_n\rangle$, at en række af værdier (kaldt \emph{indgange}) er anbragt i en lineær ordning -- i modsætning graferne og træerne, som vi skal betragte i kapitel\ref{ch:search:} og~\ref{ch:grepresent:},
+og som ikke er \emph{lineært} ordnede, og hakketabellerne i kapitel~\ref{ch:hash:}, som slet ikke er ordnede.
 
 Grundlæggende kan man tilgå indgangene i en følge på to måder.
 Den første mulighed består af at angive indgangens indeks.
@@ -53,30 +54,34 @@ Det svarer til vores konvention for rækkeadgang,
 \index{række}
 \index{statisk række}
 \index{række!statisk}
-dvs.\ at vi med udtrykket $s[i]$ angiver den $i$te indgang i følgen $s$.
-Hertil stiller vore pseudokode i afsnit~\lref{s:array} allerede \emph{statiske rækker} til rådighed.
+dvs.\ at vi med udtrykket $s[i]$ angiver den $i$te indgang $e_i$ i følgen $s$.
+Hertil stiller vores pseudokode i afsnit~\ref{ch:intro:s:pseudocode} allerede \emph{statiske rækker} til rådighed.
 En datastruktur kaldes sommetider \emph{statisk}, 
-når dens størrelse er givet på forhånd og ikke kan ændres ved tilføjelser og fjernelser.%
-\footnote{Ovs.\ anm.: Værdierne de enkelte indgange kan derimod ændres.}
+når dens størrelse er givet på forhånd og ikke kan ændres af tilføjelser og fjernelser.%
+\footnote{Ovs.\ anm.: Værdierne i de enkelte indgange kan derimod ændres.
+En datastruktur, hvis værdier ikke kan ændres kaldes \emph{uforanderlig}.
+De fleste programmeringssprogs strengtype er uforanderlig.
+}
 Vi kalder datastrukturen \emph{begrænset},
 \index{begrænset række|textbf}
 \index{række!begrænset|textbf}
-  når en øvre grænse på dens størrelse er givet på forhånd.
-I afsnit~\llabel{s:array} skal vi betragte \emph{dynamiske} eller \emph{ubegrænsede} rækker,
+når en øvre grænse på dens størrelse er givet på forhånd.
+I afsnit~\llabel{s:array} skal vi betragte \emph{ubegrænsede} (også kaldt \emph{dynamiske}) rækker,
 \index{ubegrænset række}
 \index{række!ubegrænset}
+\index{række!dynamisk}
 som kan vokse og krympe, når indgange bliver tilføjet eller fjernet i enden af følgen.
-Tidsanalysen for ubegrænsede rækker er baseret på begrebet \emph{amortiseret analyse} af algoritmer.
+Til tidsanalysen for ubegrænsede rækker skal vi bruge \emph{amortiseret analyse}.
 \index{amortiseret analyse}
 \index{algoritmeanalyse, amortiseret}
 
-Den anden mulighed for at tilgå indgangene i en følge er at tage udgangspunkt i en anden indgang.
+Den anden mulighed for at tilgå indgangene i en følge er relativt til en anden indgang.
 For eksempel kunne man spørge om efterfølgeren til indgang $e$,
 \index{efterfølger|textbf}
 forgængeren til indgang $e'$ 
 \index{forgænger|textbf}
 eller delfølgen $\langle e,\ldots, e'\rangle$ af indgange mellen $e$ og $e'$.
-Selvom den slags relativ adgang kan simuleres med indekserede rækker, skal vi i afsnit~\lref{s:list} introducere en mere fleksibel repræsentation i form af hægtede lister.
+Selvom den slags relativ adgang kan simuleres med indicerede rækker, skal vi i afsnit~\lref{s:list} introducere en mere fleksibel repræsentation i form af hægtede lister.
 Især gør denne repræsentation det lettere at indføje
 \index{indføje i følge}
 og fjerne
@@ -100,7 +105,7 @@ I dette afsnit betragter vi repræsentationen af følger ved hjælp af hægtede 
 Hægtede lister er opbygget af elementer kaldt \emph{knuder};
 \index{knude!liste-}
 hver knude består af en indgang fra følgen og en eller flere pegere.
-Man kan forestille sig en hægtet liste som en kæde, hvor der på hvert led står en af følgens indgange.
+Man kan forestille sig en hægtet liste som en kæde, hvor hvert led indeholder en af følgens indgange.
 Når vi har greb om et kædeled, kan vi derfra nå andre led i kæden.
 I en dobbelthægtet liste peger hver knude på sin forgænger og sin efterfølger.
 \index{forgænger}
@@ -124,7 +129,7 @@ gemmer en indgang med to pegere til henholdsvis efterfølger og forgænger.
 En peger til en knude kaldes også et \emph{greb}
 \index{greb|textbf}
 om denne knude, som i afsnit~\ref{ch:intro:s:pseudocode}.
-Konstruktionen virker måske ganske overskuelig, men pegere er så kraftfulde, at vi vil behandle dem med største omhu.
+Konstruktionen virker måske ligetil, men pegere er så kraftfulde, at vi vil behandle dem med største omhu.
 Hvilke konventioner (dvs.\ hvilken datastruktur\-invariant) garanterer listestrukturens konsistens, dvs.\ dens linearitet?
 \index{invariant!for listestruktur}
 \index{liste!invariant}
@@ -160,8 +165,9 @@ En følge $\langle e_1,\ldots, e_n\rangle$ med $n$ indgange repræsenteres som e
 I ringen findes en særlig \emph{attrapknude}~$h$,
 \index{liste!attrapknude|textbf}
 som ikke indholder nogen følgeindgang.
-Attrapknudens efterfølger $h_1$ indeholder følgens første indgang $e_1$, i $h_1$s efterfølger gemmes følgens anden indgang $e_2$, osv. Forgængeren til $h$ indeholder følgens sidste indgang $e_n$, se figur~\lref{alg:ditem}.
-Den tomme følge repræsenteres af en ring, som kun indeholder attrapknuden $h$.
+Attrapknudens efterfølger $h_1$ indeholder følgens første indgang $e_1$, knude~$h_1$s efterfølger $h_2$ indeholder følgens anden indgang $e_2$, osv. 
+Forgængeren til attrapknuden~$h$ indeholder følgens sidste indgang $e_n$, se figur~\lref{alg:ditem}.
+Den tomme følge repræsenteres af en ring, som kun består af attrapknuden $h$.
 I denne situation er altså $h$ sin egen efterfølger og forgænger.
 Figur~\lref{alg:dlist1} viser en implementation af dobbelthægtede lister.
 Et objekt af klassen $\List$ indeholder en enkelt knude $h$ som instansvariabel.
@@ -235,6 +241,7 @@ Dette repræsenterer en tom liste som begyndelsestilstand.
     /\!/ $\ldots, a',a,\ldots,b,b',\ldots + \ldots, t,t',\ldots\mapsto\ldots,
     a',b',\ldots + \ldots,t,a,\ldots,b,t',\ldots$
   }\\
+  \\
   ~~~~\=\kill
   $\Procedure \splice(a,b,t \colon \Handle)$\\
   \>$\Assert$ $a$ og $b$ tilhører samme liste, $b$ står ikke før $a$, og $t\notin\langle a,\ldots ,b\rangle$\\
@@ -330,7 +337,7 @@ Dette repræsenterer en tom liste som begyndelsestilstand.
 \caption{\llabel{alg:splice}Operationen \Id{splejs} på lister.}
 \end{figure}
 
-Alle grundlæggende listeoperationer bruger basisoperationen \emph{splejs},
+Alle grundlæggende listeoperationer bruger grundoperationen \emph{splejs},
 \index{splejs@\Id{splejs}|textbf}
 \index{liste!splejs@\Id{splejs}|textbf}
 som er vist i figur~\lref{alg:splice}.
@@ -361,7 +368,7 @@ I opgave 3.3 spørges og i afsnit 3.6 diskuteres hvordan denne funktion kan impl
     \>\comment{$\langle \ldots, a,b,\ldots\rangle \mapsto
    \langle \ldots, a,e,b,\ldots\ldots\rangle$.}\\
     \>$\Function \Id{indsætEfter}(x\colon\Element, a\colon\Handle)\colon \Handle$ \\
-    \>\>$\Id{sikrFriListe}$\hspace{2cm}\=\comment{Sikr at $\Id{friListe}$ er ikketom. Se opg. 3.3.}\\
+    \>\>$\Id{sikrFriListe}$\hspace{2cm}\=\comment{Sikr at $\Id{friListe}$ ikke er tom. Se opg. 3.3.}\\
     \>\>$a':=\Id{friListe}.\Id{første}$\>\comment{Skaf ny knude $a'$ til at indeholde $x$,}\\
     \>\>$\Id{flytEfter}(a',a)$\>\comment{indsæt den på rette plads,}\\
     \>\>$a'{\rightarrow} e:= x$\>\comment{og fyld den med det rette indhold.}\\
@@ -383,13 +390,13 @@ I opgave 3.3 spørges og i afsnit 3.6 diskuteres hvordan denne funktion kan impl
     \>$\Procedure\Id{tøm}\quad \Id{friListe}.\Id{sammenføj}(\this)$
   \end{tabbing}
   \caption{\llabel{alg:dlist2}
-  Nogle flere konstanttidsoperationer på dobbelthægtede lister til klassen fra figur~\lref{alg:dlist1}.}
+  Flere konstanttidsoperationer på dobbelthægtede lister til klassen fra figur~\lref{alg:dlist1}.}
 \end{figure}
 
 Baseret på disse konventioner kan vi nu implementere mange nyttige listeoperationer som funktioner bestående af en enkelt linje, som alle kræver konstant tid.
-Idet \emph{splejs} er så magtfuld, kan vi sågar behandle dellister af vilkårlig længde i konstant tid.
-Figur\lref{alg:dlist2} viser mange eksempler på den slags operationer.
-For at afgøre, om en liste er tom, behøver vi blot at undersøge, om $h$ er sin egen efterfølger.
+Idet \emph{splejs} er så kraftig, kan vi sågar behandle dellister af vilkårlig længde i konstant tid.
+Figur~\lref{alg:dlist2} viser mange eksempler på den slags operationer.
+For at afgøre om en liste er tom, behøver vi blot at undersøge, om $h$ er sin egen efterfølger.
 \index{liste!tom@\Id{tom}}
 Når en liste ikke er tom, finder vi dens første og sidste indgang som efterfølger hhv.\ forgænger til $h$.
 \index{liste!fzrste@\Id{første}}
@@ -451,7 +458,7 @@ Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet
   \begin{exerc}[Lagerhåndtering.]
     \llabel{ex:memory}
     \index{liste!lagerhåndtering|textbf}
-    Angiv en implementation af funktionen $\Id{sikrFriListe}$, som kaldes fra $\Id{indsætEfter}$, som angivet i figur~\llabel{alg:dlist2}.
+    Angiv en implementation af funktionen $\Id{sikrFriListe}$, som kaldes fra $\Id{indsætEfter}$, som angivet i figur~\lref{alg:dlist2}.
     Funktionen skal sikre, at $\Id{friListe}$ ikke er tom, og i modsat fald tilføje nye knuder.
     Fordi den kan have en negativ indvirkning på kørselstiden at kalde den af programmeringssproget til rådighed stillede grundoperation $\Allocate$ for hver knude separat, bør funktionen stille knuder til rådighed i større »portioner«.
     Kørselstiden for $\Id{sikrFriListe}$ i værste fald bør være uafhængig af portionernes størrelse.
@@ -475,7 +482,7 @@ Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet
     Men hvor stor er gevinsten i kørselstid?
     Hvilken relativ forskel i kørselstid ville du forvente i følgende situationer? 
     (a) I en kort liste med $100$ indgange gennemføres mange søgninger;
-    (b) i en lang liste med fx $10\,000\,000$ indgange gennemføres en enkelt søgning.
+    (b) i en lang liste med $10\,000\,000$ indgange gennemføres en enkelt søgning.
     Hvorfor afhænger den relative hastighedsforskel af listelængden?
   \end{exerc}
   
@@ -484,26 +491,26 @@ Betragt fx problemet at finde den næste forekomst af indgangen $x$ fra en givet
 
   I vores enkle listedatastruktur i figur~\lref{alg:dlist1} kan vi ikke bestemme listens størrelse (dvs.\ dens længde) i konstant tid.
   Til det formål kan man udvide klassen med en instansvariabel $\size$, som aktualiseres, når antallet af listeelementer bliver ændret.
-  Hermed får nu alle operationer, som kan ændre flere lister, brug for at kende længderne af de berørte lister, i modsætning til vores konvention for basisfunktionen $\splice$, som kunne nøjes med at kende til de berørte knuders greb.
+  Hermed får nu alle operationer, som kan ændre flere lister, brug for at kende længderne af de berørte lister, i modsætning til vores konvention for grundoperationen $\splice$, som kunne nøjes med at kende til de berørte knuders greb.
   Betragt fx følgende kodestump, som fjerner en enkelt knude~$a$ fra liste $L$ og flytter den bag ved knude $a'$ i liste $L'$ og aktualiserer de pågældende instansvariabler for størrelserne.
 
   \begin{tabbing}
 ~~~~\=\kill
     $\Procedure \moveAfter (a, a'\colon \Handle ; L,L'\colon \List)$\\
-    \> $\splice(a,a,a'); \quad L.\size\texttt{--}; \quad L.\size\texttt{++}$
+    \> $\splice(a,a,a'); \quad L.\size\texttt{--}; \quad L'.\size\texttt{++}$
  \end{tabbing}
  
  Vedligeholdelsen af listelængden
 \index{liste!længde}
  kræver tilsvarende ændringer i implementationen af de andre listeoperationer.
  Et større problem end de udvidede grænseflader er dog, at vi ikke længere kan garantere konstante kørselstider.
- Hertil skulle operationer som fx splejsning, der flytter hele listeafsnit, jo også have bruge for at kende til listeafsnittets størrelse.
+ Hertil skulle operationer som fx splejsning, der flytter hele listeafsnit, jo også have brug for at kende til listeafsnittets størrelse.
  Den næste opgave beskriver et muligt kompromis.
 
  \begin{exerc}
    \llabel{ex:smartsize}
-   Konstruer på grundlag af en dobbelthægtet liste en listedatatype, som både tillader konstant-tids forskydning af dellister fra en liste og bestemmelse af listens størrelse, forudsat at listen ikke har været involveret i dellisteoperationer med andre lister siden det sidste kald til $\size$.
-   Efter at den slags dellisteoperationer er blevet udført, skal værdien af $\size$ kun genberegnes, når den bliver brugt næste gange.
+   Konstruer på grundlag af en dobbelthægtet liste en listedatatype, som både tillader konstant-tids forskydning af dellister mellem liste og bestemmelse af en listens størrelse, forudsat at listen ikke har været involveret i dellisteoperationer med andre lister siden det sidste kald til $\size$.
+   Efter at den slags dellisteoperationer er blevet udført, skal værdien af $\size$ først genberegnes, når den skal bruges næste gang.
  \end{exerc}
  
  \begin{exerc}
@@ -523,10 +530,10 @@ Det gør, at enkelthægtede lister kræver mindre plads og ofte også er hurtig
 Ulempen er, at mange operationer ikke længere udføres i konstant tid eller ikke længere virker med samme almengyldighed.
 For eksempel bliver vi nødt til at kende en $\Id{EElement}$-knudes forgænger for at fjerne den.
 
-Vi følger den grundlæggende tilgangsmåde for implementationen af dobbelthægtede lister.
+Vi følger den samme grundlæggende idé som for implementationen af dobbelthægtede lister.
 En enkelthægtet list skabes som en ring af knuder.
 Hvert objekt af typen $\Id{EListe}$ har en attrapknude $h$ af typen $\Id{EElement}$, som er forgænger til den første egentlige knude og efterfølger til den sidste egentlige knude.
-Mange listeoperationer lader sig stadig gennemføre med små ændringer  af grænsefladen.
+Mange listeoperationer kan stadig gennemføres med små ændringer af grænsefladen.
 For eksempel har $\Id{splejs}$-operationen nu brug for at kende \emph{forgængeren} til den første knude af den delliste, som skal flyttes:
 \index{liste!splejs@\Id{splejs}} 
 
@@ -569,14 +576,14 @@ En nyttig tilføjelse til enkelthægtede lister er en peger på den sidste list
 \end{exerc}
 
 Vis skal i det videre forløb se nogle eksempler på brugen af enkelthægtede lister, fx hakketabeller i afsnit~\ref{ch:hash:s:chaining} og flettesortering i afsnit \ref{ch:sort:s:merge}.
-Enkelthægtede lister egner sig også til at vedligeholde af lister af frie knuder til lagerhåndtering -- inklusive for knuder i dobbelthægtede lister.
+Enkelthægtede lister egner sig også til at vedligeholde lister af frie knuder til lagerhåndtering -- inklusive for knuder i dobbelthægtede lister.
 
 \section{Ubegrænsede rækker}
 \llabel{s:array}
 \index{række!ubegrænset|textbf}
 \index{ubegrænset række|textbf}
 
-Vi betragter nu en datastruktur for følger, som ved siden af den indeksbaseret adgangsoperation $[\cdot]$ tillader operationerne $\Id{indsætBagest}$, $\Id{fjernBagest}$ og $\Id{størrelse}$ som følger:
+Vi betragter nu en datastruktur for følger, som ved siden af den indeksbaserede adgangsoperation $[\cdot]$ tillader operationerne $\Id{indsætBagest}$, $\Id{fjernBagest}$ og $\Id{størrelse}$ som følger:
 \index{række!fjernBagest@\Id{fjernBagest}|textbf}
 \index{række!indsætForrest@\Id{indsætForrest}|textbf}
 \index{række!størrelse@\Id{størrelse}|textbf}
@@ -592,18 +599,19 @@ Vi betragter nu en datastruktur for følger, som ved siden af den indeksbaseret 
 Hvorfor en den slags ubegrænsede rækkestrukturer vigtige?
 I mange situationer ved man ikke i forvejen, hvor stor en række skal blive.
 Et typisk eksempel er følgende:
-Lad os implementere unixkommandoen $\Id{sort}$, som sorterer de enkelte linjer i et arkiv.
-Vi begynder med at læse arkivets enkelte linjer ind i en række av linjer, sorterer rækker in hovedlageret og udskriver til sidst den sorterede række af linjer.
-Med ubegrænsede rækker er dette ligetil, men med begrænsede rækker skulle vi derimod behøve at læse hele arkivet to gange:
+Lad os implementere unixkommandoen $\Id{sort}$, som sorterer de enkelte linjer i en fil.
+Vi begynder med at læse filens enkelte linjer ind i en række av linjer, sorterer rækker in hovedlageret og udskriver til sidst den sorterede række af linjer.
+Med ubegrænsede rækker er dette ligetil, men med begrænsede rækker skulle vi derimod behøve at læse hele filen to gange:
 En første gang bare for at bestemme antallet af linjer, og en anden gang for at læse linjerne ind i den nu parate række af den rette størrelse.
 
 Vi skal nu beskrive, hvordan man implementerer ubegrænsede rækker.
 Vi simulerer en ubegrænset række $u$ af $n$ indgange ved at dynamisk vedligeholde en begrænset række $b$ med $w$ pladser, hvor $w\geq n$.
-De første $n$ pladser i $b$ bruges til at gemme indgangene fra $u$.
-De sidste $w-n$ pladser i $b$ er ubenyttede.
-Så længe $w>n$, kan operationen $\Id{indsætBagest}$ nøjes med at øge pejlvariablen $n$ og placere den nye indgang på den første ubenyttede plads i $b$.
+De første $n$ pladser i $b$ bruges til indgangene fra $u$.
+De resterende $w-n$ pladser i $b$ er ubenyttede.
+Så længe $w>n$, kan operationen $\Id{indsætBagest}$ nøjes med at øge pejlevariablen $n$ og placere den nye indgang på den første ubenyttede plads i $b$.
 Når $w=n$, fører det næste kald af $\Id{indsætBagest}$ til, at der stilles en ny begrænset række $b'$ til rådighed, som er en konstant faktor (fx to gange) større end $b$.
-For at genetablere invarianten at $u$ er gemt i $b$, bliver $b$s indhold kopieret til de første $n$ pladser af $b'$. Hermed den gamle række $b$ frigøres.
+For at genetablere invarianten at $u$ er gemt i $b$, bliver $b$s indhold kopieret til de første $n$ pladser af $b'$. 
+Hermed kan den gamle række $b$ frigøres.
 Endelig flyttes pegeren på $b$ til at pege på $b'$.
 Det er endnu nemmere at fjerne den sidste indgang (ved $\Id{fjernBagest}$), fordi der aldrig er fare for, at $b$ bliver for lille.
 Det kan dog tænkes, at vi spilder alt for meget lagerplads ved at tillade, at $b$ er meget større end nødvendig.
@@ -614,7 +622,7 @@ Den underliggende række vokser og krymper ved hjælp af proceduren $\Id{reallok
 \index{række!krympe}
 \index{række!realloker@\Id{realloker}|textbf}
 I vores implementation har vi benyttet konstanterne $\alpha$ og $\beta$ med $\beta= 2$ og $\alpha=4$.
-Når den aktuelle begrænsede række bliver for lille, erstatter vi den af en ny række, som er $\beta$ gange større;
+Når den aktuelle begrænsede række bliver for lille, erstatter vi den med en ny række, som er $\beta$ gange større;
 når den udnyttede del af rækken bliver $\alpha$ gange mindre end rækkens størrelse, erstatter vi den med en ny række af størrelse $n/\beta$.
 Vi gør rede for vores valg af værdierne for $\alpha$ og $\beta$ forneden.
 
@@ -678,11 +686,11 @@ Lemma~\lref{lem:amortize} er alt andet end trivielt.
 En lille og uskyldigt udseende ændring i implementationen gør påstanden falsk, som næste opgave viser.
 
 \begin{exerc}
-  Din afdelingsleder opfordrer dig til at ændre forvalget af $\alpha$ til $\alpha=2$.
-  Hans argumentet er, at det skulle være spild af plads at vente med at erstatte rækken med en mindre, til den er kvartfuld.
+  Hr.~Karrig opfordrer dig til at ændre forvalget af $\alpha$ til $\alpha=2$.
+  Hans argumentet er, at det er spild af plads at vente med at erstatte rækken med en mindre, til den er kvartfuld.
   Han foreslår derfor at formindske rækken, så snart $n\leq \frac{1}{2}w$.
   Overbevis ham om, at det er en dårlig ide.
-  Angiv hertil in følge af $m$ $\Id{indsætBagest}$- og $\Id{fjernBagest}$-operationer, som skulle kræve tid $\Theta(m^2)$, hvis I fulgte hans råd.
+  Angiv hertil en følge af $m$ $\Id{indsætBagest}$- og $\Id{fjernBagest}$-operationer, som skulle kræve tid $\Theta(m^2)$ med hans valg af $\alpha$.
 \end{exerc}
 
 Lemma~\lref{lem:amortize} er et udsagn om de såkaldt »amortiserede« omkostninger ved en følge af $\Id{indsætBagest}$- og $\Id{fjernBagest}$-operationer.
@@ -698,8 +706,8 @@ Hvad kommer til at ske i virkeligheden?
 Bjarne køber den dyre cykel, vejret slår om i regnvejr, og alle gode forsæt er glemt; den dyre cykel står i et hjørne, og ingenting er blevet amortiseret.
 I modsætning hertil planlægger vi vores datastrukturer sådan, at alle store udgifter altid retfærdiggøres af opsparinger i fortiden i stedet for af håbet om fremtidig nøjsomhed.
 I vores eksempel om transport til og fra arbejde kunne det se sådan ud:
-Astrids mål er egentlig at køre på arbejde i en luksuslimousine
-Hun køber den dog ikke på den første dag, men går derimod til fods og lægger hver dag et fast beløb til side.
+Astrids langsigtede mål er at køre på arbejde i en luksuslimousine.
+Hun køber den dog ikke med det samme, men går derimod til fods og lægger hver dag et fast beløb til side.
 Efter et stykke tid har hun nu råd til at købe en cykel.
 Hun fortsætter med at spare og har snart råd til en lille bil, og efter endnu længere tid til den ønskede luksusbil.
 Hver udgift er dækket af tidligere opsparing og er amortiseret i samme øjeblik, den sker.
@@ -781,14 +789,14 @@ Det ses let, at denne værdi aldrig er negativ.
 Vi skal vise invarians ved induktion i antal udførte operationer.
 Umiddelbart efter første udførelse af \Id{realloker} er kontostanden 1~mønt, hvilket opfylder invarianten, som jo kræver mindst 0~mønter i dette fald, hvor $n=w/2=1$.
 Hver udførelse af \Id{indsætBagest} (uden hensyntagen til det muligvis udløste kald til \Id{realloker}) øger $n$ med 1 og indbetaler 2~mønter. 
-Invarianten gælder altså stadig
+Invarianten gælder altså stadig.
 Hver udførelse af \Id{fjernBagest} (uden hensyntagen til det muligvis udløste kald til \Id{realloker}) formindsker $n$ med 1 og indbetaler 2~mønter.
 Invarianten gælder altså også i dette tilfælde stadig.
 Nu betrager vi et kald til \Id{realloker}, som jo skal bruge $n$ mønter.
-Der er to tilfælde, svarende til $n=w$  og $4n\leq n$ med $n\geq 0$.
+Der er to tilfælde, svarende til $n=w$  og $4w\leq n$ med $n\geq 0$.
 I det første tilfælde er kontostanden  ifølge invarianten mindst $2(n-\frac{1}{2}w)=n$, hvilket dækker behovet. 
 I det andet tilælde er kontostanden ifølge invarianten mindst $\frac{1}{2}w-n\ge n$, hvilket ligeledes dækker behovet.
-I begge tilfælde gælder ligheden $n=\frac{1}{2}w$ efter udførelsen af \Id{reallocate}; 
+I begge tilfælde gælder ligningen $n=\frac{1}{2}w$ efter udførelsen af \Id{reallocate}; 
 invarianten er altså stadig gyldig.
 
 \begin{exerc}
@@ -879,7 +887,7 @@ $\Id{tilføjBagest}$,
 $\Id{fjernForrest}$,
 $\Id{fjernBagest}$,
 og $\Id{tom}$ til rådighed.
-Dobbeltkøen kan observeres hos bageren, når en ubehagelig person stiller sig forrest i køen, eller den person, der står bagest i køen, bliver træt af at vente og forlader butikken.
+Dobbeltkøen kan observeres hos bageren, når en uforskammet person stiller sig forrest i køen, eller den person, der står bagest i køen, bliver træt af at vente og forlader butikken.
 Figur~\lref{fig:queues} sammenfatter funktionaliteten af datastrukturerne stak, kø og dobbeltkø.
 
 
@@ -956,7 +964,7 @@ Figur~\lref{fig:queues} sammenfatter funktionaliteten af datastrukturerne stak, 
 Hvorfor gør vi os overhovedet tanker om følgetyperne stak, kø og dobbeltkø, når nu $\Id{Liste}$-datastrukturen allerede stiller samtlige deres operationer og flere til rådighed i konstant tid?
 Det er der mindst tre grunde til.
 For det første er programmer mere læsbare og indeholder færre fejl, hvis man udtrykkeligt indskrænker sig til snævrere anvendelsesmønstre.
-For den andet tillader smallere grænseflader en større fleksibilitet ved implementationen.
+For det andet tillader smallere grænseflader en større fleksibilitet ved implementationen.
 På grund af deres enkelhed kan stakke og køer bruge specialiserede implementationer, som er mere pladsbesparende end implementationen af den almindelige type $\Id{Liste}$.
 Vi vil se nærmere på dette algoritmiske aspekt i resten af afsnittet.
 Især vil vi stræbe efter implementationer, som er baserede på rækker i stedet for lister.
@@ -998,12 +1006,12 @@ Videre betragter vi nu en rækkebaseret implementationen af en begrænset kø, s
 \index{kø!cyklisk række}
 Vi opfatter hertil rækken som en cyklisk struktur, hvis sidste indgang efterfølges af indgang~0.
 \index{række!cyklisk|textbf}
-Med andre ord er de mulige rækkeindeks tallene $0$, $\ldots$, $n$, og vi opfatter indeksene modulo $n+1$.
-Vi opretholder to indeks $f$ og $t$, som begrænser køens gyldige område; køen omfatter rækkepositionerne med indeks i $f..t-1$.
+Med andre ord er de mulige rækkeindeks tallene $0$, $\ldots$, $n$, og vi opfatter indicene modulo $n+1$.
+Vi opretholder to indeks $f$ og $t$, som begrænser køens gyldige område; køen omfatter rækkepositionerne med indeks i $f..(t-1)$.
 Indeksene $f$ og $t$ vandrer rundt i ring, efterhånden som indgange stilles i køen og fjernes fra den.
 Indgangenes cykliske opførsel opnår man ved at regne modulo rækkestørrelsen $n+1$.%
 \footnote{På mange maskiner kan man opnå en mærkbar hastighedsforbedring af indeksberegningerne ved at vælge rækkestørrelsen som en to-potens og erstatte modulooperationen med bitoperationer.}
-Til enhver tid forbliver mindst én rækkeindgang ubenyttet; eller er det vanskeligt at skelne en fuld kø (med $n$ indgange) fra en tom kø.
+Til enhver tid forbliver mindst én rækkeindgang ubenyttet; ellers er det vanskeligt at skelne en fuld kø (med $n$ indgange) fra en tom kø.
 Implementationen kan let overføres til begrænsede dobbeltkøer.
 Cykliske rækker støtter også indiceret adgang med $[\cdot]$:
 \[
@@ -1091,7 +1099,7 @@ I den slags implementationer udgør lagerforvaltningen ofte en betydelig udfordr
 
 Klassen $\Id{vector}\langle\Id{Element}\rangle$ i STL (Standard Template Library) realiserer ubegrænsede rækker.
 \index{C++!vector@\Id{vector}}
-Alligevel tillader de færreste implementationer af STL at rækker krymper.
+Alligevel tillader de færreste implementationer af STL, at rækker krymper.
 Klassens funktionalitet omfatter fastlæggelsen af rækkens maximale senere omfang ved det tidspunkt, den bliver skabt.
 Normalt angiver man hertil på dette tidspunkt et skøn over følgens længde $n$.
 På den måde kan man undgå mange udvidelsesoperationer.
@@ -1112,7 +1120,7 @@ Snublestenen ved anvendelsen af ubegrænsede rækker er den omstændighed, at pe
 (Man siger, at »referenceintegriteten« er ødelagt.)
 \index{referenceintegritet}
 Man må altså ubetinget sikre, at rækken ikke bliver skiftet ud, mens sådan en peger er i brug.
-Når den slags udskiftning ikke kan udelukkes, må man referere til indgange ved hjælp af indekser i stedet for pegere.
+Når den slags udskiftning ikke kan udelukkes, må man referere til indgange ved hjælp af indices i stedet for pegere.
 
 Både STL
 \index{STL!list@\Id{list}} 
