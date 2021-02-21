@@ -54,21 +54,19 @@ Vi vil gå ud fra, at vi har to elementaroperationer til rådighed:
 addition af tre cifre med et tocifret resultat (sommetider kaldt en heladderer)
 \index{mente}
 og multiplikationen af to cifre, ligeledes med et tocifret resultat.%
-\footnote{Læg mærke til, at summen af tre cifre højest er $3(B - 1)$ og produktet af to cifre højest er $(B-1)^2$, og at begge disse tal er højest $(B-1)\cdot B^1 + (B - 1)\cdot B^0 = B^2 - 1$, og derfor kan repræsenteres med to cifre.}
+\footnote{Læg mærke til, at summen af tre cifre højst er $3(B - 1)$ og produktet af to cifre højst er $(B-1)^2$, og at begge disse tal er højst $(B-1)\cdot B^1 + (B - 1)\cdot B^0 = B^2 - 1$, og derfor kan repræsenteres med to cifre.}
 I tilfældet $B=10$ gælder for eksempel
 \[  \begin{array}{r} 3 \\ 5 \\ {}+{}\;\;5 \\ \hline 13 \end{array}
 \qquad\text{og}\qquad    6 \cdot 7 = 42 \,. \]
-Vi vil måle effektiviten naf vores algoritmer i termer af antallet af brugte elementaroperationer.
+Vi vil måle effektiviten af vores algoritmer som antallet af brugte elementaroperationer.
 
 Hvert tal bestående af $n$ cifre kan man skrive med $m$ cifre for $m \ge n$ ved at foranstille nuller.
 For eksempel repræsenterer »425« og »000425« samme tal. 
 I det følgende går vi ud fra, at additionens eller multiplikationens operander, som vi kalder $a$ og $b$, begge består af $n$ cifre.
 Antagelsen, at de to tal har samme længde, gør vores analyse nemmere, uden at vi går glip af kapitlets væsentlige indsigter.
 Vi vender tilbage til denne bemærkning til sidst.
-Cifrene i $a$ kalder vi $a_{n-1}$, $\ldots$, $a_0$, hvor $a_{n-1}$ er det mest betydende og $a_0$  er det mindst betydende ciffer.
-%TODO højst højest lavest mest
-vi skiver $a = (a_{n-1}\ldots\,a_0)$.  
-Det mest betydende ciffer kan være 0.
+Cifrene i $a$ kalder vi $a_{n-1}$, $\ldots$, $a_0$, hvor $a_{n-1}$ er det mestbetydende og $a_0$  er det mindstbetydende ciffer.
+Vi skriver $a = (a_{n-1}\ldots\,a_0)$, hvor det mestbetydende ciffer kan være 0.
 På samme måde lader vi tallet $b$ bestå af cifrene $b_{n-1}$, $\ldots$, $b_0$ og skriver $b =(b_{n-1}\ldots\,b_0)$.
 
 
@@ -77,14 +75,14 @@ På samme måde lader vi tallet $b$ bestå af cifrene $b_{n-1}$, $\ldots$, $b_0
 \index{addition|textbf}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Alle ved, hvordan man lægger
+Vi ved alle, hvordan man lægger
 $a = (a_{n-1}\ldots\,a_0)$ og $b = (b_{n-1}\ldots\,b_0)$ sammen.
-Vi skriver blot tallene under hinanden, forskudt efter de mindst betydende cifre, og lægger de enkelte cifre sammen fra højre til venstre.
-Herved flyttes et enkelt ciffer fra en position til den næste.
-Dette ciffer kaldes \emph{menten}. 
+Vi skriver blot tallene under hinanden, forskudt efter de mindstbetydende cifre, og lægger de enkelte cifre sammen fra højre til venstre.
+Herved flyttes et enkelt ciffer, kaldt \emph{menten},
 \index{mente}
+fra en position til den næste.
 Resultatet er et $(n+1)$-cifret tal $s=(s_n\ldots\,s_0)$.
-Metoden kan fremstilles grafisk som på følgende måde:
+Metoden kan fremstilles grafisk på følgende måde:
 
 \[       \begin{array}  {rrrrrr}
                         & a_{n-1} &\ldots &a_1 &a_0 & \text{første operand}\\
@@ -92,13 +90,15 @@ Metoden kan fremstilles grafisk som på følgende måde:
                  c_n &c_{n-1} & \ldots &c_1  & 0  &\text{menter}\\ \hline
                      s_n &s_{n-1} & \ldots &s_1  &s_0  &\text{sum}\end{array} 
 \]
-Her er $c_0,\ldots,c_n$ følgen af menter, og $s = (s_n\ldots\,s_0)$ den resulterende sum. 
+Her betegner $c_0,\ldots,c_n$ følgen af menter, og $s = (s_n\ldots\,s_0)$ er den resulterende sum. 
 Der gælder $c_0 = 0$, $c_{i+1}\cdot B + s_i  = a_i + b_i + c_i$ for $0 \le i < n$ og $s_n = c_n$. 
 Som program kan vi skrive algoritmen på følgende måde:
 \begin{quote}
 \begin{code}
+  ~~~~\=\kill
 \DeclareInit{$c$}{\Id{Ciffer}}{$0$}\RRem{Variabel for menten}\\
-\ForFromTo{i}{0}{n-1} {\rm adder $a_i$, $b_i$, $c$ for at danne $s_i$ og den nye mente $c$}\\
+\ForFromTo{i}{0}{n-1} \\
+  \>{\rm læg $a_i$, $b_i$, $c$ sammen, resultatet er $s_i$ og den nye mente $c$}\\
 $s_n\Is c$
 \end{code}
 \end{quote}
@@ -107,25 +107,25 @@ Algoritmen bruger en elementaroperation per position og derfor $n$ elementaroper
 
 \begin{thm} 
   Addition af to heltal med $n$ cifre kræver præcis $n$ elementaroperationer.
-  Resultatet er et $(n+1)$-cifret tal.
+  Resultatet er et $(n+1)$-cifret heltal.
 \end{thm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Multiplikation: Skolemetoden}
 \index{Multiplikation (heltal)!skolemetode|textbf} 
 
-Alle ved, hvordan man ganger to tal sammen.
+Vi ved også alle, hvordan man ganger to tal sammen.
 I dette afsnit skal vi gense »skolemetoden« for multiplikation.
-I et senere afsnit skal vi kigge på en anden metode, som er betydliget hurtigere for store tal.
+Derefter vil vi kigge på en anden metode, som er betydliget hurtigere for store tal.
 
 Vi begynder langsomt.
 Først skal vi forstå, hvordan man ganger et $n$-cifret tal $a$ med et etcifret tal $b_j$.
-Vi bruge betegnelsen $b_j$, fordi det skal vise sig praktisk længere fremme i argumentet.
-For hvert ciffer Ziffer $a_i$ i $a$ danner vi produktet $a_i \cdot b_j$.
+Vi bruger betegnelsen $b_j$, fordi det bliver praktisk længere fremme i argumentet.
+For hvert ciffer~$a_i$ i tallet~$a$ udregner vi produktet~$a_i \cdot b_j$.
 Resultatet er et tocifret tal $(c_i d_i)$, dvs.
 \[ a_i \cdot b_j = c_i \cdot B + d_i \qquad\text{for }i\in \{0,\ldots, n-1\}\,. \]
 Ud fra alle cifrene $c_i$ og $d_i$ danner vi to tal $c = (c_{n-1} \ldots\, c_{0} \, 0)$ og $d = (d_{n-1} \ldots\, d_0)$.
-Idet $c_i$-cifrene er højestbetydende, hægter vi et ekstra 0 på $c$.
+Idet $c_i$-cifrene er mestbetydende, hægter vi et ekstra 0 på $c$.
 Nu lægger vi $c$ og $d$ sammen og får produktet $p_j = a \cdot b_j$. 
 Grafisk ser det ud på følgende måde:
 \[ (a_{n-1} \ldots\, a_i \ldots\, a_0) \cdot b_j  \quad \longrightarrow \quad
@@ -138,9 +138,9 @@ Grafisk ser det ud på følgende måde:
 \]
 Hvor mange elementaroperationer har vi brugt?
 For hvert $i\in\{0,\ldots, n-1\}$ kræves en elementaroperation for at danne produktet $a_i \cdot b_j$.
-For at lægge $(c_{n-1}\ldots c_0\,0)$ og $(d_{n-1}\ldots d_0)$ kan vi nøjes med at kopiere $d_0$ uden at betale nogen operation, de andre position kræver en elementaraddition.
-Total giver det $2n$ elementaroperationer.
-Læg mærke til, at mente i den sidste elementaraddition er $0$, fordi $a\cdot b_j \le  (B^n-1)(B-1) < B^{n+1}$.
+For at lægge $(c_{n-1}\ldots c_0\,0)$ til $(d_{n-1}\ldots d_0)$ kan vi nøjes med at kopiere $d_0$ uden at betale nogen operation, de andre position kræver en elementaraddition.
+Totalt kræver det $2n$ elementaroperationer.
+Læg mærke til, at menten i den sidste elementaraddition er $0$, fordi $a\cdot b_j \le  (B^n-1)(B-1) < B^{n+1}$.
 Resultatet består altså af $n+1$ cifre.
 
 \begin{lemma} 
@@ -149,21 +149,21 @@ Resultatet består altså af $n+1$ cifre.
 \end{lemma}
 
 I praksis vil man nok være lidt mere snedig.
-Man sammenfatter nemlig dannelsen af cifferprodukutet $a_i \cdot b_j$ og additionen af $c$ og $d$ i samme fase,
+Man sammenfatter nemlig udregningen af cifferproduktet $a_i \cdot b_j$ og additionen af $c$ og $d$ i samme fase,%
 \footnote{I oversætterkonstruktion
 \index{oversætter}
 \index{løkkefusion} 
 kaldes denne transformation, som hører til kodegenerering og kodeoptimering, for \emph{løkkefusion}.} 
-dvs. at de enelte cifre i $c$ og $d$ skabes i det øjeblik, hvor de skal bruges i den afsluttende addition.
+dvs. at de enelte cifre i $c$ og $d$ skabes i samme øjeblik, som de skal bruges i den afsluttende addition.
 Vores algoritme danner i stedet samtlige cifferprodukter $a_i \cdot b_j$ for $i\in\{0,\ldots, n-1\}$ i en fase for sig.
-Det tjener kun til at gøre beskrivelsen mere klar.
+Det tjener kun til at gøre beskrivelsen mere letforståelig.
 
 \begin{exerc} 
   Skriv et program, der ganger $a$ og $b_j$ i samme fase.
 \end{exerc}
 
 Nu er vi parate til at gange to $n$-cifrede tal.
-Skolemetoden for denne opgave ser ud på følgende måde:
+Skolemetoden hertil virker som følger:
 Vi danner delprodukterne $p_j$ (med repræsentationen $(p_{j,n}\ldots\, p_{j,0})$), ved at gange  $a$  med det $j$te ciffer $b_j$ i $b$, og adderer derefter produkterne $p_j \cdot B^j$, passende forskudt under hinanden, for at danne produktet af $a$ og $b$.
 Grafiskt ser det sådan ud:
 \[
@@ -176,7 +176,7 @@ p_{n-1,n} & \ldots & p_{n-1,3} & p_{n-1,2} & p_{n-1,1} & p_{n-1,0} \\ \hline
 \multicolumn{8}{c}{\text{Summen af  de $n$ delprodukter}}
 \end{array} \]
 Beskrivelsen i pseudokode er vældig kompakt.
-Vi initialiserer produktet $p$  til 0  og lægger delprodukterne $a \cdot b_j \cdot B^j$ til $p$ et efter et for $j\in \{0,\ldots, n-1\}$:
+Vi initialiserer produktet $p$  til $0$ og lægger delprodukterne $a \cdot b_j \cdot B^j$ til $p$ et efter et for $j\in \{0,\ldots, n-1\}$:
 
 \begin{quote}
   \begin{code}
@@ -188,7 +188,7 @@ Vi initialiserer produktet $p$  til 0  og lægger delprodukterne $a \cdot b_j \c
 \index{algoritmenanalyse!sum}%
 Nu skal vi bestemme, hvor mange elementaroperationer skolemetoden bruger.
 For hvert delprodukt $p_j$ bruges $2n$ elementaroperationer, og derfor kræver beregningen af samtlige delprodukter $2n^2$ elementaroperationer i det hele.
-Prouktet $a \cdot b$ består  af  $2n$ cifre, og derfor behandler hver addition $p + a \cdot b_j \cdot B^j$ tal bestående af højst $2n$ cifre.
+Produktet $a \cdot b$ består  af  $2n$ cifre, og derfor har de tal, der indgår i en addition på formen $p + a \cdot b_j \cdot B^j$,  højst $2n$ cifre.
 Hver af disse $n-1$ additioner koster højst $2n$ elementaroperationer, sammenlagt højst $2n^2-2n$ mange.
 I det hele bruges altså højst $4n^2$ elementaroperationer.     
 
@@ -197,7 +197,7 @@ Tallet $a \cdot b_j \cdot B^j$ består af $n + 1 + j$ cifre, hvoraf de sidste $j
 Vi kan altså begynde med additionen på position $(j + 1)$.
 Desuden gælder der i  det øjeblik, som $a \cdot b_j \cdot B^j$ lægges til $p$, at $p$ har værdien $a\cdot(b_{j-1}\ldots\,b_0)$, som består af højst $n+j$ cifre.
 Derfor går additionen af  $p$ og $a \cdot b_j\cdot B^j$ ud på att lægge to $(n+1)$-cifrede tal sammen til et  $(n+1)$-cifret resultat, hvilket kun behøver $n + 1$ elementaroperationer. 
-Sammenlagt behøver alle $n-1$ additioner ikke mere end $(n-1)(n+1) < n^2$ elementaroperationer.
+Sammenlagt kræver alle $n-1$ additioner ikke mere end $(n-1)(n+1) < n^2$ elementaroperationer.
 Vi får følgende resultat:
 
 \begin{thm}
@@ -239,6 +239,7 @@ fordobles.
 \end{tabular}
 \end{minipage}
 %
+\qquad
   \begin{minipage}{0.65\textwidth}
     \begin{tikzpicture}[scale = .8]
     \begin{loglogaxis} [ xlabel=$n$, xmin = 8, xmax = 262144,ylabel=$T_n$ (sek.),   log basis x={2},     grid=both,
@@ -266,19 +267,19 @@ fordobles.
 \end{tikzpicture}
 \end{minipage}
 \caption{Udførelsestiden for skolemetoden til multiplikation af to $n$-cifrede tal.
-De tre søjler i tabllen til \emph{venstre} angiver $n$, udførelsestiden $T_n$ af \protect\CC-implementationen fra afsnit~\lref{s: programs}  og forholdet $T_n/T_{n/2}$.  
+De tre søjler i tabellen til \emph{venstre} angiver $n$, udførelsestiden $T_n$ af \protect\CC-implementationen fra afsnit~\lref{s: programs}  og forholdet $T_n/T_{n/2}$.  
 Grafen til \emph{højre} tegner $\log T_n$ som funktion af $\log n$; stort set som en ret linje.
 Læg mærke til, at når $T_n = \alpha n^\beta$ for konstante faktorer $\alpha$ og $\beta$, så gælder $T_n/T_{n/2} =
 2^\beta$ og $\log T_n = \beta \log n + \log \alpha$.
-Med anndre ord er $\log T_n$ en lineær funktion af  $\log n$ med hældning $\beta$.
+Med andre ord er $\log T_n$ en lineær funktion af  $\log n$ med hældning $\beta$.
 I vores tilfælde er hældningen 2, hvilket man kan efterprøve med en lineal.}
 \llabel{fig:school_times}
 \end{figure}
 
 Antag nu, at vi implementerer multiplikationsalgoritmen i vores yndlingsprogrammeringssprog (det gør vi faktisk forneden) og måler den tid, det tager på vores yndlingscomputer at gange par $n$-cifrede tal $a$ og $b$ for forskellige $n$.
-Hvile udførelsestider kan vi regne med?
+Hvilke udførelsestider kan vi regne med?
 Vi påstår, at eksperimentet vil vise kvadratisk vækst i $n$.
-Grunden hertil er, at \emph{elementaroperationerne er repræsentative for programmets udførelsetid}.
+Grunden hertil er, at \emph{elementaroperationerne er repræsentative for programmets udførelsestid}.
 Betragt hertil først additionen af to $n$-cifrede tal.
 Hvad sker der under programmets udførelse?
 For hver cifferposition $i$ flyttes cifrene $a_i$ og $b_i$ fra hovedlageret til processoren, summen $a_i+b_i+c$ bliver regnet ud, sumcifret $s_i$ kopieres over i hovedlageret, menten $c$ aktualiseres, index $i$ tælles op og løkkeafslutningsbetingelsen prøves.
@@ -286,9 +287,9 @@ I vores analyse har vi talt præcis 1 elementaroperation for hvert $i$, derfor e
 På en moderne processor opstår desuden særlige fænomener som pipelining af operationer
 \index{pipelining}
 % TODO pipelining
-og den meget vanskelige mekanisme for datastransport mellem hovelageret og processoren, men disse påvirker alle cifferpositioner nogenlunde lige.
+og den meget vanskelige mekanisme for datastransport mellem hovedlageret og processoren, men disse påvirker alle cifferpositioner nogenlunde lige.
 Derfor er antallet af elementaroperationer også repræsentativt for udførelsestiden af en faktisk implementation på en virkelig computer.
-Samme overvejelser kan gennemføres for multiplikationsalgoritmen, forde etcifret multiplikation ligner etcifret addition, og skolemetodens anden fase går ud på en følge af additioner.
+Samme overvejelser kan gennemføres for multiplikationsalgoritmen, idet etcifret multiplikation ligner etcifret addition, og skolemetodens anden fase går ud på en følge af additioner.
 
 \index{ingeniørsaspekter}%
 
@@ -301,12 +302,13 @@ Eksperimentet skal derfor vare meget længere en denne enhed for begrænse effek
 multiplikationer af tilfældige $n$-cifrede tal for at bestemme den gennemsnitlige udførelsestid $T_n$.
 Denne finder man i tabellens anden søjle.
 Figur~\lref{fig:school_times} viser desuden datapunkterne grafisk.%	
-\footnote{I denne bog angiver $\log x$ logaritmen af $x$ med grundtal~2, altså $\log_2 x$.}%
-Målepunkterne indikerer kvadratisk vækst, hvilket man kan aflæse på forskellige måder.
+\footnote{I denne bog angiver $\log x$ logaritmen af $x$ med grundtal~2, altså $\log_2 x$.}
+Målepunkterne antyder kvadratisk vækst, hvilket man kan aflæse på forskellige måder.
 Forholdet $T_n/T_{n/2}$ er altid tæt på 4, og tegningen i dobbeltlogaritmisk skala viser stort set et ret linje med hældning~2.
 Eksperimentet er altså ganske lovende:
 \emph{Vores teoretiske analyse tillader forudsigelser af algoritmens faktiske opførsel.
-Analysen kom frem til, at antallet af elementaroperationer vokser kvadratisk, vis har argumenteret for, at udførelsestiden burde ligge tæt op ad antallet af elementaroperationer, og den målte udførelsestid vokser vitterligt kvadratisk.} 
+Analysen kom frem til, at antallet af elementaroperationer vokser kvadratisk. 
+Vi har argumenteret for, at udførelsestiden burde ligge tæt op ad antallet af elementaroperationer, og den målte udførelsestid vokser vitterligt kvadratisk.} 
 Alligevel observerer vi også systematiske afvigelser.
 For små $n$ vokser tiden fra en række i tabellen til den næste med mindre end en faktor $4$.
 Det hænger sammenn med, at lineære og konstante termer stadig spiller en betragtelig rolle for udførelsestiden.
@@ -316,8 +318,8 @@ Vi vender tilbage til dette punkt i afsnit~\ref{ch:intro:s:model}.
 
 \begin{exerc} 
   Skriv programmer for addition og multiplikation af lange tal.
-  Antag, at tallene er givet som følger (rækker eller lister eller hvad dit programmeringssprog nu måtte bruge af datastrukturer) af decimalcifre, og anvend den forhåndenværende aritmetik fro at implementere elementaroperationerne.
-  Skriv så funktioner \texttt{plus}, \texttt{gange1} og \texttt{gange} til henholdsvis addition af to tal, multiplikation af et tal med et etcifret tal og multiplkation af $n$-cifrede tal.
+  Antag, at tallene er givet som følger (rækker eller lister eller hvad dit programmeringssprog nu måtte bruge af datastrukturer) af decimalcifre, og anvend den forhåndenværende aritmetik for at implementere elementaroperationerne.
+  Skriv så funktioner \texttt{plus}, \texttt{gange1} og \texttt{gange} til henholdsvis addition af to tal, multiplikation af et tal med et etcifret tal og multiplikation af $n$-cifrede tal.
   Lav din egen udgave af figur~\lref{fig:school_times}.
   Prøv også at bruge et større grundtal end 10, fx $2^{16}$.  
 \end{exerc}
@@ -334,7 +336,7 @@ Vi vender tilbage til dette punkt i afsnit~\ref{ch:intro:s:model}.
 \index{algoritmekonstruktion!resultatkontroll}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Vores additions- og multiplkationsalgoritmer er temmelig simple, så vi kan trygt gå ud fra at være i stand til at implementere dem korrekt i det valgte programmeringssprog.
+Vores additions- og multipækationsalgoritmer er temmelig simple, så vi kan trygt gå ud fra at være i stand til at implementere dem korrekt i det valgte programmeringssprog.
 Alligevel er konstruktionen af programmer kendt for at være behæftet med fejl,%
 \footnote{Fejlen i divisionsalgoritmen i Pentium-processorens divisionsalgoritme for kommatal var notorisk.
 Den var resultatet af en enkelt fejlagtig indgang i en tabel i algoritmen.
@@ -399,19 +401,19 @@ Men $135153 \bmod 7 = 4$, og vi har opdatet, at $135153$ og $429 \cdot 357$ er f
 \section{En rekursiv udgave af skolemetoden}
 \index{multiplikation (naturlige tal)!rekursiv}
 \index{algoritmekonstruktion!rekursion}
-\index{algoritmekonstruktion!del-og-hersk|textbf}
+\index{algoritmekonstruktion!del og hersk|textbf}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 Vi vil nu udvikle en rekursiv udgave af skolemetoden for multiplikation.
-Det er vores første møde med det algoritmiske princip »\emph{del-og-hersk}«,
-\index{algoritmekonstruktion!del-og-hersk!multiplikation} 
-\index{algoritmekonstruktion!divideandconquer@\emph{divide-and-conquer}|siehe{algoritmekonstruktion, del-og-hersk}} 
+Det er vores første møde med det algoritmiske princip »\emph{del og hersk}«,
+\index{algoritmekonstruktion!del og hersk!multiplikation} 
+\index{algoritmekonstruktion!divideandconquer@\emph{divide-and-conquer}|siehe{algoritmekonstruktion, del og hersk}} 
 et af de grundlæggende paradigmer for algoritmekonstruktion.
 
 Vi betragter igen to $n$-cifrede tal $a$ og $b$, som vi ønsker at multiplicere.
 Nu bruger vi følgende fremgangsmåde: 
 Lad $k = \floor{n/2}$.
-Opdel $a$ i to tal $a_\mathrm H$ og $a_\mathrm L$, således at $a_\mathrm L$ består af de $k$ lavestbetydende cifre i $a$, og $a_\mathrm H$ består af de $n-k$ højestbetydende cifre.
+Opdel $a$ i to tal $a_\mathrm H$ og $a_\mathrm L$, således at $a_\mathrm L$ består af de $k$ mindstbetydende cifre i $a$, og $a_\mathrm H$ består af de $n-k$ mestbetydende cifre.
 På samme måde opdeles $b$ i $b_\mathrm H$ og $b_\mathrm L$.
 Vi har altså
 \[ a = a_\mathrm H \cdot B^{k} + a_\mathrm L  \quad \text{og} \quad b = b_\mathrm H \cdot B^{k} + b_\mathrm L\,,  \]
@@ -431,8 +433,8 @@ Vi er parate til at beskrive den fuldstængide algoritme.
 For at multiplicere etcifrede tal sammen, benytter vi elementaroperationerne for multiplikation.
 For at multiplicere tal bestående af $n\ge2$ cifre, bruger vi metoden foroven med skridtene (a) til (c).
 
-Metoden hedder »del-og-hersk«, fordi den reducerer problemet at gange $a$ og $b$ til en række  \emph{enklere} delopgaver af samme slags.
-En del-og-hersk-algoritme består altid af tre skridt:
+Metoden hedder »del og hersk«, fordi den reducerer problemet at gange $a$ og $b$ til nogle \emph{enklere} delopgaver af samme slags.
+En del og hersk-algoritme består altid af tre skridt:
 I  første skridt opdeles den oprindelige instans i mindre delinstanser
  (vores skridt~(a)); 
  i næste skridt løses problemet på de mindre instanser med den samme metode, det vil sige \emph{rekursivt}
@@ -490,8 +492,8 @@ I den sammenhæng vil vi støde på en såkaldt \emph{rekursionsligning}, et sl
   Opdelingen af tallene $a$ og $b$ i de fire dele $a_\mathrm H$, $a_\mathrm L$, $b_\mathrm H$ kræver  $b_\mathrm L$ ingen elementaroperationer.
   \footnote{Selvfølgeligt kræver dette skridt beregningstid, men denne tages altså ikke hensyn til i analysen.}
   Hvert af de fire tal har højst $\ceil{n/2}$ cifre, så de fire rekursive multiplikationer bruger sammenlagt ikke mere end $4 \cdot T(\ceil{n/2})$ elementaroperationer.
-  Sammenføjningen af
-  $a_\mathrm L\cdot b_\mathrm L$ og $a_\mathrm H\cdot b_\mathrm H\cdot B^{2k}$ til et tal koster ingen elementaroperationer, idet $a_\mathrm L\cdot b_\mathrm L$ kun består af $2k$ cifre og $a_\mathrm H\cdot b_\mathrm H\cdot B^{2k}$ ender med $2k$ nuller.
+  At lægge
+  $a_\mathrm L\cdot b_\mathrm L$ og $a_\mathrm H\cdot b_\mathrm H\cdot B^{2k}$ sammen koster ingen elementaroperationer, idet $a_\mathrm L\cdot b_\mathrm L$ kun består af $2k$ cifre og $a_\mathrm H\cdot b_\mathrm H\cdot B^{2k}$ ender med $2k$ nuller.
   %TODO wtf k?
   Afslutningsvist bruges to additioner til at beregne det endelige resultat.
   Hver af disse additioner behandler to tal med højst $2n$ cifre og bruger derfor højst
@@ -523,15 +525,15 @@ I afsnnit~\ref{ch:intro:s:analysis} skal vi se, hvordan man løser rekursionslig
 en hurtigere metode til multiplikation af store naturlige tal.
 Hans algoritmes udførelsestid vokser omtrent som  $n^{\log 3} \approx n^{\num{1.585}}$.
 Metoden er overraskende nem.
-Karatsuba lagde mærke til, at man kan spare en af multiplikationerne i del-og-hersk-udgaven basered på en enkel lighed mellem to termer.
-Det vil sige, at man kan gange to $n$-cifrede tal sammen ved at gange  blot \emph{tre} tal af den halve længde.
+Karatsuba lagde mærke til, at man kan spare en af multiplikationerne i del og hersk-udgaven væk ved hjælp af en enkel enkel omskrivning.
+Resultatet er, at man kan gange to $n$-cifrede tal sammen ved at gange  blot \emph{tre} tal af den halve længde.
 
-Vi vil nu beskrive denne tilgang i detaljer.
+Vi vil nu beskrive hans metode i detaljer.
 Lad $k=\floor{n/2}$. 
-Som før kalder vi multiplikationens to operander for $a$ og $b$ og deler $a$ i to tal $a_\mathrm H$ og $a_\mathrm L$, hvor $a_\mathrm L$ er de $k$ lavestbetydende cifre i $a$ og 
-$a_\mathrm H$ er de resterene $n - k$ højestbetydende cifre. 
+Som før kalder vi multiplikationens to operander for $a$ og $b$ og deler $a$ i to tal $a_\mathrm H$ og $a_\mathrm L$, hvor $a_\mathrm L$ er de $k$ mindstbetydende cifre i $a$, 
+og $a_\mathrm H$ er de resterene $n - k$ mestbetydende cifre. 
 På samme måde opdeles $b$ i $b_\mathrm L$ og $b_\mathrm H$.
-Da gælder
+Vi har altså
 \[ a = a_\mathrm H \cdot B^{k} + a_\mathrm L  \quad \text{og} \quad b = b_\mathrm H \cdot B^{k} + b_\mathrm L \,,\]
 og derfor (trikket er i den anden ligning!)
 \begin{multline*}
@@ -542,13 +544,13 @@ a\cdot b = a_\mathrm H\cdot b_\mathrm H\cdot B^{2k} + (a_\mathrm H\cdot b_\mathr
 + a_\mathrm L\cdot b_\mathrm L \,.
 \end{multline*}
 Umiddelbart ser det jo ud, som om vi bare har gjort tingene mere komplicerede.
-Men ved nærmere syn ser man, at det sidste udtryk kun bruger tre multiplikationer af kortere tal, nemlig beregningen af $a_\mathrm H\cdot b_\mathrm H$, $a_\mathrm L \cdot b_\mathrm L$ og $(a_\mathrm H + a_\mathrm L) \cdot (b_\mathrm H + b_\mathrm L)$.
-Der kræves også fem additioner,
+Men ved nærmere eftersyn ser man, at det sidste udtryk kun bruger tre multiplikationer af kortere tal, nemlig beregningen af $a_\mathrm H\cdot b_\mathrm H$, $a_\mathrm L \cdot b_\mathrm L$ og $(a_\mathrm H + a_\mathrm L) \cdot (b_\mathrm H + b_\mathrm L)$.
+Godtnok kræves der nu fem additioner,
 \footnote{For at være nøjagtig, skal man bruge fire additioner og en subtraktion.
 Vi overlader det til læseren at overbevise sig om, at subtraktion ikke er dyrere end addition.
 }
 hvilket er tre mere end i den rekursive udgave af skolemetoden.
-Men det afgørende er, at additionerne (som udføres umiddelbart)  er meget billige i forhold til multiplikationerrne (som er rekursive), hvorfor det er giver mening at spare en multiplikation for prisen af tre additioner.
+Men det afgørende er, at additionerne (som udføres umiddelbart) er meget billige i forhold til multiplikationerrne (som kræver rekursion), hvorfor det er giver mening at spare en multiplikation for prisen af tre additioner.
 Vi har altså følgende  algoritme for at beregne $a \cdot b$:
 
 \begin{enumerate}[(a)]
@@ -561,7 +563,7 @@ p_1 = (a_\mathrm H + a_\mathrm L) \cdot (b_\mathrm H + b_\mathrm L).\]
 (Den første sum er bare en sammenføjning af to tal, ikke en rigtig addition.)
 \end{enumerate}
 
-Tallene $a_\mathrm H$, $a_\mathrm L$, $b_\mathrm H$, $b_\mathrm L$, $a_\mathrm H + a_\mathrm L$ og $b_\mathrm H + b_\mathrm L$ består af højst $\ceil{n/2} + 1$ cifre. 
+Tallene $a_\mathrm H$, $a_\mathrm L$, $b_\mathrm H$, $b_\mathrm L$, $a_\mathrm H + a_\mathrm L$ og $b_\mathrm H + b_\mathrm L$ består hvert af højst $\ceil{n/2} + 1$ cifre. 
 Derfor er multiplikationen i skridt~(b) enklere end den oprindelige opgave, såfremt $\ceil{n/2} + 1 < n$, dvs. $n \ge 4$.
 Den fuldstændige algoritme kan nu beskrives på følgende måde:
 For at multiplicere tal med tre cifre eller mindre, benytter man skolemetoden.
@@ -642,7 +644,7 @@ Forbedringen i varianten K32 (med udførelsestid $T_{K32}(n)$) beskrives i
 afsnit~\lref{s:engineering}.
 Begge akser bruger en logaritmisk skala.
 Groft sagt viser figuren tre linjer med forskellig hældning.
-Udførelsestiden $T_\mathrm S$ for skolemetoden vokser som~$n^2$, derfor har denn tilsvarende linje hældning ~$2$.
+Udførelsestiden $T_\mathrm S$ for skolemetoden vokser som~$n^2$, og derfor har den tilsvarende linje hældning~$2$.
 Linjen for  Karatsubas algoritme $T_{\mathrm K4}$ har en svagere hældning, hvilket tyder på, at udførelsestiden vokser som $n^\beta$ for en konstant $\beta < 2$.
 Kvotienterne \footnote{$T_{K4}(1024) = \num{0.0455}$,
 $T_{K4}(2048) = \num{0.1375}$ og $T_{K4}(4096) = \num{0.41}$.} 
@@ -681,8 +683,8 @@ T_K(n) \le
   For $n\le3$ bruger vi sætning~\lref{thm:eff of school method}, som siger, at multiplikationen af to $n$-cifrede tal med skolemetoden bruger højst $3n^2$ elementaroperationer.
   Betragt nu tilfældet $n\ge4$. 
   Opdelingen af $a$ og $b$ i fire dele $a_\mathrm H$, $a_\mathrm L$, $b_\mathrm H$ und $b_\mathrm L$ bruger ingen elementaroperationer (jf. fodnoten i beviset for lemma~~\lref{thm:recursive school help}).
-  Alle dele samt summerne $a_\mathrm L + a_\mathrm H$ og $b_\mathrm L + b_\mathrm H$ har hver højst $\ceil{n/2} + 1 $ cifre; så det tre rekursive multiplikationer bruger højst $3 \cdot T_K(\ceil{n/2} + 1)$ elementaroperationer. 
-  For at danne summerne $a_\mathrm L + a_\mathrm H$ og $b_\mathrm L + b_\mathrm H$ skal vi bruge to additioner, hvis resultatet hver har færre end $n$ cifre, så vi bruger $2n$ elementaroperationer. 
+  Alle dele samt summerne $a_\mathrm L + a_\mathrm H$ og $b_\mathrm L + b_\mathrm H$ har hver højst $\ceil{n/2} + 1 $ cifre; så de tre rekursive multiplikationer bruger højst $3 \cdot T_K(\ceil{n/2} + 1)$ elementaroperationer. 
+  For at udregne summerne $a_\mathrm L + a_\mathrm H$ og $b_\mathrm L + b_\mathrm H$ skal vi bruge to additioner, hvis resultatet hver har færre end $n$ cifre, så vi bruger $2n$ elementaroperationer. 
   Endelig bruges tre additioner af højst $2n$-cifrede tal for at udregne resultatet fra de tre produkter, hvilket kræver højst $3\cdot 2n$ yderligere elementaroperationerer.
   Sammenlagt giver dette den øvre grænse i lemmaet for $n\ge4$.
 \end{proof} 
@@ -1007,7 +1009,7 @@ I afsnit~\ref{ch:intro:s:analysis} viser vi, hvordan man kan løse rekursionslig
 \index{rekursionsligning}
 For fuldstændighedens skyld beviser vi lemma~\lref{thm:recursive school} og sætning~\lref{thm:Karatsuba}.
 Vi begynder med analysen af den rekursive udgave af skolemetoden.
-I lemma~\lref{thm:recursive school help} har vi set, at det maksimale antal elementaroperationer, som skal bruges til multiplkation af to $n$-cifrede tal, opfylder rekursionsligningen
+I lemma~\lref{thm:recursive school help} har vi set, at det maksimale antal elementaroperationer, som skal bruges til multiplikation af to $n$-cifrede tal, opfylder rekursionsligningen
 \begin{equation*}
 T(n) \le 
 \begin{cases}
@@ -1021,7 +1023,7 @@ For topotens $n$ med $n > 1$ gælder
 \[ T(n) \le 4\cdot T(n/2) + 4n \le 4 (5 (n/2)^2 - 4n/2) + 4 n = 5n^2 - 4n \,;
 \]
 hvor den anden ulighed gælder ved induktion.
-For vilkårlig $n$ observerer vi, at multiplkationsalgoritmen på to $n$-cifrede tal ikke kan være dyrere end på to $2^{\lceil\log n\rceil}$-cifrede tal, idet $n =2^{\log n} \leq 2^{\lceil\log n\rceil}$.
+For vilkårlig $n$ observerer vi, at multiplikationsalgoritmen på to $n$-cifrede tal ikke kan være dyrere end på to $2^{\lceil\log n\rceil}$-cifrede tal, idet $n =2^{\log n} \leq 2^{\lceil\log n\rceil}$.
 Derfor gælder $T(n) \le T(2^{\ceil{\log n}})$.
 Idet $2^{\ceil{\log n}}\leq 2^{1+\log n} = 2n$, får vi den øvre grænse $T(n) \le 20 n^2$ for alle $n$.    
 
@@ -1111,11 +1113,11 @@ hvor vi har brugt $3^{\log n} = 2^{(\log 3) \cdot (\log n)} = n^{\log 3}$.
 \section{Historiske anmærkninger og yderligere resultater}
 \llabel{s:further}
 
-Er Karatsubas algoritme den hurtigst kendte multiplkationsalgoritme?
+Er Karatsubas algoritme den hurtigst kendte multiplikationsalgoritme?
 Nej, man kender meget hurtigere metoder.
-Karatsubas algoritme deler $n$-cifrede tal op i to dele og klarer sig med blot tre multiplkationer af halvt så lange tal.
+Karatsubas algoritme deler $n$-cifrede tal op i to dele og klarer sig med blot tre multiplikationer af halvt så lange tal.
 En naturlig generalisering er at opdele tallene i $k$ bidder af længde omtrent $n/k$. 
-Hvis det rekursive skridt kan nøjes med $l$ multiplkationer af tal af længde $n/k$, så vokser udførelsestiden af algoritmen som $n^{\log_k \ell}$. 
+Hvis det rekursive skridt kan nøjes med $l$ multiplikationer af tal af længde $n/k$, så vokser udførelsestiden af algoritmen som $n^{\log_k \ell}$. 
 Denne observation nblev brugt af Toom~\cite{Toom}\index{Toom, A.} og Cook~\cite{Cook}\index{Cook, W. J.} for at opnå udførelsestiden
 \footnote{Vi definerer $O(\cdot)$-notationen i afsnit~\protect\ref{ch:intro:s:o}.}  
 $O(n^{ 1 + \epsilon})$ for vilkårligt positivt~$\epsilon$. 
@@ -1135,5 +1137,6 @@ og af De, Kurur, Saha und Saptharishi~\cite{DeKSS13}
 \index{Saptharishi, R.}
 Her betegner $\log^*n$  det mindste tal $k\ge0$ med egenskaben, at $\log(\log(\dots\log(n)\dots))$ ($k$-foldigt gentagen anvendelse) er højst $1$.
 Funktionen $\log^*n$ vokser altså yderst langsomt.
+Den øvre grænse på $O(n\log n)$ blev etableret i 2019 af Harvey og van der Hoeven.
  
 
