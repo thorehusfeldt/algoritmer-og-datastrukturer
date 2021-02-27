@@ -9,19 +9,19 @@
 \noindent
 {\itshape
 Virksomheden \emph{KnM} sælger skræddersyet tøj af højeste kvalitet.
-Virksomheden er ansvarlig for markedsføring, opmåling, forsendelse, osv. men selve fremstillingen er overladt til uafhængige skrædderier.
+Virksomheden er ansvarlig for markedsføring, opmåling, forsendelse, osv., men selve fremstillingen er overladt til uafhængige skrædderier.
 Virksomheden beholder 20\% af overskuddet.
 Da den blev grundlagt i det nittende århundrede, fandtes der fem kontraktskrædderier.
 I dag behersker den 15\% af verdensmarkedet, på verdensplan arbejder tusindvis af skrædderier for \emph{KnM}.
 
-Din opgaver er at tildele ordrer til kontraktskrædderierne.
-Herved følges den enkle regel, at næste ordre går til det skrædderi, hvis samlede ordreværdi i indeværende år er mindst.
+Din opgave er at tildele ordrer til kontraktskrædderierne.
+Reglen er, at næste ordre går til det skrædderi, hvis samlede ordreværdi i indeværende år er mindst.
 Grundlæggerne af \emph{KnM} benyttede en kridttavle for at holde rede på de løbende ordresummer -- i datalogisk terminologi havde de en lineær liste af værdier og brugte lineær tid til at finde det rigtig skrædderi.
 Imidlertid er virksomheden blevet for stor til denne løsning.
 Kan du give en »skalerbar« løsning, som kun kræver, at man kigger på et lille antal indgange for at finde ud af, hvem der skal få næste ordre?
 
 Næste år ændres reglen.
-For at gøre det attraktivt at levere til tiden, modtager skrædderiet nu den næste ordre, hvis dens \emph{udestående} bestillinger har den mindste totale værdi.
+For at gøre det attraktivt at levere til tiden, modtager et skrædderi nu den næste ordre, hvis dens \emph{udestående} bestillinger har den mindste totale værdi.
 Det betyder, at så snart en ny bestilling leveres, skal dens værdi trækkes fra det pågældende skrædderis udestående ordreværdi.
 Er din strategi for fordeling af bestillinger tilstrækkelig fleksibel til også at tage hensyn til den nye regel uden tab af effektivitet?
 }
@@ -30,29 +30,29 @@ Er din strategi for fordeling af bestillinger tilstrækkelig fleksibel til også
 \setcounter{footnote}{1}
 
 \bigskip\noindent
-Den datatype,
-% TODO orig uses datastruktur
-som bedst løser problemet foroven, kaldes for \emph{prioritetskø}.
+Datatypen, som løser problemet foroven, kaldes en \emph{prioritetskø}.
 \index{prioritetskø|textbf}
-Vi begynder med at angive datatypens specifikation.
+Vi begynder med at specificere datatypens funktionalitet.
 Prioritetskøer forvalter en mængde $Q$ af \emph{indgange} med \emph{nøgler}
 \index{nzgle@nøgle}
 under følgende operationer:
+\medskip
 
 \begin{tabular}{ll}
 $Q.\Id{opbyg}(\set{e_1,\ldots,e_n})$ & $Q \Is \set{e_1,\ldots,e_n}$ \\
 $Q.\Id{tilføj}(e)$ & $Q\Is Q\cup\set{e}$ \\
 $Q.\Id{mindste}$ &  \Return $\min Q$
 \index{prioritetskø!minimum|textbf}\index{prioritetskø!mindste@\Id{mindste}|textbf}  
- (indgang med mindste nøgle).\\
+ (en indgang med mindste nøgle)\\
 $Q.\Id{fjernMindste}$& $e\Is\min Q$;\quad 
-   $Q\Is Q\setminus\set{e}$;\quad \Return $e$\index{prioritetskø!fjernMindste@\Id{fjernMindste}|textbf}.
+   $Q\Is Q\setminus\set{e}$;\quad \Return $e$\index{prioritetskø!fjernMindste@\Id{fjernMindste}|textbf}
 \end{tabular}
+\medskip
 
-Disse operationer rækker til den første del af vores eksempel.
-Hvert år bygger vi en ny prioritetskø, som for hvert skrædderi har en indang med en nøgle, som sættes til 0 i begyndelsen.
-For at uddele en ny ordre, udtager vi en indgang $e$ med minimal nøgle, adderer ordrens værdi til denne nøgle, og putter den modificere indgang tilbage i køen.
-I afsnit \ref{s:heap} præsenterer vi en enkel og effektiv implementation af denne grundfunktionalitet.
+Disse operationer er tilstrækkelige til den første del af vores eksempel.
+Hvert år bygger vi en ny prioritetskø, hvori hvert skrædderi er indang med en nøgle, som sættes til 0 i begyndelsen.
+For at uddele en ny ordre, udtager vi en indgang $e$ med minimal nøgle, adderer ordrens værdi til denne nøgle, og stiller den modificere indgang tilbage i køen.
+I afsnit~\ref{s:heap} præsenterer vi en enkel og effektiv implementation af denne grundfunktionalitet.
 
 [TODO udeladt afsnit om adresserbare prioritetskøer] 
 
@@ -62,28 +62,27 @@ I afsnit \ref{s:heap} præsenterer vi en enkel og effektiv implementation af den
 Vis, hvordan man implementerer en (størrelsesbegrænset) prioritetskø
 \index{prioritetskø!naiv}
 som række.
-Når køen maksimale størrelse er $w$, bruges en række af størrelse $w$; de faktisk eksisterende indgange i prioritetskøen indtager rækkens første $n$ pladser.
-Sammenling kørselstiderne for operationerne af to varianter af denne implementation:
+Hvis køens maksimale størrelse er $w$, bruges en række af størrelse $w$; de faktisk eksisterende indgange i prioritetskøen indtager rækkens første $n$ pladser.
+Sammenlign kørselstiderne for operationerne af to varianter af denne implementation:
 den ene holder rækkens elementer i sorteret orden, den anden holder elementerne usorteret.
 \end{exerc}
 
 \begin{exerc}[Addresserbar prioritetskø som dobbelthægtet liste] 
-Vis, hvordan man implementerer en  adresserbar prioritetskø
+Vis, hvordan man implementerer en adresserbar prioritetskø
 som dobbelthægtet liste.
 Hver listeknude repræsenterer en indgang i prioritetskøen. 
-Sammenling kørselstiderne for operationerne af to varianter af denne implementation:
+Sammenlign kørselstiderne for operationerne af to varianter af denne implementation:
 den ene holder listens elementer i sorteret orden, den anden holder elementerne usorteret.
-implementieren kann. 
 \end{exerc}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Binærhobe}\label{s:heap}\index{prioritetskø!binærhob|textbf}%
 \index{binærhob|sieheunter{prioritetskø}}
 
-En hob (eller binærhob) er en enkel og effektiv implementation af en ikke-adresserbar prioritetskø \cite{Williams64}\index{Williams, J. W. J.}.
-Ganske som en række kan den udvides til en ubegrænsede udgave
+En hob (eller binærhob) er en enkel og effektiv implementation af en (ikke-adresserbar) prioritetskø \cite{Williams64}\index{Williams, J. W. J.}.
+På samme måde som en række kan den udvides til en ubegrænset udgave
 \index{prioritetskø!begrænset}\index{prioritetskø!ubegrænset}
-(s. afs.~\ref{s:array}). 
+som beskrevet i  afsnit~\ref{s:array}.
 Man kan sågar bruge hobe til at implementere adresserbare prioritetskøer, men vi skal lære endnu bedre muligheder at kende senere.
 
 \begin{figure}
@@ -178,7 +177,7 @@ Man kan sågar bruge hobe til at implementere adresserbare prioritetskøer, men 
 \end{tikzpicture}
 \caption{\label{fig:heapex-bijection}
 En hob med $n=12$ indgange, som er gemt i en række med $w=13$ pladser.
-Figuren fremstiller hoben både som række og som det implicitte binærtræ, her tegnet på to måder.
+Figuren viser hoben både som række og som det implicitte binærtræ, her tegnet på to måder.
 Knuderne svarer til indeksmængden $\{1,\ldots,n\}$, hvor $1$ står for roden.
 Rodens børn har indeks $2$ og $3$.
 Generelt har børnene til knude $j$ indeks $2j$ og $2j+1$ (forudsat at disse tal ligger i $\{1,\ldots, n\}$).
@@ -406,15 +405,15 @@ Der gælder invariant i dette implicitte træ, at nøglen i en forgængerknude a
 \caption{\label{fig:heapex}
 Operationer på hoben fra fig.~\ref{fig:heapex-bijection}.
 \emph{Til venstre} vises effekten af at tilføje den nye indgang \texttt{B}.
-Vi skriver \texttt{B} i en ny knude med index 13, som bliver et blad.
+Vi skriver \texttt{B} i en ny bladknude med index 13.
 De tykke kanter markerer vejen fra den nye bladknude til roden.
-Indgang \texttt{B} vandrer ad denne vej op til den første knude, hvis forgænger ikke er støore end \texttt{B}.
+Indgang \texttt{B} vandrer ad denne vej op til den første knude, hvis forgænger ikke er større end \texttt{B}.
 For at skabe plads til \texttt{B}, bliver de andre indgange på vejen forskudt et niveau længere ned.
 \emph{Til højre} vises effekten af at fjerne rodindgangen.
-(Denne indeholder altid den mindste nøgle.)
-De tykke kanter markerer den vej $p$ ned fra roden, som i hver knude følger den mindre nøgle.
+(Denne indgang indeholder altid en mindste nøgle.)
+De tykke kanter markerer vejen $p$ ned fra roden, som i hver knude følger den mindre nøgle.
 Indgangen \texttt{Q}, fundet i bladet med størst indeks, flyttes først til roden, for derefter at vandre nedad langs $p$, til den finder en knude, hvis efterfølger (på $p$) ikke er mindre end {\tt Q} eller ikke eksisterer.
-De andre indgange på vejen forskydes et niveau opad, for at gøre plads til \texttt{Q}.
+De andre indgange på vejen forskydes et niveau opad for at gøre plads til \texttt{Q}.
 }
 \end{figure}
 
@@ -443,17 +442,16 @@ For at forstå denne definition betragter vi en bijektion mellen tallene $\{1,\l
 \index{binærtræ!venstrefuldstændigt}
 \index{binærtræ!fuldstændigt}
 Hobreglen medfører, at nøglerne langs hver vej fra en knude til roden er monotont svagt aftagende;
-især gælder at at indgangen ved roden, dvs. rækkeposition 1, indeholder den minimale nøgle.
-Operationen $\Id{mindste}$, som skan finde sådan en indgang, behøver altså tid  $O(1)$.
+især gælder der, at indgangen ved roden, dvs. rækkeposition~$1$, indeholder en mindste nøgle.
+Operationen $\Id{mindste}$, som skal finde sådan en indgang, behøver altså kun tid $O(1)$.
 Konstruktionen af en tom hob med plads til $n$ indgange behøver ligeledes konstant tid, fordi der blot skal stilles en række af størrelse $w$ til rådighed.
-\footnote{O.a.: Vi går her ud fra vores antagelser om maskinmodellen. 
-TODO.}
-Fig.~\ref{alg:heap} angiver pseudokoden for disse enkle operationer.
+\footnote{O.a.: Vi går her ud fra vores antagelser om maskinmodellen, ifølge hvilken en ikke-initialiseret række kan skabes i konstant tid.
+Ellers tager det tid $O(w)$.}
+Fig.~\ref{alg:heap} viser pseudokoden for disse enkle operationer.
 
 At celle $h[1]$
 \index{prioritetskø!minimum}
-indeholder et mindsteelement svarer til situationen i en ordnet række, som er indiceret fra $1$.
-% TODO  clarify indexing in orig
+indeholder et mindste element svarer til situationen i en ordnet række, som er indiceret fra $1$.
 Hobreglen
 \index{hobregel|textbf} 
 er dog et meget svagere krav på rækkestrukturen end at være sorteret.
@@ -468,10 +466,10 @@ Angiv samtlige hob\-repræsentationer af mængden $\set{1,2,3,4}$.
 \end{exerc}
 
 Vi skal nu se, at denne større fleksibilitet tillader meget effektive implementationer af \Id{tilføj} og \Id{fjernMindste}.
-Vi skal beskrive disse procedurer så de er lette at forstå og deres korrekthed er let at vise.
+Vi skal beskrive disse procedurer, så de er lette at forstå og deres korrekthed er let at vise.
 I afsnittet~\ref{s:implementation} skal vi skitsere, hvordan en effektiv implementation kunne se ud. 
-Instættelsesoperationen $\Id{tilføj}(e)$ placerer en ny indgang $e$ i første omgang sidst i hoben, dvs. den øger $n$ med 1 og sætter $e$ på position $h[n]$.
-Derefter flyttes $e$ til en passende position på vejen fra bladet $h[n]$ til roden:
+Instættelsesoperationen $\Id{tilføj}(e)$ placerer en ny indgang $e$ i første omgang sidst i hoben, dvs. den øger $n$ med 1 og sætter derefter $e$ på position $h[n]$.
+Herefter flyttes $e$ til en passende position på vejen fra bladet $h[n]$ til roden:
 \begin{quote}
 \begin{tabbing}
 ~~~~\=~~~~\=~~~~\kill
@@ -483,8 +481,8 @@ Derefter flyttes $e$ til en passende position på vejen fra bladet $h[n]$ til r
 \end{quote}
 \index{prioritetskø!binærhob!tilføj@\Id{tilføj}|textbf}
 \index{prioritetskø!binærhob!sigtOp@\Id{sigtOp}|textbf}%
-Herved skubber operationen \Id{sigtOp}$(j)$ indgangen i knude $j$ i retning af roden,  indtil denne er nået eller den møder en forgænger, vhis nøgle ikke er større (s.~fig.~\ref{fig:heapex}).
-Vi skal vise, at $h$ herefter er en hob igen.
+Herved skubber operationen \Id{sigtOp}$(j)$ indgangen i knude $j$ i retning af roden,  indtil roden er nået eller indgangen møder en forgænger, hvis nøgle ikke er større (se  figur~\ref{fig:heapex}).
+Vi skal vise, at $h$ dermed igen er en hob.
 Lad os sige at »kun $h[j]$  er måske for lille«, når $h$ enten selv er en hob eller kan gøres til en hob ved at erstatte nøglen $x$ i $h[j]$ med en passende nøgle $x'$ med $x'>x$.
 
 \begin{quote}
@@ -502,7 +500,7 @@ Lad os sige at »kun $h[j]$  er måske for lille«, når $h$ enten selv er en ho
 
 \begin{exerc}
 Vis: 
-(a) Antagelserne i algoritmen etabler dens korrekthed.
+(a) Antagelserne i algoritmen etablerer dens korrekthed.
 Hertil skal man vise, at hvis kun $h[j]$ måske er for lille, så er enten $h$ en hob eller ombytningen $\Id{ombyt}(h[j],h[\floor{j/2}])$ medfører, at kun $h[\floor{j/2}]$ måske er for lille.
 (b) \Id{sigtOp}$(n)$ har kørselstid $O(\log n)$.
 (Dette medfører samme grænse for \Id{tilføj}.)  
@@ -526,8 +524,8 @@ $h[1]\Is h[n]$;\quad $n\Decrement$\\
 \end{tabbing}
 \end{quote}
 
-Proceduren \Id{sigtNed}$(1)$ skubber den nye indgang i roden nedad, til hobreglen gælder igen.
-For at være mere nøjagtig, betragt vejen $p$, som begynder ved roden og ved hver knude fortsætter ved det barnm som har den mindre nøgle (s. fig.~\ref{fig:heapex});
+Proceduren \Id{sigtNed}$(1)$ skubber den nye indgang i roden nedad, til hobreglen er retableret.
+For at være mere nøjagtig, betragt vejen $p$, som begynder ved roden og ved hver knude fortsætter ved det barn som har den mindre nøgle (s. fig.~\ref{fig:heapex});
 i tilfælde af nøglelighed er beslutningen ligegyldig. 
 Man følger denne vej, til man når en knude, hvis børn (hvis de findes) indeholder nøgler, som er mindst lige så store som $h[1]$s nøgle.
 Indgangen $h[1]$ sættes på denne plads; alle indgange på vejen $p$ vandrer et niveau opad.
@@ -582,6 +580,7 @@ I den følgende opgave behandles denne ide i detaljer.
 Betragt en vilkårlig række $h[1..n]$ af indgange. 
 Disse skal permuteras således, at hobreglen gælder.
 Hertil bruges følgende to procedurer:
+\begin{quote}
 \begin{tabbing}
 ~~~~\=~~~~\=\kill
 \Procedure \Id{opbygHobBaglæns}\+\\
@@ -592,16 +591,17 @@ Hertil bruges følgende to procedurer:
        \Id{opbygHobRekursivt}$(2j+1)$\-\\
     \Id{sigtNed}$(j)$
 \end{tabbing}
+\end{quote}
 
 \begin{enumerate}[(a)]
 \item Vis, at både \Id{opbygHobBaglæns} og \Id{opbygHobRekursivt}$(1)$ etablerer hobreglen.
 \item Implementer begge algoritmer effektivt og sammenlign deres kørselstider for tilfældige tal  som nøgler og $n\in\{\,10^i\colon 2\leq i\leq 8\}$.
-Det kommer meget an på, hvor effektiv implementationen af \Id{opbygHobRekursivt} bliver.
+Meget afhænger af, hvor effektiv implementationen af \Id{opbygHobRekursivt} bliver.
 For små undertræer kan det være meningsfuld at »udrede« rekursionen for små undertræer, dvs. at erstatte den med direkte opdeling i forskellige tilfælde.
 \item (*) For store $n$ udgøres forskellen mellem de to algoritmer hovedsageligt af de effekter, som lagerhierarkiet 
 \index{fjernlager!hobopbygning}
 medfører.
-Analyser begge algoritmer med henblik på antallet af nødvendige i/u-operationer i fjernlagermodellen, som beskrevet sidst i afsnit~\ref{ch:intro:s:model}. 
+Analysér begge algoritmer med henblik på antallet af nødvendige i/u-operationer i fjernlagermodellen, som beskrevet sidst i afsnit~\ref{ch:intro:s:model}. 
 Vis især, at \Id{opbygHobRekursivt} kun behøver $O(n/B)$ i/u-operationer, når blokstørrelsen er $b$ og det hurtige lager har størrelse $M=\Omega(B\log B)$ hat. 
 \end{enumerate}
 \end{exerc}
@@ -612,9 +612,10 @@ Følgende sætning sammenfatter vores resultater om hobe:
 Betragt en ikke-adresserbar prioritetskø implementeret som hob.
 Konstruktionen af en tom hob og funktionen \Id{mindste} tager konstant tid, operationerne \Id{fjernMindste} og \Id{tilføj} kan udføres i logaritmisk tid $O(\log n)$, og \Id{opbyg} tager lineær tid.
 \end{thm}
+
 \begin{proof} 
 Det implicitte binærtræ, som svarer til en hob med $n$ indgange, har dybde $k = \floor{\log n}$.
-Operationerne \Id{tilføj} og \Id{fjernMindste} gennemløber en del af vejen fra roden til et blad og har derform logaritmisk kørselstid.
+Operationerne \Id{tilføj} og \Id{fjernMindste} gennemløber en del af vejen fra roden til et blad og har derfor logaritmisk kørselstid.
 Operationenen \Id{mindste} rapporterer indholdet af roden, hvilket tager konstant tid.
 Konstruktionen af en tom hob kræver blot allokering af en række, hvilket tager konstant tid.
 Uanset hvilken af de to procedurer for \Id{opbyg} man bruger:
@@ -627,7 +628,6 @@ Den totale kørselstid for  \Id{opbyg} er derfor asymptotisk begrænset af
 	 2^k \sum_{j \ge 1} \frac{j}{2^j} =
 	 O(n) \,.
  \]
-%TODO orig uses more Landau symbols
 Den sidste ulighed benytter formel (\ref{app:notation:eq:ipowi}).
 \end{proof}
 
